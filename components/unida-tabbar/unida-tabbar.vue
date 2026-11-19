@@ -1,9 +1,8 @@
 <template>
-	<!-- UNIDA 专属底部导航：下沉式波浪底座（发布位独立） + U 星球发布键 + 3D 立体图标 -->
+	<!-- UNIDA 专属底部导航 V4：纯 CSS 凹槽底座（开源通用做法，零图片） + U 星球发布键 + 3D 立体图标 -->
 	<view class="unida-tabbar">
-		<!-- 波浪底座：中间下沉让出发布球，左右波峰托起图标；必须用 image 标签 -->
-		<view class="wave-solid"></view>
-		<image class="wave-bg" src="/static/art/wave-tab-v2.png" mode="scaleToFill" />
+		<!-- 白色圆角底座：mask 径向渐变在中上真挖穿一个圆凹口，U 星球悬浮其中 -->
+		<view class="tabbar-sheet"></view>
 
 		<!-- 导航内容 -->
 		<view class="tabbar-content">
@@ -29,7 +28,7 @@
 				<view v-if="activeIndex === 1" class="active-line"></view>
 			</view>
 
-			<!-- 中间留白（发布球独立悬浮于波浪谷上方） -->
+			<!-- 中间留白（凹口区，U 星球独立悬浮） -->
 			<view class="tab-item publish-space"></view>
 
 			<!-- 消息 -->
@@ -60,7 +59,7 @@
 			</view>
 		</view>
 
-		<!-- 中央 U 星球发布键（独立于波浪，带呼吸光晕） -->
+		<!-- 中央 U 星球发布键（悬浮凹口，呼吸光晕） -->
 		<view class="publish-center" @tap="onPublishTap">
 			<view class="publish-glow"></view>
 			<image class="publish-logo" src="/static/unida/tabbar/publish-logo.png" mode="aspectFit" />
@@ -115,13 +114,8 @@
 </script>
 
 <style lang="scss" scoped>
-	/* ==================== 设计令牌 ==================== */
+	/* ==================== 容器 ==================== */
 	.unida-tabbar {
-		--purple: #805CFA;
-		--purple-deep: #6941E8;
-		--text-main: #41365E;
-		--text-muted: #88809F;
-
 		position: fixed;
 		left: 0;
 		right: 0;
@@ -134,24 +128,20 @@
 		padding-bottom: constant(safe-area-inset-bottom);
 	}
 
-	/* ==================== 下沉式波浪底座 ==================== */
-	/* wave-tab-v2：左右波峰托图标，中间谷底下沉让位发布球；谷底曲线最低 208rpx */
-	.wave-bg {
+	/* ==================== 凹槽底座（纯 CSS，开源通用做法） ==================== */
+	.tabbar-sheet {
 		position: absolute;
 		left: 0;
-		top: 14rpx;
-		width: 100%;
-		height: 300rpx;
-		z-index: 1;
-	}
-	/* 波浪图下方的实心白底：从谷底最低点(约208rpx)之下接缝，保证谷区透明不被填白 */
-	.wave-solid {
-		position: absolute;
-		left: 0; right: 0;
-		top: 212rpx;
+		right: 0;
 		bottom: 0;
-		background: #FFFFFF;
-		z-index: 0;
+		height: 132rpx;
+		background: linear-gradient(180deg, #FFFFFF 0%, #FBF8FF 100%);
+		border-radius: 44rpx 44rpx 0 0;
+		box-shadow: 0 -8rpx 30rpx rgba(123, 97, 255, 0.10);
+		/* 中上挖穿一个圆凹口（圆心在顶边中线，半径 66rpx），U 星球悬浮其中；
+		   mask 是 uview 等开源凹槽 tabbar 的标准实现，小程序双内核均支持 */
+		-webkit-mask: radial-gradient(circle at 50% 0, transparent 0 66rpx, #000 74rpx);
+		mask: radial-gradient(circle at 50% 0, transparent 0 66rpx, #000 74rpx);
 	}
 
 	/* ==================== 导航布局 ==================== */
@@ -159,29 +149,28 @@
 		position: absolute;
 		left: 0;
 		right: 0;
-		top: 44rpx;
-		height: 140rpx;
+		top: 40rpx;
+		height: 112rpx;
 		display: grid;
 		grid-template-columns: repeat(5, 1fr);
 		align-items: start;
 		z-index: 5;
 	}
 	.tab-item {
-		height: 125rpx;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: flex-start;
 		position: relative;
-		padding-top: 10rpx;
+		padding-top: 8rpx;
 		box-sizing: border-box;
 	}
 	.publish-space { pointer-events: none; }
 
 	/* ==================== 3D 立体图标 ==================== */
 	.icon-wrap {
-		width: 68rpx;
-		height: 68rpx;
+		width: 66rpx;
+		height: 66rpx;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -189,9 +178,9 @@
 		transition: transform 0.25s ease;
 	}
 	.tab-ico {
-		width: 66rpx;
-		height: 66rpx;
-		opacity: 0.45;
+		width: 62rpx;
+		height: 62rpx;
+		opacity: 0.55;
 		transition: opacity 0.25s ease, transform 0.25s ease;
 	}
 	/* 选中：图标弹起 + 底部紫色光晕 */
@@ -236,7 +225,7 @@
 	.tab-text {
 		margin-top: 6rpx;
 		font-size: 23rpx;
-		color: var(--text-muted);
+		color: #88809F;
 		font-weight: 500;
 		line-height: 34rpx;
 	}
@@ -252,10 +241,11 @@
 	}
 
 	/* ==================== 中央 U 星球发布键 ==================== */
+	/* 凹口圆心在 sheet 顶边中线（距 tabbar 顶 24rpx），球心与其重合 */
 	.publish-center {
 		position: absolute;
 		left: 50%;
-		top: 16rpx;
+		top: -32rpx;
 		transform: translateX(-50%);
 		width: 160rpx;
 		display: flex;
@@ -266,20 +256,19 @@
 	/* 呼吸光晕（径向渐变，不用 filter，性能友好） */
 	.publish-glow {
 		position: absolute;
-		top: -6rpx;
+		top: 44rpx;
 		left: 50%;
 		transform: translateX(-50%);
-		width: 160rpx;
-		height: 160rpx;
+		width: 168rpx;
+		height: 168rpx;
 		border-radius: 50%;
-		background: radial-gradient(circle, rgba(154, 120, 255, 0.30) 0%, rgba(154, 120, 255, 0.12) 46%, rgba(154, 120, 255, 0) 70%);
+		background: radial-gradient(circle, rgba(154, 120, 255, 0.32) 0%, rgba(154, 120, 255, 0.12) 46%, rgba(154, 120, 255, 0) 70%);
 		animation: glowPulse 3.2s ease-in-out infinite;
 	}
 	@keyframes glowPulse {
 		0%, 100% { opacity: 0.75; transform: translateX(-50%) scale(1); }
 		50% { opacity: 1; transform: translateX(-50%) scale(1.06); }
 	}
-	/* U 星球 logo：立体星球 + 光环 + 星芒，本身就是发布按钮主体 */
 	.publish-logo {
 		position: relative;
 		width: 112rpx;
@@ -287,7 +276,7 @@
 		z-index: 2;
 	}
 	.publish-text {
-		margin-top: 0rpx;
+		margin-top: 4rpx;
 		font-size: 23rpx;
 		color: #6C3FF2;
 		font-weight: 700;
