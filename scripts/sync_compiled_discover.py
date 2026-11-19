@@ -45,6 +45,15 @@ def to_native_page(js):
         rest = pat.sub(repl, rest)
     # reqId 没被转换，是普通实例属性，在 onLoad 里初始化
     rest = rest.replace("\t\tonLoad() {", "\t\tonLoad() {\n\t\t\tthis.reqId = 0;", 1)
+    # 带参事件（onMainTab/onChip/onSort）在 WXML 里改成 data-i 传值，
+    # 这里把方法入参从数字 i 改为从 event.dataset 读取，兼容原来的方法体
+    for name in ("onMainTab", "onChip", "onSort"):
+        rest = re.sub(
+            r"(" + name + r"\()(i)(\)\s*\{)",
+            lambda m, n=name: n + "(e) {\n\t\t\t\tconst i = Number(e.currentTarget.dataset.i);",
+            rest,
+            count=1
+        )
     return head + rest
 
 
@@ -81,8 +90,12 @@ def main():
     # ── js
     js = vue.split("<script>")[1].split("</script>")[0]
     js = js.replace("import unidaTabbar from '@/components/unida-tabbar/unida-tabbar.vue';", "")
-    js = js.replace("import { fetchDiscover, DISCOVER_FILTERS } from '@/common/api/discover.js';",
-                    "const { fetchDiscover, DISCOVER_FILTERS } = require('../../common/api/discover.js');")
+    import re as _re
+    js = _re.sub(
+        r"import \{[^}]+\} from '@/common/api/discover\.js';",
+        "const { fetchDiscover, DISCOVER_FILTERS, DISCOVER_SORTS } = require('../../common/api/discover.js');",
+        js
+    )
     js = re.sub(r"components:\s*\{\s*unidaTabbar\s*\},", "components: {},", js)
     js = js.replace("export default {", "Page({")
     js = re.sub(r"data\(\)\s*\{\s*return (\{.*?\});\s*\},",

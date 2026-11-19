@@ -47,22 +47,42 @@ BODY = """
   </div>
 </div>
 
-<!-- Hero 品牌 Banner -->
+<!-- Hero 融合 Banner -->
 <div class="hero">
-  <img class="hero__sky" src="static/unida/backgrounds/bg-campus-sky.jpg">
-  <div class="hero__tint"></div>
-  <div class="hero__spark hero__spark--1"></div>
-  <div class="hero__spark hero__spark--2"></div>
-  <div class="hero__spark hero__spark--3"></div>
-  <div class="hero__copy">
-    <div class="hero__pill"><div class="hero__live"></div><span class="hero__pill-txt">今天 <span class="hero__num">1,284</span> 位同学找到了搭子</span></div>
-    <span class="hero__title">在校园，</span>
-    <span class="hero__title hero__title--2">找到和你同频的人</span>
-    <div class="hero__search"><img class="hero__search-ico" src="static/icons-dark/search.png"><span class="hero__search-ph">搜活动、搭子、社团</span></div>
+  <div class="hero__slide hero__slide--brand">
+    <img class="hero__sky" src="static/unida/backgrounds/bg-campus-sky.jpg">
+    <div class="hero__tint"></div>
+    <div class="hero__spark hero__spark--1"></div>
+    <div class="hero__spark hero__spark--2"></div>
+    <div class="hero__spark hero__spark--3"></div>
+    <div class="hero__copy">
+      <div class="hero__pill"><div class="hero__live"></div><span class="hero__pill-txt">今天 <span class="hero__num">1,284</span> 位同学找到了搭子</span></div>
+      <span class="hero__title">在校园，</span>
+      <span class="hero__title hero__title--2">找到和你同频的人</span>
+      <div class="hero__search"><img class="hero__search-ico" src="static/icons-dark/search.png"><span class="hero__search-ph">搜活动、搭子、社团</span></div>
+    </div>
+    <img class="hero__trio" src="static/unida/characters/trio-back.webp">
+    <img class="hero__planet" src="static/unida/mascot/u-planet.png">
+    <div class="hero__fade"></div>
   </div>
-  <img class="hero__trio" src="static/unida/characters/trio-back.webp">
-  <img class="hero__planet" src="static/unida/mascot/u-planet.png">
-  <div class="hero__fade"></div>
+  <div class="hero__dots"><div class="hero__dot hero__dot--on"></div><div class="hero__dot"></div><div class="hero__dot"></div><div class="hero__dot"></div></div>
+</div>
+
+<!-- 任务大卡预览（模拟第2屏） -->
+<div class="hero hero--task">
+  <div class="hero__slide hero__slide--task" style="background:linear-gradient(135deg,#EFE7FF 0%,#F6EEFF 100%)">
+    <div class="task__tag" style="background:linear-gradient(135deg,#9B7BFF,#6C3FF2)">校园推广</div>
+    <div class="task__body">
+      <span class="task__eyebrow">校园精选 · 高积分任务</span>
+      <span class="task__title">图书馆自习搭子招募</span>
+      <span class="task__desc">发布即得 200 积分 · 今日剩 3 席</span>
+      <div class="task__cta"><span class="task__cta-t">去完成</span></div>
+    </div>
+    <div class="task__point"><span class="task__point-num">200</span><span class="task__point-unit">积分</span></div>
+    <img class="task__art" src="static/unida/characters/trio-back.webp">
+    <div class="task__halo"></div>
+  </div>
+  <div class="hero__dots"><div class="hero__dot"></div><div class="hero__dot hero__dot--on"></div><div class="hero__dot"></div><div class="hero__dot"></div></div>
 </div>
 
 <!-- 类目 -->
@@ -73,20 +93,6 @@ BODY = """
   <div class="cats__item"><div class="cats__fig" style="background:rgba(128,92,250,.09)"><img class="cats__img" src="static/unida/illustrations/icon-gift-v2.png"></div><span class="cats__label">生活互助</span></div>
   <div class="cats__item"><div class="cats__fig" style="background:rgba(105,185,245,.11)"><img class="cats__img" src="static/unida/illustrations/icon-team-v2.png"></div><span class="cats__label">社团招新</span></div>
   <div class="cats__item"><div class="cats__fig" style="background:rgba(169,139,255,.14)"><img class="cats__img" src="static/unida/illustrations/icon-planet.png"></div><span class="cats__label">同校广场</span></div>
-</div>
-
-<!-- 校园任务轮播 -->
-<div class="promo">
-  <div class="promo__swiper">
-    <div class="promo__card" style="background:linear-gradient(135deg, #EFE7FF 0%, #F6EEFF 100%)">
-      <div class="promo__tag" style="background:linear-gradient(135deg, #9B7BFF, #6C3FF2)">校园推广</div>
-      <div class="promo__body"><span class="promo__title">图书馆自习搭子招募</span><span class="promo__desc">发布即得 200 积分 · 今日剩 3 席</span></div>
-      <div class="promo__point"><span class="promo__point-num">200</span><span class="promo__point-unit">积分</span></div>
-      <img class="promo__arrow" src="static/icons-dark/chevron.png">
-      <img class="promo__deco" src="static/unida/mascot/u-planet.png">
-    </div>
-  </div>
-  <div class="promo__dots"><div class="promo__dot promo__dot--on"></div><div class="promo__dot"></div><div class="promo__dot"></div></div>
 </div>
 
 <!-- 现在可以搭 -->
@@ -134,20 +140,25 @@ BODY = """
     <div class="tabs__item tabs__item--on">全部</div><div class="tabs__item">找搭子</div><div class="tabs__item">求助</div><div class="tabs__item">出闲置</div>
   </div></div>
   <div class="feed">
-    <div class="feed__bar" style="background:#805CFA"></div>
     <div class="feed__head">
       <div class="feed__av" style="background:linear-gradient(135deg,#805CFA,#A98BFF)">星</div>
       <div class="feed__who">
-        <div class="feed__row"><span class="feed__name">阿星</span><div class="feed__tag" style="color:#805CFA;background:rgba(128,92,250,.10)">找搭子</div></div>
+        <div class="feed__row"><span class="feed__name">阿星</span><div class="feed__id" style="color:#805CFA;background:rgba(128,92,250,.10)">找搭子</div></div>
         <span class="feed__meta">计算机学院 · 大二 · 5 分钟前</span>
       </div>
+      <div class="feed__more">···</div>
     </div>
-    <span class="feed__text">有没有人一起去吃新开的烤肉店？AA 制，本周六晚，人多可以拼桌～</span>
-    <div class="feed__topic"><span class="feed__topic-t"># 周末探店</span></div>
+    <div class="feed__main">
+      <div class="feed__left">
+        <span class="feed__text">有没有人一起去吃新开的烤肉店？AA 制，本周六晚，人多可以拼桌～</span>
+        <div class="feed__topics"><span class="feed__topic">#周末探店</span><span class="feed__topic feed__topic--soft">#校园搭子</span></div>
+      </div>
+      <img class="feed__thumb" src="static/art/art-cheer.jpg">
+    </div>
     <div class="feed__acts">
       <div class="feed__act"><img class="feed__act-ico" src="static/icons-dark/heart.png"><span class="feed__act-n">42</span></div>
       <div class="feed__act"><img class="feed__act-ico" src="static/icons-dark/message.png"><span class="feed__act-n">12</span></div>
-      <div class="feed__join">我也要搭</div>
+      <div class="feed__join" style="color:#805CFA;border-color:#805CFA">加入搭子 ›</div>
     </div>
   </div>
 </div>
@@ -213,8 +224,11 @@ img { display:block; }
 .rail::-webkit-scrollbar { display:none; }
 .hero__trio { animation:none !important; }
 .hero__sky, .now__img, .act__img { object-fit: cover; }
-.cats__img, .hero__search-ico, .now__ico, .feed__act-ico, .hd__ico, .hd__chev, .end__planet, .promo__deco { object-fit: contain; }
-.promo__arrow { object-fit: contain; }
+.cats__img, .hero__search-ico, .now__ico, .feed__act-ico, .hd__ico, .hd__chev, .end__planet, .task__art { object-fit: contain; }
+.hero__trio, .task__art, .feed__thumb { object-fit: cover; }
+.feed__thumb { object-position: center; }
+.hero--task { margin-top: 12px; }
+.task__cta-t { line-height: 30px; }
 """
 
 html = f"""<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">

@@ -51,6 +51,20 @@
 				</view>
 			</scroll-view>
 
+			<!-- ══════════ 排序条（发现页独有 · 深度检索） ══════════ -->
+			<view class="sortbar">
+				<view class="sortbar__l">
+					<view
+						class="sortbar__item"
+						v-for="(s, i) in sorts"
+						:key="i"
+						:class="{ 'sortbar__item--on': sort === i }"
+						@click="onSort(i)"
+					>{{ s }}</view>
+				</view>
+				<text class="sortbar__count">共 {{ total }} 条</text>
+			</view>
+
 			<!-- ══════════ 双列瀑布流 ══════════ -->
 			<view class="grid">
 				<view class="card" v-for="(item, i) in feedList" :key="item.id" @click="onCardTap(item)">
@@ -109,7 +123,7 @@
 
 <script>
 	import unidaTabbar from '@/components/unida-tabbar/unida-tabbar.vue';
-	import { fetchDiscover, DISCOVER_FILTERS } from '@/common/api/discover.js';
+	import { fetchDiscover, DISCOVER_FILTERS, DISCOVER_SORTS } from '@/common/api/discover.js';
 
 	export default {
 		components: { unidaTabbar },
@@ -124,13 +138,16 @@
 				reqId: 0,
 				mainTabs: [
 					{ label: '找搭子', icon: '/static/unida/illustrations/icon-run.png', key: 'buddy' },
-					{ label: '校园活动', icon: '/static/unida/illustrations/icon-horn.png', key: 'activity' },
-					{ label: '社团招新', icon: '/static/unida/illustrations/icon-team.png', key: 'club' }
+					{ label: '校园活动', icon: '/static/unida/illustrations/icon-horn-v2.png', key: 'activity' },
+					{ label: '社团招新', icon: '/static/unida/illustrations/icon-team-v2.png', key: 'club' }
 				],
 				mainTab: 0,
 				chips: DISCOVER_FILTERS,
 				activeChip: 0,
-				feedList: []
+				sorts: DISCOVER_SORTS,
+				sort: 0,
+				feedList: [],
+				total: 0
 			};
 		},
 		onLoad() {
@@ -162,11 +179,13 @@
 					const res = await fetchDiscover({
 						tab: this.mainTab,
 						filter: this.activeChip,
+						sort: this.sort,
 						page: reset ? 1 : this.page + 1,
 						size: 6
 					});
 					if (reqId !== this.reqId) return;
 					this.feedList = reset ? res.list : this.feedList.concat(res.list);
+					this.total = res.total;
 					this.hasMore = res.hasMore;
 					this.page = reset ? 1 : this.page + 1;
 				} catch (e) {
@@ -187,6 +206,11 @@
 			onChip(i) {
 				if (i === this.activeChip) return;
 				this.activeChip = i;
+				this.loadFeed(true);
+			},
+			onSort(i) {
+				if (i === this.sort) return;
+				this.sort = i;
 				this.loadFeed(true);
 			},
 			onSearch() {
@@ -217,7 +241,7 @@
 		font-size: $fs-display;
 		font-weight: $fw-bold;
 		color: $c-ink;
-		letter-spacing: -1.2rpx;
+		letter-spacing: -1.6rpx;
 		line-height: 1.1;
 	}
 	.hd__title-sub {
@@ -225,6 +249,7 @@
 		margin-top: 4rpx;
 		font-size: $fs-caption;
 		color: $t-sub;
+		letter-spacing: 0.6rpx;
 	}
 	.hd__search {
 		margin-top: 20rpx;
@@ -266,9 +291,10 @@
 		margin-top: 8rpx;
 		font-size: $fs-caption;
 		font-weight: $fw-semibold;
+		letter-spacing: 0.4rpx;
 		color: $t-main;
 	}
-	.maintabs__item--on .maintabs__label { color: #fff; }
+	.maintabs__item--on .maintabs__label { color: #fff; font-weight: $fw-bold; }
 
 	/* ══════════ 筛选 chip ══════════ */
 	.chips { width: 100%; white-space: nowrap; margin-top: 24rpx; }
@@ -287,8 +313,39 @@
 	.chips__item--on {
 		background: $g-cta;
 		color: #fff;
-		font-weight: $fw-semibold;
+		font-weight: $fw-bold;
+		letter-spacing: 0.2rpx;
 		box-shadow: 0 8rpx 18rpx rgba(128, 92, 250, 0.24);
+	}
+
+	/* ══════════ 排序条 ══════════ */
+	.sortbar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 22rpx $page-x 4rpx;
+	}
+	.sortbar__l { display: flex; align-items: center; }
+	.sortbar__item {
+		height: 46rpx;
+		padding: 0 22rpx;
+		margin-right: 8rpx;
+		border-radius: $r-pill;
+		font-size: 23rpx;
+		color: $t-sub;
+		line-height: 46rpx;
+	}
+	.sortbar__item:first-child { margin-left: -22rpx; }
+	.sortbar__item--on {
+		color: $c-primary;
+		font-weight: $fw-bold;
+		background: rgba(128, 92, 250, 0.09);
+	}
+	.sortbar__count {
+		font-family: $ff-num;
+		font-size: 21rpx;
+		color: $t-tertiary;
+		letter-spacing: 0.3rpx;
 	}
 
 	/* ══════════ 双列瀑布流 ══════════ */
@@ -353,7 +410,8 @@
 		box-shadow: 0 4rpx 12rpx rgba(42, 36, 64, 0.2);
 	}
 	.card__ring-t {
-		font-size: 20rpx;
+		font-family: $ff-num;
+		font-size: 21rpx;
 		font-weight: $fw-bold;
 	}
 	.card__body { padding: 16rpx 18rpx 18rpx; }
@@ -370,10 +428,11 @@
 		display: block;
 		margin-top: 10rpx;
 		font-size: 28rpx;
-		font-weight: $fw-semibold;
-		color: $t-main;
-		line-height: 1.4;
-		min-height: 78rpx;
+		font-weight: $fw-bold;
+		color: $c-ink;
+		letter-spacing: -0.3rpx;
+		line-height: 1.42;
+		min-height: 80rpx;
 	}
 	.card__meta {
 		display: flex;
@@ -406,11 +465,11 @@
 	.card__joined {
 		margin-left: 8rpx;
 		font-family: $ff-num;
-		font-size: 19rpx;
+		font-size: 20rpx;
 		font-weight: $fw-bold;
 		color: $c-primary;
 	}
-	.card__price { font-size: 22rpx; font-weight: $fw-bold; }
+	.card__price { font-family: $ff-num; font-size: 23rpx; font-weight: $fw-bold; }
 
 	/* ══════════ 底部状态 ══════════ */
 	.foot { padding: 8rpx $page-x 20rpx; }

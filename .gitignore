@@ -20,6 +20,9 @@ _sync_disc.css
 __pycache__/
 *.pyc
 
+# 视觉自检截图（过程产物，不进仓库；已跟踪的历史截图保留）
+docs/audit/*.png
+
 # 系统文件
 .DS_Store
 Thumbs.db

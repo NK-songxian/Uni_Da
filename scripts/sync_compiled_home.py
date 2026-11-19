@@ -70,6 +70,8 @@ def wxml_from_template(tpl):
                lambda m: f'style="background:{{{{{m.group(1)}}}}}"', s)
     s = re.sub(r':style="\{\s*color:\s*([A-Za-z0-9_\.]+),\s*background:\s*([A-Za-z0-9_\.]+)\s*\}"',
                lambda m: f'style="color:{{{{{m.group(1)}}}}};background:{{{{{m.group(2)}}}}}"', s)
+    s = re.sub(r':style="\{\s*color:\s*([A-Za-z0-9_\.]+),\s*borderColor:\s*([A-Za-z0-9_\.]+)\s*\}"',
+               lambda m: f'style="color:{{{{{m.group(1)}}}}};border-color:{{{{{m.group(2)}}}}}"', s)
     s = re.sub(r':style="\{\s*background:\s*([A-Za-z0-9_\.]+),\s*marginLeft:[^}]*\}"',
                lambda m: f'style="background:{{{{{m.group(1)}}}}}"', s)
 
@@ -90,7 +92,10 @@ def wxml_from_template(tpl):
             return f'{attr}="onCategoryTap" data-label="{{{{{arg}.label}}}}"'
         if name == "onPromoTap":
             return f'{attr}="onPromoTap" data-id="{{{{{arg}.id}}}}"'
-        # onCardTap / onJoin 只用事件做跳转或提示，参数可忽略
+        if name in ("onChip", "onMainTab", "onSort", "onFeedTab"):
+            # 这三个方法接收数组下标 i；小程序里改为 data-i 传值
+            return f'{attr}="{name}" data-i="{{{{{arg}}}}}"'
+        # onCardTap 只用事件做跳转或提示，参数可忽略
         if "." in arg:
             return f'{attr}="{name}" data-id="{{{{{arg}.id}}}}"'
         return f'{attr}="{name}"'
@@ -238,8 +243,11 @@ def main():
     # ── js：从源码 script 里取 data / 生命周期 / methods
     js = vue.split("<script>")[1].split("</script>")[0]
     js = js.replace("import unidaTabbar from '@/components/unida-tabbar/unida-tabbar.vue';", "")
-    js = js.replace("import { fetchOverview, fetchFeed } from '@/common/api/home.js';",
-                    "const { fetchOverview, fetchFeed } = require('../../common/api/home.js');")
+    js = re.sub(
+        r"import \{[^}]+\} from '@/common/api/home\.js';",
+        "const { fetchOverview, fetchFeed } = require('../../common/api/home.js');",
+        js
+    )
     js = re.sub(r"components:\s*\{\s*unidaTabbar\s*\},", "components: {},", js)
     js = js.replace("export default {", "Page({")
     # 去掉最后一个 "};"

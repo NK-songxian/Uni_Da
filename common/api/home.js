@@ -189,73 +189,73 @@ const FEED_POOL = [
 		id: 'f1', user: '阿星', ch: '星', college: '计算机学院 · 大二', time: '5 分钟前',
 		cat: '找搭子', topic: '周末探店', tab: 1,
 		text: '有没有人一起去吃新开的烤肉店？AA 制，本周六晚，人多可以拼桌～',
-		like: 42, cmt: 12, ...PURPLE
+		like: 42, cmt: 12, cover: ART + 'art-cheer.jpg', ...PURPLE
 	},
 	{
 		id: 'f2', user: '小林同学', ch: '林', college: '设计学院 · 大一', time: '18 分钟前',
 		cat: '校园活动', topic: '社团招新', tab: 0,
 		text: '街舞社、动漫社、志愿者协会都在招人，周四中午在中心广场摆摊，有兴趣的来看看。',
-		like: 128, cmt: 36, ...GREEN
+		like: 128, cmt: 36, cover: ART + 'art-guitar.jpg', ...GREEN
 	},
 	{
 		id: 'f3', user: 'Leo', ch: 'L', college: '外国语学院 · 大三', time: '32 分钟前',
 		cat: '求助', topic: '代取快递', tab: 2,
 		text: '帮忙取个快递，东区驿站，酬劳 5 元，今晚之前都在图书馆，顺路的同学私我。',
-		like: 9, cmt: 4, ...SUN
+		like: 9, cmt: 4, cover: ART + 'art-campus.jpg', ...SUN
 	},
 	{
 		id: 'f4', user: '苏叶', ch: '苏', college: '数媒 · 大二', time: '1 小时前',
 		cat: '找搭子', topic: '羽毛球', tab: 1,
 		text: '周三晚上体育馆还有一块空场地，想找两个人打双打，水平不限，主要图个开心。',
-		like: 27, cmt: 8, ...PURPLE
+		like: 27, cmt: 8, cover: ART + 'art-tennis.jpg', ...PURPLE
 	},
 	{
 		id: 'f5', user: '陈一鸣', ch: '陈', college: '机械 · 大三', time: '1 小时前',
 		cat: '出闲置', topic: '二手教材', tab: 3,
 		text: '出一套《机械原理》和《材料力学》教材，九成新，无笔记，两本 40 带走。',
-		like: 15, cmt: 6, ...SKY
+		like: 15, cmt: 6, cover: ART + 'art-balls.jpg', ...SKY
 	},
 	{
 		id: 'f6', user: '周可以把', ch: '周', college: '新闻 · 大一', time: '2 小时前',
 		cat: '找搭子', topic: '夜跑', tab: 1,
 		text: '想组个固定的夜跑小队，每周二四晚上八点环湖，配速 6 分半，缺两个队友。',
-		like: 33, cmt: 11, ...GREEN
+		like: 33, cmt: 11, cover: ART + 'art-cheer.jpg', ...GREEN
 	},
 	{
 		id: 'f7', user: 'Yuki', ch: 'Y', college: '英语 · 大四', time: '3 小时前',
 		cat: '求助', topic: '找室友', tab: 2,
 		text: '下个月搬去西区公寓，两室一厅，想找个作息规律的女生合租，价格好商量。',
-		like: 21, cmt: 15, ...SUN
+		like: 21, cmt: 15, cover: ART + 'art-campus.jpg', ...SUN
 	},
 	{
 		id: 'f8', user: '安琪', ch: '安', college: '音乐 · 大二', time: '4 小时前',
 		cat: '校园活动', topic: '合唱团', tab: 0,
 		text: '合唱团冬招开始啦，不需要基础，会唱就行，每周三晚排练，期末有专场演出。',
-		like: 76, cmt: 19, ...PURPLE
+		like: 76, cmt: 19, cover: ART + 'art-guitar.jpg', ...PURPLE
 	},
 	{
 		id: 'f9', user: '老赵', ch: '赵', college: '土木 · 研一', time: '5 小时前',
 		cat: '出闲置', topic: '自行车', tab: 3,
 		text: '毕业出一辆捷安特通勤车，骑了两年，车况良好，带锁，200 自提。',
-		like: 18, cmt: 9, ...SKY
+		like: 18, cmt: 9, cover: ART + 'art-balls.jpg', ...SKY
 	},
 	{
 		id: 'f10', user: '小鹿', ch: '鹿', college: '心理 · 大二', time: '昨天',
 		cat: '找搭子', topic: '自习搭子', tab: 1,
 		text: '找个每天早上八点图书馆的搭子，互相监督打卡，坚持到期末就行。',
-		like: 54, cmt: 22, ...PURPLE
+		like: 54, cmt: 22, cover: ART + 'art-campus.jpg', ...PURPLE
 	},
 	{
 		id: 'f11', user: '阿哲', ch: '哲', college: '电子 · 大三', time: '昨天',
 		cat: '求助', topic: '借设备', tab: 2,
 		text: '想借一台示波器做课设，用两天，可以付租金，有的话评论区喊我。',
-		like: 6, cmt: 3, ...SUN
+		like: 6, cmt: 3, cover: ART + 'art-tennis.jpg', ...SUN
 	},
 	{
 		id: 'f12', user: '小满', ch: '满', college: '食品 · 大一', time: '前天',
 		cat: '出闲置', topic: '宿舍好物', tab: 3,
 		text: '出一个小台灯和一个收纳架，都是今年新买的，宿舍搬家带不走。',
-		like: 12, cmt: 5, ...SKY
+		like: 12, cmt: 5, cover: ART + 'art-balls.jpg', ...SKY
 	}
 ];
 

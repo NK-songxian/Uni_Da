@@ -17,6 +17,10 @@ export function setDiscoverFail(v) {
 
 // 筛选 chip（页面直接引用，避免两处维护）
 export const DISCOVER_FILTERS = ['全部', '学习', '运动', '娱乐', '生活', '社团', '跑腿'];
+// 排序方式（首页没有的深度检索能力，与首页推荐流去重）
+export const DISCOVER_SORTS = ['综合', '最新', '最热'];
+// chip 下标 → 分类名。按 category 匹配，不再依赖数据里易错的下标字段
+const FILTER_CATEGORY = { 1: '学习', 2: '运动', 3: '娱乐', 4: '生活', 5: '社团', 6: '跑腿' };
 
 const PURPLE = { bar: '#805CFA', barSoft: 'rgba(128,92,250,.10)', bg: 'linear-gradient(135deg,#805CFA,#A98BFF)' };
 const GREEN = { bar: '#29CA83', barSoft: 'rgba(41,202,131,.10)', bg: 'linear-gradient(135deg,#29CA83,#93EDCF)' };
@@ -127,23 +131,39 @@ const POOL = [
 ];
 
 /**
- * @param {Object} opt { tab, filter, page, size }
+ * @param {Object} opt { tab, filter, sort, page, size }
+ *   tab    0 找搭子 / 1 校园活动 / 2 社团招新
+ *   filter DISCOVER_FILTERS 下标，0=全部
+ *   sort   DISCOVER_SORTS 下标，0 综合 / 1 最新 / 2 最热
  * @returns {{ list, hasMore, total }}
  */
 export async function fetchDiscover(opt = {}) {
 	const tab = opt.tab || 0;
 	const filter = opt.filter || 0;
+	const sort = opt.sort || 0;
 	const page = opt.page || 1;
 	const size = opt.size || 6;
 	await delay(420);
 	if (mockFail) throw new Error('NETWORK');
 
 	let list = POOL.filter((d) => d.tab === tab);
-	// filter=0 表示"全部"，不筛选
-	if (filter !== 0) {
-		const filtered = list.filter((d) => d.filter === filter);
-		if (filtered.length) list = filtered;
+	// 按分类名匹配，彻底避免下标错位（原数据 filter 字段与 chip 对不上）
+	const cat = FILTER_CATEGORY[filter];
+	if (cat) list = list.filter((d) => d.category === cat);
+
+	// 排序：发现页独有的深度检索能力
+	if (sort === 1) {
+		// 最新：POOL 里 id 越大越新（d12 > d1）
+		list = list.slice().sort((a, b) => Number(b.id.slice(1)) - Number(a.id.slice(1)));
+	} else if (sort === 2) {
+		// 最热：报名比例优先，同比例看报名人数
+		list = list.slice().sort((a, b) => {
+			const ra = a.joined / a.total, rb = b.joined / b.total;
+			return rb - ra || b.joined - a.joined;
+		});
 	}
+	// sort=0 综合：保留 POOL 原始顺序（热门优先已体现在数据排列里）
+
 	const start = (page - 1) * size;
 	const pageList = list.slice(start, start + size);
 	return {

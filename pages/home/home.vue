@@ -42,30 +42,76 @@
 
 		<template v-else>
 
-			<!-- ══════════ 2 · Hero 品牌 Banner（紫渐变 + 同款插画 + U 星球） ══════════ -->
+			<!-- ══════════ 2 · Hero 融合 Banner（品牌主视觉 + 高积分任务同屏轮播） ══════════ -->
 			<view class="hero">
-				<image class="hero__sky" src="/static/unida/backgrounds/bg-campus-sky.jpg" mode="aspectFill" />
-				<view class="hero__tint"></view>
-				<view class="hero__spark hero__spark--1"></view>
-				<view class="hero__spark hero__spark--2"></view>
-				<view class="hero__spark hero__spark--3"></view>
+				<swiper
+					class="hero__swiper"
+					:indicator-dots="false"
+					:autoplay="true"
+					:interval="5000"
+					:duration="600"
+					:circular="true"
+					@change="onHeroChange"
+				>
+					<!-- 第 1 屏 · 品牌主视觉 -->
+					<swiper-item>
+						<view class="hero__slide hero__slide--brand">
+							<image class="hero__sky" src="/static/unida/backgrounds/bg-campus-sky.jpg" mode="aspectFill" />
+							<view class="hero__tint"></view>
+							<view class="hero__spark hero__spark--1"></view>
+							<view class="hero__spark hero__spark--2"></view>
+							<view class="hero__spark hero__spark--3"></view>
+							<view class="hero__copy">
+								<view class="hero__pill">
+									<view class="hero__live"></view>
+									<text class="hero__pill-txt">今天 <text class="hero__num">{{ todayJoin }}</text> 位同学找到了搭子</text>
+								</view>
+								<text class="hero__title">在校园，</text>
+								<text class="hero__title hero__title--2">找到和你同频的人</text>
+								<view class="hero__search" @click="onSearch">
+									<image class="hero__search-ico" src="/static/icons-dark/search.png" mode="aspectFit" />
+									<text class="hero__search-ph">搜活动、搭子、社团</text>
+								</view>
+							</view>
+							<image class="hero__trio" src="/static/unida/characters/trio-back.webp" mode="widthFix" />
+							<image class="hero__planet" src="/static/unida/mascot/u-planet.png" mode="aspectFit" />
+							<view class="hero__fade"></view>
+						</view>
+					</swiper-item>
 
-				<view class="hero__copy">
-					<view class="hero__pill">
-						<view class="hero__live"></view>
-						<text class="hero__pill-txt">今天 <text class="hero__num">{{ todayJoin }}</text> 位同学找到了搭子</text>
-					</view>
-					<text class="hero__title">在校园，</text>
-					<text class="hero__title hero__title--2">找到和你同频的人</text>
-					<view class="hero__search" @click="onSearch">
-						<image class="hero__search-ico" src="/static/icons-dark/search.png" mode="aspectFit" />
-						<text class="hero__search-ph">搜活动、搭子、社团</text>
-					</view>
+					<!-- 后续屏 · 校园精选任务大卡 -->
+					<swiper-item v-for="(p, i) in promos" :key="p.id">
+						<view class="hero__slide hero__slide--task" :style="{ background: p.bg }" @click="onPromoTap(p)">
+							<view class="task__tag" :style="{ background: p.tagBg }">{{ p.tag }}</view>
+							<view class="task__body">
+								<text class="task__eyebrow">校园精选 · 高积分任务</text>
+								<text class="task__title">{{ p.title }}</text>
+								<text class="task__desc">{{ p.desc }}</text>
+								<view class="task__cta">
+									<text class="task__cta-t">去完成</text>
+									<image class="task__cta-ico" src="/static/icons-dark/chevron.png" mode="aspectFit" />
+								</view>
+							</view>
+							<view class="task__point">
+								<text class="task__point-num">{{ p.point }}</text>
+								<text class="task__point-unit">积分</text>
+							</view>
+							<image class="task__art" src="/static/unida/characters/trio-back.webp" mode="widthFix" />
+							<view class="task__halo"></view>
+						</view>
+					</swiper-item>
+				</swiper>
+
+				<!-- 统一指示器：1 品牌 + N 任务 -->
+				<view class="hero__dots">
+					<view class="hero__dot" :class="{ 'hero__dot--on': heroCur === 0 }"></view>
+					<view
+						class="hero__dot"
+						v-for="(p, i) in promos"
+						:key="i"
+						:class="{ 'hero__dot--on': heroCur === i + 1 }"
+					></view>
 				</view>
-
-				<image class="hero__trio" src="/static/unida/characters/trio-back.webp" mode="widthFix" />
-				<image class="hero__planet" src="/static/unida/mascot/u-planet.png" mode="aspectFit" />
-				<view class="hero__fade"></view>
 			</view>
 
 			<!-- ══════════ 3 · 六大入口（3D 图标 + 彩色 squircle 底） ══════════ -->
@@ -75,43 +121,6 @@
 						<image class="cats__img" :src="c.icon" mode="aspectFit" />
 					</view>
 				<text class="cats__label">{{ c.label }}</text>
-			</view>
-		</view>
-
-		<!-- ══════════ 3.5 · 校园任务轮播（运营位：优质发布/高积分推广） ══════════ -->
-		<view class="promo">
-			<swiper
-				class="promo__swiper"
-				:indicator-dots="false"
-				:autoplay="true"
-				:interval="4000"
-				:duration="500"
-				:circular="true"
-				@change="onPromoChange"
-			>
-				<swiper-item v-for="(p, i) in promos" :key="i">
-					<view class="promo__card" :style="{ background: p.bg }" @click="onPromoTap(p)">
-						<view class="promo__tag" :style="{ background: p.tagBg }">{{ p.tag }}</view>
-						<view class="promo__body">
-							<text class="promo__title">{{ p.title }}</text>
-							<text class="promo__desc">{{ p.desc }}</text>
-						</view>
-						<view class="promo__point">
-							<text class="promo__point-num">{{ p.point }}</text>
-							<text class="promo__point-unit">积分</text>
-						</view>
-						<image class="promo__arrow" src="/static/icons-dark/chevron.png" mode="aspectFit" />
-						<image class="promo__deco" src="/static/unida/mascot/u-planet.png" mode="aspectFit" />
-					</view>
-				</swiper-item>
-			</swiper>
-			<view class="promo__dots">
-				<view
-					class="promo__dot"
-					:class="{ 'promo__dot--on': promoCur === i }"
-					v-for="(p, i) in promos"
-					:key="i"
-				></view>
 			</view>
 		</view>
 
@@ -195,20 +204,26 @@
 				</view>
 
 				<view class="feed" v-for="(f, i) in feedList" :key="f.id" @click="onCardTap(f)">
-					<view class="feed__bar" :style="{ background: f.bar }"></view>
 					<view class="feed__head">
 						<view class="feed__av" :style="{ background: f.bg }">{{ f.ch }}</view>
 						<view class="feed__who">
 							<view class="feed__row">
 								<text class="feed__name">{{ f.user }}</text>
-								<view class="feed__tag" :style="{ color: f.bar, background: f.barSoft }">{{ f.cat }}</view>
+								<view class="feed__id" :style="{ color: f.bar, background: f.barSoft }">{{ f.cat }}</view>
 							</view>
 							<text class="feed__meta">{{ f.college }} · {{ f.time }}</text>
 						</view>
+						<view class="feed__more">···</view>
 					</view>
-					<text class="feed__text">{{ f.text }}</text>
-					<view class="feed__topic" v-if="f.topic">
-						<text class="feed__topic-t"># {{ f.topic }}</text>
+					<view class="feed__main">
+						<view class="feed__left">
+							<text class="feed__text">{{ f.text }}</text>
+							<view class="feed__topics">
+								<text class="feed__topic">#{{ f.topic }}</text>
+								<text class="feed__topic feed__topic--soft">#校园搭子</text>
+							</view>
+						</view>
+						<image class="feed__thumb" :src="f.cover" mode="aspectFill" />
 					</view>
 					<view class="feed__acts">
 						<view class="feed__act">
@@ -219,7 +234,7 @@
 							<image class="feed__act-ico" src="/static/icons-dark/message.png" mode="aspectFit" />
 							<text class="feed__act-n">{{ f.cmt }}</text>
 						</view>
-						<view class="feed__join" @click.stop="onJoin(f)">我也要搭</view>
+						<view class="feed__join" :style="{ color: f.bar, borderColor: f.bar }" @click.stop="onJoin(f)">加入搭子 ›</view>
 					</view>
 				</view>
 
@@ -343,9 +358,9 @@
 				acts: [],
 				mates: [],
 
-				// 校园任务轮播
+				// 校园任务轮播（已融合进 Hero，heroCur 0=品牌屏，1..N=任务屏）
 				promos: [],
-				promoCur: 0,
+				heroCur: 0,
 
 				// 同校动态（分页）
 				feedTabs: ['全部', '找搭子', '求助', '出闲置'],
@@ -475,8 +490,8 @@
 
 			/* ═════════ 交互 ═════════ */
 
-			onPromoChange(e) {
-				this.promoCur = e.detail.current;
+			onHeroChange(e) {
+				this.heroCur = e.detail.current;
 			},
 			onPromoTap(p) {
 				// 兼容三种入参：小程序 event（dataset）/ Vue 字符串 id / Vue 对象
@@ -584,14 +599,21 @@
 		border: 2rpx solid #fff;
 	}
 
-	/* ══════════ 2 Hero 品牌 Banner ══════════ */
+	/* ══════════ 2 Hero 融合 Banner ══════════ */
 	.hero {
 		position: relative;
 		margin: 8rpx $page-x 0;
-		height: 680rpx;
+		height: 520rpx;
 		border-radius: $r-lg;
 		overflow: hidden;
 		box-shadow: 0 16rpx 40rpx rgba(84, 45, 175, 0.22);
+	}
+	.hero__swiper { width: 100%; height: 100%; }
+	.hero__slide {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
 	}
 	.hero__sky {
 		position: absolute;
@@ -603,21 +625,26 @@
 		position: absolute;
 		left: 0; right: 0; top: 0;
 		height: 100%;
-		background: linear-gradient(168deg, rgba(155,123,255,0.78) 0%, rgba(128,92,250,0.66) 38%, rgba(108,63,242,0.30) 70%, rgba(245,240,255,0.30) 100%);
+		background: linear-gradient(168deg, rgba(155,123,255,0.80) 0%, rgba(128,92,250,0.70) 40%, rgba(108,63,242,0.34) 72%, rgba(245,240,255,0.34) 100%);
 	}
 	.hero__spark {
 		position: absolute;
 		border-radius: 50%;
 		background: $c-sun;
 		box-shadow: 0 0 0 8rpx rgba(255, 201, 79, 0.18);
+		animation: sparkFloat 3.4s ease-in-out infinite;
 	}
-	.hero__spark--1 { width: 14rpx; height: 14rpx; top: 96rpx; right: 60rpx; }
-	.hero__spark--2 { width: 10rpx; height: 10rpx; top: 168rpx; right: 152rpx; background: #fff; box-shadow: 0 0 0 6rpx rgba(255,255,255,0.2); }
-	.hero__spark--3 { width: 12rpx; height: 12rpx; top: 250rpx; right: 34rpx; background: $c-mint-light; box-shadow: 0 0 0 6rpx rgba(147,237,207,0.22); }
+	.hero__spark--1 { width: 14rpx; height: 14rpx; top: 78rpx; right: 56rpx; }
+	.hero__spark--2 { width: 10rpx; height: 10rpx; top: 140rpx; right: 138rpx; background: #fff; box-shadow: 0 0 0 6rpx rgba(255,255,255,0.2); animation-delay: .6s; }
+	.hero__spark--3 { width: 12rpx; height: 12rpx; top: 208rpx; right: 34rpx; background: $c-mint-light; box-shadow: 0 0 0 6rpx rgba(147,237,207,0.22); animation-delay: 1.2s; }
+	@keyframes sparkFloat {
+		0%, 100% { transform: translateY(0); opacity: 1; }
+		50% { transform: translateY(-10rpx); opacity: .65; }
+	}
 	.hero__copy {
 		position: relative;
 		z-index: 5;
-		padding: 30rpx 30rpx 0;
+		padding: 24rpx 28rpx 0;
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
@@ -625,8 +652,8 @@
 	.hero__pill {
 		display: flex;
 		align-items: center;
-		height: 50rpx;
-		padding: 0 18rpx;
+		height: 46rpx;
+		padding: 0 16rpx;
 		border-radius: $r-pill;
 		background: rgba(255, 255, 255, 0.94);
 		box-shadow: 0 6rpx 18rpx rgba(84, 45, 175, 0.18);
@@ -642,62 +669,204 @@
 	.hero__pill-txt { font-size: $fs-caption; color: $c-deep; font-weight: $fw-medium; }
 	.hero__num {
 		font-family: $ff-num;
-		font-size: 26rpx;
+		font-size: 25rpx;
 		font-weight: $fw-bold;
 		color: $c-primary;
 	}
 	.hero__title {
 		display: block;
-		margin-top: 26rpx;
-		font-size: 58rpx;
-		line-height: 1.16;
+		margin-top: 20rpx;
+		font-size: 52rpx;
+		line-height: 1.14;
 		font-weight: $fw-bold;
 		color: #fff;
-		letter-spacing: -1.6rpx;
+		letter-spacing: -1.4rpx;
 		text-shadow: 0 4rpx 20rpx rgba(46, 12, 106, 0.55), 0 2rpx 6rpx rgba(46, 12, 106, 0.4);
 	}
 	.hero__title--2 { margin-top: 2rpx; color: #FFF0B8; }
 	.hero__search {
-		margin-top: 22rpx;
-		width: 400rpx;
-		height: 72rpx;
+		margin-top: 18rpx;
+		width: 370rpx;
+		height: 66rpx;
 		border-radius: $r-pill;
 		background: rgba(255, 255, 255, 0.97);
 		box-shadow: 0 10rpx 28rpx rgba(46, 12, 106, 0.26), inset 0 2rpx 0 #fff;
 		display: flex;
 		align-items: center;
-		padding: 0 26rpx;
+		padding: 0 24rpx;
 	}
-	.hero__search-ico { width: 30rpx; height: 30rpx; opacity: 0.6; }
+	.hero__search-ico { width: 28rpx; height: 28rpx; opacity: 0.6; }
 	.hero__search-ph {
-		margin-left: 14rpx;
+		margin-left: 12rpx;
 		font-size: $fs-body;
 		color: $t-sub;
 	}
 	.hero__trio {
 		position: absolute;
 		z-index: 3;
-		left: 50%;
-		bottom: 0;
-		width: 540rpx;
-		margin-left: -270rpx;
+		left: 52%;
+		bottom: -6rpx;
+		width: 430rpx;
 	}
 	.hero__planet {
 		position: absolute;
 		z-index: 6;
 		right: 14rpx;
-		bottom: 20rpx;
-		width: 124rpx;
-		height: 120rpx;
+		bottom: 16rpx;
+		width: 112rpx;
+		height: 108rpx;
 		filter: drop-shadow(0 8rpx 18rpx rgba(46, 12, 106, 0.4));
+		animation: haloFloat 4s ease-in-out infinite;
 	}
 	.hero__fade {
 		position: absolute;
 		left: 0; right: 0; bottom: 0;
-		height: 90rpx;
-		background: linear-gradient(180deg, rgba(128, 92, 250, 0) 0%, rgba(84, 45, 175, 0.24) 100%);
+		height: 80rpx;
+		background: linear-gradient(180deg, rgba(128, 92, 250, 0) 0%, rgba(84, 45, 175, 0.22) 100%);
 		z-index: 4;
 		pointer-events: none;
+	}
+
+	/* 任务大卡（满幅，与品牌屏同高） */
+	.hero__slide--task { padding: 0; }
+	.task__tag {
+		position: absolute;
+		left: 0; top: 0;
+		height: 42rpx;
+		padding: 0 20rpx;
+		border-radius: 0 0 $r-sm 0;
+		color: #fff;
+		font-size: 21rpx;
+		font-weight: $fw-semibold;
+		line-height: 42rpx;
+		z-index: 4;
+	}
+	.task__body {
+		position: absolute;
+		left: 30rpx;
+		top: 66rpx;
+		z-index: 5;
+		width: 440rpx;
+	}
+	.task__eyebrow {
+		display: block;
+		font-size: 21rpx;
+		font-weight: $fw-semibold;
+		color: $c-primary;
+		letter-spacing: 1rpx;
+	}
+	.task__title {
+		display: block;
+		margin-top: 14rpx;
+		font-size: 42rpx;
+		line-height: 1.22;
+		font-weight: $fw-bold;
+		color: $c-ink;
+		letter-spacing: -1rpx;
+	}
+	.task__desc {
+		display: block;
+		margin-top: 14rpx;
+		font-size: 23rpx;
+		color: $c-deep;
+		opacity: 0.86;
+		line-height: 1.4;
+	}
+	.task__cta {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-top: 26rpx;
+		width: 168rpx;
+		height: 60rpx;
+		border-radius: $r-pill;
+		background: $g-cta;
+		box-shadow: 0 10rpx 22rpx rgba(128, 92, 250, 0.30);
+	}
+	.task__cta-t {
+		color: #fff;
+		font-size: 24rpx;
+		font-weight: $fw-semibold;
+	}
+	.task__cta-ico {
+		width: 22rpx;
+		height: 22rpx;
+		margin-left: 6rpx;
+		transform: rotate(-90deg);
+		filter: brightness(0) invert(1);
+	}
+	.task__point {
+		position: absolute;
+		right: 28rpx;
+		top: 70rpx;
+		z-index: 5;
+		display: flex;
+		align-items: baseline;
+		height: 56rpx;
+		padding: 0 18rpx;
+		border-radius: $r-pill;
+		background: linear-gradient(135deg, #FFE39B 0%, $c-sun 100%);
+		box-shadow: 0 8rpx 18rpx rgba(255, 201, 79, 0.42);
+	}
+	.task__point-num {
+		font-family: $ff-num;
+		font-size: 36rpx;
+		font-weight: $fw-bold;
+		color: #7A5200;
+		line-height: 56rpx;
+	}
+	.task__point-unit {
+		margin-left: 4rpx;
+		font-size: 20rpx;
+		color: #7A5200;
+		line-height: 56rpx;
+	}
+	.task__art {
+		position: absolute;
+		z-index: 2;
+		right: -20rpx;
+		bottom: -30rpx;
+		width: 400rpx;
+		opacity: 0.96;
+	}
+	.task__halo {
+		position: absolute;
+		z-index: 1;
+		right: 40rpx;
+		top: 150rpx;
+		width: 260rpx;
+		height: 260rpx;
+		border-radius: 50%;
+		background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 72%);
+		animation: haloFloat 5s ease-in-out infinite;
+	}
+	@keyframes haloFloat {
+		0%, 100% { transform: translateY(0) scale(1); opacity: .9; }
+		50% { transform: translateY(-12rpx) scale(1.04); opacity: .7; }
+	}
+
+	/* 统一指示器 */
+	.hero__dots {
+		position: absolute;
+		left: 0; right: 0;
+		bottom: 18rpx;
+		z-index: 9;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	.hero__dot {
+		width: 10rpx;
+		height: 10rpx;
+		border-radius: $r-pill;
+		background: rgba(255, 255, 255, 0.5);
+		margin: 0 5rpx;
+		box-shadow: 0 1rpx 4rpx rgba(46, 12, 106, 0.3);
+		transition: width 240ms $ease-out;
+	}
+	.hero__dot--on {
+		width: 30rpx;
+		background: #fff;
 	}
 
 	/* ══════════ 3 类目 ══════════ */
@@ -735,123 +904,6 @@
 		color: $t-main;
 	}
 
-	/* ══════════ 3.5 校园任务轮播 ══════════ */
-	.promo {
-		margin: 24rpx $page-x 0;
-	}
-	.promo__swiper {
-		height: 152rpx;
-		border-radius: $r-md;
-	}
-	.promo__card {
-		position: relative;
-		height: 152rpx;
-		padding: 30rpx 24rpx 0;
-		border-radius: $r-md;
-		overflow: hidden;
-		box-shadow: 0 10rpx 26rpx rgba(84, 45, 175, 0.14);
-	}
-	.promo__tag {
-		position: absolute;
-		left: 0;
-		top: 0;
-		height: 36rpx;
-		padding: 0 14rpx;
-		border-radius: 0 0 $r-sm 0;
-		color: #fff;
-		font-size: 19rpx;
-		font-weight: $fw-semibold;
-		line-height: 36rpx;
-		z-index: 2;
-	}
-	.promo__body {
-		position: relative;
-		z-index: 3;
-		width: 400rpx;
-	}
-	.promo__title {
-		display: block;
-		font-size: 30rpx;
-		font-weight: $fw-bold;
-		color: $c-ink;
-		letter-spacing: -0.4rpx;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-	.promo__desc {
-		display: block;
-		margin-top: 8rpx;
-		font-size: 21rpx;
-		color: $c-deep;
-		opacity: 0.82;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-	.promo__point {
-		position: absolute;
-		right: 56rpx;
-		bottom: 20rpx;
-		z-index: 3;
-		display: flex;
-		align-items: baseline;
-		height: 44rpx;
-		padding: 0 16rpx;
-		border-radius: $r-pill;
-		background: linear-gradient(135deg, #FFE39B 0%, $c-sun 100%);
-		box-shadow: 0 4rpx 12rpx rgba(255, 201, 79, 0.4);
-	}
-	.promo__point-num {
-		font-family: $ff-num;
-		font-size: 28rpx;
-		font-weight: $fw-bold;
-		color: #7A5200;
-		line-height: 44rpx;
-	}
-	.promo__point-unit {
-		margin-left: 4rpx;
-		font-size: 18rpx;
-		color: #7A5200;
-		line-height: 44rpx;
-	}
-	.promo__arrow {
-		position: absolute;
-		right: 20rpx;
-		bottom: 26rpx;
-		z-index: 3;
-		width: 26rpx;
-		height: 26rpx;
-		transform: rotate(-90deg);
-		opacity: 0.7;
-	}
-	.promo__deco {
-		position: absolute;
-		right: -10rpx;
-		top: -18rpx;
-		z-index: 1;
-		width: 120rpx;
-		height: 116rpx;
-		opacity: 0.9;
-	}
-	.promo__dots {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		margin-top: 14rpx;
-	}
-	.promo__dot {
-		width: 12rpx;
-		height: 12rpx;
-		border-radius: $r-pill;
-		background: rgba(128, 92, 250, 0.22);
-		margin: 0 5rpx;
-	}
-	.promo__dot--on {
-		width: 30rpx;
-		background: $c-primary;
-	}
-
 	/* ══════════ 通用区块头 ══════════ */
 	.sec { margin-top: 44rpx; }
 	.sec__hd {
@@ -866,12 +918,13 @@
 		font-size: $fs-h1;
 		font-weight: $fw-bold;
 		color: $c-ink;
-		letter-spacing: -0.8rpx;
+		letter-spacing: -1rpx;
 	}
 	.sec__sub {
 		margin-left: 14rpx;
 		font-size: $fs-caption;
 		color: $t-sub;
+		letter-spacing: 0.2rpx;
 	}
 	.sec__more {
 		font-size: $fs-caption;
@@ -1047,107 +1100,147 @@
 		background: rgba(255, 255, 255, 0.78);
 		color: $t-sub;
 		font-size: $fs-caption;
+		font-weight: $fw-medium;
+		letter-spacing: 0.4rpx;
 		line-height: 60rpx;
 		border: 2rpx solid transparent;
 	}
 	.tabs__item--on {
 		background: $g-brand;
 		color: #fff;
-		font-weight: $fw-semibold;
+		font-weight: $fw-bold;
+		letter-spacing: 0.2rpx;
 		box-shadow: 0 8rpx 20rpx rgba(128, 92, 250, 0.26);
 	}
 	.feed {
 		position: relative;
 		margin: 0 $page-x 20rpx;
-		padding: 24rpx 26rpx 22rpx 34rpx;
+		padding: 24rpx 26rpx 20rpx;
 		border-radius: $r-md;
-		background: #fff;
-		box-shadow: 0 8rpx 24rpx rgba(123, 97, 255, 0.08);
-		overflow: hidden;
-	}
-	.feed__bar {
-		position: absolute;
-		left: 0; top: 0; bottom: 0;
-		width: 6rpx;
+		background: rgba(255, 255, 255, 0.94);
+		border: 2rpx solid rgba(255, 255, 255, 0.96);
+		box-shadow: 0 10rpx 30rpx rgba(123, 97, 255, 0.10);
 	}
 	.feed__head { display: flex; align-items: center; }
 	.feed__av {
-		width: 76rpx;
-		height: 76rpx;
+		width: 68rpx;
+		height: 68rpx;
 		border-radius: 50%;
+		border: 3rpx solid #fff;
 		color: #fff;
-		font-size: 30rpx;
+		font-size: 27rpx;
 		font-weight: $fw-semibold;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		box-shadow: 0 5rpx 14rpx rgba(123, 97, 255, 0.20);
 	}
-	.feed__who { margin-left: 16rpx; flex: 1; }
+	.feed__who { margin-left: 14rpx; flex: 1; }
 	.feed__row { display: flex; align-items: center; }
+	/* 品牌排版：不加载外部字体（保启动速度），靠字重/字距/颜色分层做设计感 */
 	.feed__name {
-		font-size: 30rpx;
-		font-weight: $fw-semibold;
-		color: $t-main;
+		font-size: 31rpx;
+		font-weight: $fw-bold;
+		color: $c-ink;
+		letter-spacing: -0.6rpx;
 	}
-	.feed__tag {
+	.feed__id {
 		margin-left: 12rpx;
-		height: 34rpx;
-		padding: 0 12rpx;
-		border-radius: 8rpx;
-		font-size: 20rpx;
-		line-height: 34rpx;
+		height: 32rpx;
+		padding: 0 13rpx;
+		border-radius: $r-pill;
+		font-size: 19rpx;
+		font-weight: $fw-semibold;
+		letter-spacing: 0.2rpx;
+		line-height: 32rpx;
 	}
 	.feed__meta {
 		display: block;
-		margin-top: 6rpx;
-		font-size: 22rpx;
-		color: $t-sub;
+		margin-top: 7rpx;
+		font-size: 21rpx;
+		color: $t-tertiary;
+		letter-spacing: 0.5rpx;
+	}
+	.feed__more {
+		font-size: 30rpx;
+		color: $t-tertiary;
+		letter-spacing: 2rpx;
+		padding: 0 6rpx;
+		line-height: 1;
+	}
+	.feed__main {
+		display: flex;
+		align-items: stretch;
+		margin-top: 18rpx;
+	}
+	.feed__left {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
 	}
 	.feed__text {
-		display: block;
-		margin-top: 16rpx;
-		font-size: $fs-body;
-		line-height: 1.58;
-		color: $t-main;
+		font-size: 28rpx;
+		line-height: 1.66;
+		color: #37314E;
+		letter-spacing: 0.3rpx;
+	}
+	.feed__topics {
+		display: flex;
+		flex-wrap: wrap;
+		margin-top: auto;
+		padding-top: 14rpx;
 	}
 	.feed__topic {
-		margin-top: 14rpx;
-		display: flex;
-	}
-	.feed__topic-t {
-		height: 44rpx;
-		padding: 0 18rpx;
+		height: 42rpx;
+		padding: 0 16rpx;
+		margin-right: 10rpx;
 		border-radius: $r-pill;
-		background: rgba(128, 92, 250, 0.08);
+		background: rgba(128, 92, 250, 0.10);
 		color: $c-primary;
-		font-size: 22rpx;
-		line-height: 44rpx;
+		font-size: 21rpx;
+		font-weight: $fw-semibold;
+		letter-spacing: 0.3rpx;
+		line-height: 42rpx;
+	}
+	.feed__topic--soft {
+		background: rgba(255, 201, 79, 0.14);
+		color: #B07A00;
+	}
+	.feed__thumb {
+		width: 168rpx;
+		height: 168rpx;
+		margin-left: 18rpx;
+		border-radius: 20rpx;
+		flex-shrink: 0;
 	}
 	.feed__acts {
 		display: flex;
 		align-items: center;
 		margin-top: 18rpx;
 		padding-top: 16rpx;
-		border-top: 2rpx solid $c-line;
+		border-top: 2rpx solid rgba(128, 92, 250, 0.08);
 	}
-	.feed__act { display: flex; align-items: center; margin-right: 34rpx; }
-	.feed__act-ico { width: 30rpx; height: 30rpx; }
+	.feed__act { display: flex; align-items: center; margin-right: 30rpx; }
+	.feed__act-ico { width: 28rpx; height: 28rpx; opacity: 0.55; }
 	.feed__act-n {
 		margin-left: 8rpx;
 		font-family: $ff-num;
-		font-size: 24rpx;
+		font-size: 25rpx;
+		font-weight: $fw-semibold;
 		color: $t-sub;
 	}
 	.feed__join {
 		margin-left: auto;
-		height: 52rpx;
-		padding: 0 26rpx;
+		height: 50rpx;
+		padding: 0 22rpx;
 		border-radius: $r-pill;
-		background: rgba(128, 92, 250, 0.10);
-		color: $c-primary;
+		border: 2rpx solid $c-primary;
+		background: #fff;
 		font-size: 22rpx;
-		font-weight: $fw-semibold;
-		line-height: 52rpx;
+		font-weight: $fw-bold;
+		letter-spacing: 0.3rpx;
+		line-height: 46rpx;
 	}
 
 	/* ══════════ 6 校园活动 ══════════ */
