@@ -1,0 +1,528 @@
+{
+  "项目": "UNIDA 有你搭",
+  "版本": "v1.0",
+  "更新时间": "2026-11-19",
+  "说明": "发布目录 static/unida 进小程序包；素材库 assets/unida 为原尺寸备份，不进包。",
+  "统计": {
+    "文件数": 29,
+    "发布总体积MB": 1.23,
+    "可用": 25,
+    "仅参考": 4,
+    "缺失项": 11
+  },
+  "素材": [
+    {
+      "文件名": "logo-horizontal.png",
+      "文件路径": "/static/unida/brand/logo-horizontal.png",
+      "素材库路径": "assets/unida/brand/logo-horizontal.png",
+      "素材用途": "品牌横版组合（U图标+有你搭字标），用于顶栏/登录页/关于页",
+      "图片尺寸": "640x183",
+      "库内尺寸": "1400x400",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "320×92rpx",
+      "所属页面": [
+        "global",
+        "login",
+        "mine"
+      ],
+      "使用状态": "ready",
+      "体积KB": 90
+    },
+    {
+      "文件名": "logo-lockup.png",
+      "文件路径": "/static/unida/brand/logo-lockup.png",
+      "素材库路径": "assets/unida/brand/logo-lockup.png",
+      "素材用途": "官方完整组合（UNIDA + 有你搭，白色圆角底），仅用于启动页/关于页",
+      "图片尺寸": "560x202",
+      "库内尺寸": "900x324",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "280×101rpx",
+      "所属页面": [
+        "splash",
+        "mine/about"
+      ],
+      "使用状态": "ready",
+      "体积KB": 98
+    },
+    {
+      "文件名": "u-planet.png",
+      "文件路径": "/static/unida/mascot/u-planet.png",
+      "素材库路径": "assets/unida/mascot/u-planet.png",
+      "素材用途": "U 星球吉祥物（3D 光泽带行星环），品牌符号与情感载体",
+      "图片尺寸": "260x251",
+      "库内尺寸": "600x580",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "120×116rpx",
+      "所属页面": [
+        "tabbar",
+        "empty",
+        "publish"
+      ],
+      "使用状态": "ready",
+      "体积KB": 95
+    },
+    {
+      "文件名": "trio-back.webp",
+      "文件路径": "/static/unida/characters/trio-back.webp",
+      "素材库路径": "assets/unida/characters/trio-back.png",
+      "素材用途": "三人背影（背 UNIDA 书包走向校园），首页 hero 底图；源图底部即裁切位，需贴容器底对齐",
+      "图片尺寸": "700x545",
+      "库内尺寸": "900x700",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "700×545px",
+      "所属页面": [
+        "home"
+      ],
+      "使用状态": "ready-底边裁切",
+      "体积KB": 102
+    },
+    {
+      "文件名": "char-boy.webp",
+      "文件路径": "/static/unida/characters/char-boy.webp",
+      "素材库路径": "assets/unida/characters/char-boy.png",
+      "素材用途": "单人立绘·男生（网球拍+UNIDA卫衣），发现页/引导页主视觉",
+      "图片尺寸": "380x838",
+      "库内尺寸": "651x1436",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "380×838px",
+      "所属页面": [
+        "discover",
+        "onboarding"
+      ],
+      "使用状态": "ready",
+      "体积KB": 73
+    },
+    {
+      "文件名": "char-girl-guitar.webp",
+      "文件路径": "/static/unida/characters/char-girl-guitar.webp",
+      "素材库路径": "assets/unida/characters/char-girl-guitar.png",
+      "素材用途": "单人立绘·女生吉他（紫卫衣+耳机），音乐类活动与推荐位",
+      "图片尺寸": "380x581",
+      "库内尺寸": "700x1071",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "380×581px",
+      "所属页面": [
+        "discover",
+        "activity-detail"
+      ],
+      "使用状态": "ready",
+      "体积KB": 70
+    },
+    {
+      "文件名": "char-girl-cap.webp",
+      "文件路径": "/static/unida/characters/char-girl-cap.webp",
+      "素材库路径": "assets/unida/characters/char-girl-cap.png",
+      "素材用途": "单人立绘·女生鸭舌帽（羽毛球拍+牛仔），运动类活动与组局",
+      "图片尺寸": "380x669",
+      "库内尺寸": "700x1232",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "380×669px",
+      "所属页面": [
+        "discover",
+        "party-detail"
+      ],
+      "使用状态": "ready",
+      "体积KB": 48
+    },
+    {
+      "文件名": "trio-front.jpg",
+      "文件路径": "/static/unida/illustrations/trio-front.jpg",
+      "素材库路径": "assets/unida/illustrations/trio-front.png",
+      "素材用途": "三人正面合影（自带浅色雾面底，非透明），登录/引导/分享卡",
+      "图片尺寸": "720x900",
+      "库内尺寸": "900x1125",
+      "是否透明背景": "否",
+      "推荐显示尺寸": "720×900px",
+      "所属页面": [
+        "login",
+        "share-card"
+      ],
+      "使用状态": "ready-需淡边融入",
+      "体积KB": 146
+    },
+    {
+      "文件名": "icon-study.png",
+      "文件路径": "/static/unida/illustrations/icon-study.png",
+      "素材库路径": "assets/unida/illustrations/icon-study.png",
+      "素材用途": "3D 图标·学习组队（学士帽+书堆）",
+      "图片尺寸": "150x146",
+      "库内尺寸": "220x215",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "88×86rpx",
+      "所属页面": [
+        "home",
+        "discover"
+      ],
+      "使用状态": "ready",
+      "体积KB": 38
+    },
+    {
+      "文件名": "icon-run.png",
+      "文件路径": "/static/unida/illustrations/icon-run.png",
+      "素材库路径": "assets/unida/illustrations/icon-run.png",
+      "素材用途": "3D 图标·运动搭子（奔跑小人）",
+      "图片尺寸": "150x137",
+      "库内尺寸": "220x201",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "88×80rpx",
+      "所属页面": [
+        "home",
+        "discover"
+      ],
+      "使用状态": "ready",
+      "体积KB": 36
+    },
+    {
+      "文件名": "icon-horn.png",
+      "文件路径": "/static/unida/illustrations/icon-horn.png",
+      "素材库路径": "assets/unida/illustrations/icon-horn.png",
+      "素材用途": "3D 图标·校园活动（喇叭）",
+      "图片尺寸": "150x159",
+      "库内尺寸": "220x233",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "88×93rpx",
+      "所属页面": [
+        "home",
+        "discover"
+      ],
+      "使用状态": "ready",
+      "体积KB": 38
+    },
+    {
+      "文件名": "icon-gift.png",
+      "文件路径": "/static/unida/illustrations/icon-gift.png",
+      "素材库路径": "assets/unida/illustrations/icon-gift.png",
+      "素材用途": "3D 图标·互助/福利（礼盒）",
+      "图片尺寸": "150x112",
+      "库内尺寸": "220x164",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "88×60rpx",
+      "所属页面": [
+        "home",
+        "discover"
+      ],
+      "使用状态": "ready",
+      "体积KB": 28
+    },
+    {
+      "文件名": "icon-team.png",
+      "文件路径": "/static/unida/illustrations/icon-team.png",
+      "素材库路径": "assets/unida/illustrations/icon-team.png",
+      "素材用途": "3D 图标·同校动态/社团（旗帜+人群）",
+      "图片尺寸": "150x129",
+      "库内尺寸": "220x189",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "88×75rpx",
+      "所属页面": [
+        "home",
+        "discover"
+      ],
+      "使用状态": "ready",
+      "体积KB": 34
+    },
+    {
+      "文件名": "icon-planet.png",
+      "文件路径": "/static/unida/illustrations/icon-planet.png",
+      "素材库路径": "assets/unida/illustrations/icon-planet.png",
+      "素材用途": "3D 图标·找搭子/广场（星球+社媒气泡）",
+      "图片尺寸": "150x133",
+      "库内尺寸": "220x195",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "88×78rpx",
+      "所属页面": [
+        "home",
+        "discover"
+      ],
+      "使用状态": "ready",
+      "体积KB": 37
+    },
+    {
+      "文件名": "swatch-1.png",
+      "文件路径": "/static/unida/illustrations/swatch-1.png",
+      "素材库路径": "assets/unida/illustrations/swatch-1.png",
+      "素材用途": "色卡·品牌紫渐变（仅作配色参考，不作画面元素）",
+      "图片尺寸": "122x121",
+      "库内尺寸": "122x121",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "-",
+      "所属页面": [
+        "reference"
+      ],
+      "使用状态": "reference",
+      "体积KB": 17
+    },
+    {
+      "文件名": "swatch-2.png",
+      "文件路径": "/static/unida/illustrations/swatch-2.png",
+      "素材库路径": "assets/unida/illustrations/swatch-2.png",
+      "素材用途": "色卡·阳光黄渐变（仅作配色参考）",
+      "图片尺寸": "122x121",
+      "库内尺寸": "122x121",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "-",
+      "所属页面": [
+        "reference"
+      ],
+      "使用状态": "reference",
+      "体积KB": 18
+    },
+    {
+      "文件名": "swatch-3.png",
+      "文件路径": "/static/unida/illustrations/swatch-3.png",
+      "素材库路径": "assets/unida/illustrations/swatch-3.png",
+      "素材用途": "色卡·天空蓝渐变（仅作配色参考）",
+      "图片尺寸": "122x120",
+      "库内尺寸": "122x120",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "-",
+      "所属页面": [
+        "reference"
+      ],
+      "使用状态": "reference",
+      "体积KB": 17
+    },
+    {
+      "文件名": "swatch-4.png",
+      "文件路径": "/static/unida/illustrations/swatch-4.png",
+      "素材库路径": "assets/unida/illustrations/swatch-4.png",
+      "素材用途": "色卡·蜜桃粉渐变（仅作配色参考）",
+      "图片尺寸": "122x120",
+      "库内尺寸": "122x120",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "-",
+      "所属页面": [
+        "reference"
+      ],
+      "使用状态": "reference",
+      "体积KB": 17
+    },
+    {
+      "文件名": "deco-sparkle-1.png",
+      "文件路径": "/static/unida/illustrations/deco-sparkle-1.png",
+      "素材库路径": "assets/unida/illustrations/deco-sparkle-1.png",
+      "素材用途": "装饰·四角星闪光（黄）",
+      "图片尺寸": "83x83",
+      "库内尺寸": "83x83",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "48×48rpx",
+      "所属页面": [
+        "global"
+      ],
+      "使用状态": "ready",
+      "体积KB": 13
+    },
+    {
+      "文件名": "deco-sparkle-2.png",
+      "文件路径": "/static/unida/illustrations/deco-sparkle-2.png",
+      "素材库路径": "assets/unida/illustrations/deco-sparkle-2.png",
+      "素材用途": "装饰·四角星闪光（紫）",
+      "图片尺寸": "82x81",
+      "库内尺寸": "82x81",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "48×48rpx",
+      "所属页面": [
+        "global"
+      ],
+      "使用状态": "ready",
+      "体积KB": 13
+    },
+    {
+      "文件名": "deco-shield.png",
+      "文件路径": "/static/unida/illustrations/deco-shield.png",
+      "素材库路径": "assets/unida/illustrations/deco-shield.png",
+      "素材用途": "装饰·认证盾牌（紫+对勾）",
+      "图片尺寸": "109x116",
+      "库内尺寸": "109x116",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "56×60rpx",
+      "所属页面": [
+        "mine",
+        "verify"
+      ],
+      "使用状态": "ready",
+      "体积KB": 20
+    },
+    {
+      "文件名": "deco-chat.png",
+      "文件路径": "/static/unida/illustrations/deco-chat.png",
+      "素材库路径": "assets/unida/illustrations/deco-chat.png",
+      "素材用途": "装饰·对话气泡贴纸（白紫+橙点）",
+      "图片尺寸": "158x112",
+      "库内尺寸": "158x112",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "100×71rpx",
+      "所属页面": [
+        "message",
+        "empty"
+      ],
+      "使用状态": "ready",
+      "体积KB": 25
+    },
+    {
+      "文件名": "deco-orbit-1.png",
+      "文件路径": "/static/unida/illustrations/deco-orbit-1.png",
+      "素材库路径": "assets/unida/illustrations/deco-orbit-1.png",
+      "素材用途": "装饰·金色椭圆光轨（极淡，仅作低对比背景装饰）",
+      "图片尺寸": "160x58",
+      "库内尺寸": "240x87",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "160×58rpx",
+      "所属页面": [
+        "home"
+      ],
+      "使用状态": "ready-对比度低",
+      "体积KB": 16
+    },
+    {
+      "文件名": "deco-cloud.png",
+      "文件路径": "/static/unida/illustrations/deco-cloud.png",
+      "素材库路径": "assets/unida/illustrations/deco-cloud.png",
+      "素材用途": "装饰·云朵（浅紫立体）",
+      "图片尺寸": "160x59",
+      "库内尺寸": "240x88",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "120×44rpx",
+      "所属页面": [
+        "login",
+        "empty"
+      ],
+      "使用状态": "ready",
+      "体积KB": 11
+    },
+    {
+      "文件名": "deco-heart.png",
+      "文件路径": "/static/unida/illustrations/deco-heart.png",
+      "素材库路径": "assets/unida/illustrations/deco-heart.png",
+      "素材用途": "装饰·手绘爱心（紫色线稿）",
+      "图片尺寸": "106x99",
+      "库内尺寸": "106x99",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "64×60rpx",
+      "所属页面": [
+        "activity-detail",
+        "mine"
+      ],
+      "使用状态": "ready",
+      "体积KB": 21
+    },
+    {
+      "文件名": "deco-appicon.png",
+      "文件路径": "/static/unida/illustrations/deco-appicon.png",
+      "素材库路径": "assets/unida/illustrations/deco-appicon.png",
+      "素材用途": "扁平 U 应用图标（紫渐变 squircle），消息流/列表页头像框与角标底",
+      "图片尺寸": "149x146",
+      "库内尺寸": "149x146",
+      "是否透明背景": "是",
+      "推荐显示尺寸": "72×71rpx",
+      "所属页面": [
+        "message",
+        "mine"
+      ],
+      "使用状态": "ready",
+      "体积KB": 28
+    },
+    {
+      "文件名": "bg-campus-sky.jpg",
+      "文件路径": "/static/unida/backgrounds/bg-campus-sky.jpg",
+      "素材库路径": "assets/unida/backgrounds/bg-campus-sky.png",
+      "素材用途": "背景·校园天空（蓝天白云+黄叶+紫花树），顶栏与 hero 后景",
+      "图片尺寸": "750x404",
+      "库内尺寸": "853x460",
+      "是否透明背景": "否",
+      "推荐显示尺寸": "750×404px",
+      "所属页面": [
+        "home",
+        "discover"
+      ],
+      "使用状态": "ready",
+      "体积KB": 34
+    },
+    {
+      "文件名": "bg-grass.jpg",
+      "文件路径": "/static/unida/backgrounds/bg-grass.jpg",
+      "素材库路径": "assets/unida/backgrounds/bg-grass.png",
+      "素材用途": "背景·草坪花丛（绿草+紫花），页面底部收边",
+      "图片尺寸": "640x258",
+      "库内尺寸": "853x344",
+      "是否透明背景": "否",
+      "推荐显示尺寸": "640×258px",
+      "所属页面": [
+        "home"
+      ],
+      "使用状态": "ready",
+      "体积KB": 54
+    },
+    {
+      "文件名": "bg-campus-building.jpg",
+      "文件路径": "/static/unida/backgrounds/bg-campus-building.jpg",
+      "素材库路径": "assets/unida/backgrounds/bg-campus-building.png",
+      "素材用途": "背景·UNIDA 教学楼一角（紫调建筑+樱花），个人页头图",
+      "图片尺寸": "395x340",
+      "库内尺寸": "395x340",
+      "是否透明背景": "否",
+      "推荐显示尺寸": "395×340px",
+      "所属页面": [
+        "mine"
+      ],
+      "使用状态": "ready-分辨率偏低",
+      "体积KB": 26
+    }
+  ],
+  "缺失素材": [
+    {
+      "名称": "独立成就徽章 PNG",
+      "目标目录": "badges/",
+      "说明": "展板里的 5 枚勋章与展台底座粘连，无法单独取用；需要独立透明徽章 ×6（学习/运动/社交/活动/连续/校园之星）"
+    },
+    {
+      "名称": "底部导航图标集（品牌版）",
+      "目标目录": "icons/tabbar/",
+      "说明": "展板导航图标内嵌在设计稿里不可取；现有 static/icons 的 20 个是自绘白色线性图标，非品牌资产，需按 U 风格重绘（默认灰 + 选中紫双态 + 发布态）"
+    },
+    {
+      "名称": "分类图标选中态变体",
+      "目标目录": "illustrations/",
+      "说明": "现有 6 个 3D 图标只有常态，缺选中/激活态"
+    },
+    {
+      "名称": "空状态插画",
+      "目标目录": "illustrations/empty/",
+      "说明": "无数据、无网络、无消息、无结果 共 4 张，是去模板化最关键的一组，目前完全缺失"
+    },
+    {
+      "名称": "真实活动封面图",
+      "目标目录": "activities/",
+      "说明": "现有 art-*.png 是从登录页裁的局部插画，不是活动实景；正式运营需要 12+ 张活动封面（球局/音乐节/露营/自习/招新/志愿）"
+    },
+    {
+      "名称": "等级与成长值视觉",
+      "目标目录": "badges/level/",
+      "说明": "Lv.1~Lv.6 等级徽章 + 经验条刻度，个人页成长体系必需"
+    },
+    {
+      "名称": "头像占位图集",
+      "目标目录": "characters/avatars/",
+      "说明": "6 张不同风格的默认头像（男生/女生/中性 × 2）"
+    },
+    {
+      "名称": "学校认证角标",
+      "目标目录": "badges/",
+      "说明": "「在校认证」小角标，个人卡与动态卡高频使用"
+    },
+    {
+      "名称": "兴趣标签图标集",
+      "目标目录": "icons/interest/",
+      "说明": "展板上的兴趣标签图标是设计稿内嵌，需独立导出 12 个（羽毛球/音乐/学习/摄影/编程/艺术/运动/美食/旅行/游戏/电影/志愿）"
+    },
+    {
+      "名称": "分享海报模板",
+      "目标目录": "share/",
+      "说明": "活动分享卡 9:16 底图，用于生成朋友圈海报"
+    },
+    {
+      "名称": "加载与刷新动效",
+      "目标目录": "motion/",
+      "说明": "U 星球转圈 loading、下拉刷新 U 弹跳，建议用 CSS 实现不占包体"
+    }
+  ]
+}

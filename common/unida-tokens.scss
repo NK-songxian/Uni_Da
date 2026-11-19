@@ -1,0 +1,91 @@
+// ============================================================
+// UNIDA 设计令牌  unida-tokens.scss
+// 与 docs/UNIDA-DESIGN-SYSTEM.md 一一对应
+// 用法：@import '@/common/unida-tokens.scss';
+// 规则：新页面禁止写死色值，一律走变量
+// ============================================================
+
+// ---------- 核心色（唯一来源）
+$c-primary:        #805CFA;   // 活力紫  主按钮/选中态/强调
+$c-deep:           #542DAF;   // 深紫    标题强调/数据/深色块
+$c-mist:           #F5F0FF;   // 浅紫    页面底
+$c-sun:            #FFC94F;   // 阳光黄  高亮/徽章/星芒
+$c-mint:           #29CA83;   // 活力绿  成功/在线/认证
+$c-sky:            #69B9F5;   // 天空蓝  信息/链接
+
+// ---------- 扩展色（仅图形与渐变）
+$c-ink:            #39007E;   // 品牌墨紫  仅字标与大标题
+$c-purple-light:   #A98BFF;   // 浅紫      渐变中段
+$c-ice:            #E9D5FE;   // 冰紫      玻璃层
+$c-peach:          #FF9B77;   // 蜜橙      暖点缀，一屏最多一处
+$c-mint-light:     #93EDCF;   // 薄荷      浅绿底
+
+// ---------- 中性色
+$t-main:           #2A2440;   // 主文字
+$t-sub:            #8A83A0;   // 次文字
+$t-tertiary:       #B8B2C8;   // 三级/占位
+$c-line:           #EFEAF7;   // 分割线
+$c-white:          #FFFFFF;
+
+// ---------- 语义色
+$c-success:        $c-mint;
+$c-warning:        $c-sun;
+$c-danger:         #F2564D;
+$c-info:           $c-sky;
+
+// ---------- 字体
+$ff-base:          -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+$ff-num:           'DIN Alternate', 'Poppins', -apple-system, sans-serif;
+
+$fs-display:       56rpx;
+$fs-h1:            44rpx;
+$fs-h2:            36rpx;
+$fs-h3:            32rpx;
+$fs-body:          28rpx;
+$fs-caption:       24rpx;
+$fs-micro:         22rpx;
+
+$fw-regular:       400;
+$fw-medium:        500;
+$fw-semibold:      600;
+$fw-bold:          700;
+
+// ---------- 圆角
+$r-xs:             12rpx;
+$r-sm:             20rpx;
+$r-md:             28rpx;
+$r-lg:             36rpx;
+$r-squircle:       40rpx;
+$r-pill:           999rpx;
+
+// ---------- 阴影
+$sh-card:          0 8rpx 24rpx rgba(123, 97, 255, 0.08);
+$sh-float:         0 14rpx 36rpx rgba(123, 97, 255, 0.22);
+$sh-inner:         inset 0 2rpx 0 rgba(255, 255, 255, 0.95);
+
+// ---------- 间距
+$sp-1:             8rpx;
+$sp-2:             12rpx;
+$sp-3:             16rpx;
+$sp-4:             24rpx;
+$sp-5:             32rpx;
+$sp-6:             48rpx;
+$sp-7:             64rpx;
+
+$page-x:           32rpx;    // 页面左右安全边距
+$block-gap:        40rpx;    // 区块间距
+
+// ---------- 渐变
+$g-brand:          linear-gradient(160deg, #9B7BFF 0%, #805CFA 45%, #6C3FF2 100%);
+$g-cta:            linear-gradient(145deg, #A98BFF 0%, #8964FC 55%, #754AF0 100%);
+$g-glass:          linear-gradient(150deg, rgba(255,255,255,0.94) 0%, rgba(247,242,255,0.88) 100%);
+
+// ---------- 动效
+$ease-out:         cubic-bezier(0.22, 0.9, 0.3, 1);
+$dur-fast:         120ms;
+$dur-base:         320ms;
+
+// ---------- tabbar 尺寸（改这里就能整体调整导航高度）
+$tabbar-h:         156rpx;
+$tabbar-icon:      48rpx;
+$publish-d:        80rpx;
