@@ -1,10 +1,9 @@
 <template>
-	<!-- UNIDA 专属底部导航：波浪半透明底座 + 悬浮发布键 + 发光选中态 + 消息角标 -->
+	<!-- UNIDA 专属底部导航：下沉式波浪底座（发布位独立） + U 星球发布键 + 3D 立体图标 -->
 	<view class="unida-tabbar">
-		<!-- 波浪底座：必须用 image 标签，小程序 background-image 引用本地图不生效 -->
+		<!-- 波浪底座：中间下沉让出发布球，左右波峰托起图标；必须用 image 标签 -->
 		<view class="wave-solid"></view>
-		<image class="wave-bg" src="/static/art/wave-bg.png" mode="scaleToFill" />
-		<view class="wave-highlight"></view>
+		<image class="wave-bg" src="/static/art/wave-tab-v2.png" mode="scaleToFill" />
 
 		<!-- 导航内容 -->
 		<view class="tabbar-content">
@@ -14,7 +13,7 @@
 				:class="{ active: activeIndex === 0 }"
 				@tap="onTabTap(0)"
 			>
-				<view class="icon-wrap"><view class="icon-home"></view></view>
+				<view class="icon-wrap"><image class="tab-ico" src="/static/unida/tabbar/tab-home.png" mode="aspectFit" /></view>
 				<text class="tab-text">首页</text>
 				<view v-if="activeIndex === 0" class="active-line"></view>
 			</view>
@@ -25,12 +24,12 @@
 				:class="{ active: activeIndex === 1 }"
 				@tap="onTabTap(1)"
 			>
-				<view class="icon-wrap"><view class="icon-compass"></view></view>
+				<view class="icon-wrap"><image class="tab-ico" src="/static/unida/tabbar/tab-discover.png" mode="aspectFit" /></view>
 				<text class="tab-text">发现</text>
 				<view v-if="activeIndex === 1" class="active-line"></view>
 			</view>
 
-			<!-- 中间留白 -->
+			<!-- 中间留白（发布球独立悬浮于波浪谷上方） -->
 			<view class="tab-item publish-space"></view>
 
 			<!-- 消息 -->
@@ -40,7 +39,7 @@
 				@tap="onTabTap(3)"
 			>
 				<view class="icon-wrap message-wrap">
-					<view class="icon-message"></view>
+					<image class="tab-ico" src="/static/unida/tabbar/tab-message.png" mode="aspectFit" />
 					<view v-if="unreadCount > 0" class="message-badge">
 						{{ unreadCount > 99 ? '99+' : unreadCount }}
 					</view>
@@ -55,18 +54,16 @@
 				:class="{ active: activeIndex === 4 }"
 				@tap="onTabTap(4)"
 			>
-				<view class="icon-wrap"><view class="icon-user"></view></view>
+				<view class="icon-wrap"><image class="tab-ico" src="/static/unida/tabbar/tab-mine.png" mode="aspectFit" /></view>
 				<text class="tab-text">我的</text>
 				<view v-if="activeIndex === 4" class="active-line"></view>
 			</view>
 		</view>
 
-		<!-- 中央悬浮发布按钮 -->
+		<!-- 中央 U 星球发布键（独立于波浪，带呼吸光晕） -->
 		<view class="publish-center" @tap="onPublishTap">
-			<view class="publish-orbit"></view>
-			<view class="publish-button">
-				<text class="plus-icon">+</text>
-			</view>
+			<view class="publish-glow"></view>
+			<image class="publish-logo" src="/static/unida/tabbar/publish-logo.png" mode="aspectFit" />
 			<text class="publish-text">发布</text>
 		</view>
 	</view>
@@ -122,7 +119,6 @@
 	.unida-tabbar {
 		--purple: #805CFA;
 		--purple-deep: #6941E8;
-		--purple-light: #B69AFF;
 		--text-main: #41365E;
 		--text-muted: #88809F;
 
@@ -138,34 +134,24 @@
 		padding-bottom: constant(safe-area-inset-bottom);
 	}
 
-	/* ==================== 波浪底座（image 标签，S形起伏+立体渐变+高光） ==================== */
+	/* ==================== 下沉式波浪底座 ==================== */
+	/* wave-tab-v2：左右波峰托图标，中间谷底下沉让位发布球；谷底曲线最低 208rpx */
 	.wave-bg {
 		position: absolute;
 		left: 0;
 		top: 14rpx;
 		width: 100%;
 		height: 300rpx;
-		/* 无 filter：小程序 image 上加 drop-shadow 会整片变暗/失效，立体感由图内渐变提供 */
 		z-index: 1;
 	}
-	/* 波浪图下方的实心白底，从图的白色区接缝处铺到屏幕底，防止内容透上来 */
+	/* 波浪图下方的实心白底：从谷底最低点(约208rpx)之下接缝，保证谷区透明不被填白 */
 	.wave-solid {
 		position: absolute;
 		left: 0; right: 0;
-		top: 150rpx;
+		top: 212rpx;
 		bottom: 0;
 		background: #FFFFFF;
 		z-index: 0;
-	}
-	.wave-highlight {
-		position: absolute;
-		left: 4%;
-		right: 4%;
-		top: -8rpx;
-		height: 40rpx;
-		border-radius: 50%;
-		border-top: 2rpx solid rgba(255, 255, 255, 0.5);
-		opacity: 0.6;
 	}
 
 	/* ==================== 导航布局 ==================== */
@@ -173,7 +159,7 @@
 		position: absolute;
 		left: 0;
 		right: 0;
-		top: 48rpx;
+		top: 44rpx;
 		height: 140rpx;
 		display: grid;
 		grid-template-columns: repeat(5, 1fr);
@@ -187,12 +173,12 @@
 		align-items: center;
 		justify-content: flex-start;
 		position: relative;
-		padding-top: 12rpx;
+		padding-top: 10rpx;
 		box-sizing: border-box;
 	}
 	.publish-space { pointer-events: none; }
 
-	/* ==================== ICON WRAP ==================== */
+	/* ==================== 3D 立体图标 ==================== */
 	.icon-wrap {
 		width: 68rpx;
 		height: 68rpx;
@@ -200,114 +186,37 @@
 		align-items: center;
 		justify-content: center;
 		position: relative;
-		border-radius: 23rpx;
-		transition: all 0.25s ease;
+		transition: transform 0.25s ease;
 	}
-	/* 选中：发光背景 */
-	.tab-item.active .icon-wrap {
-		background: linear-gradient(145deg, #A88BFF, #7951F4);
-		box-shadow:
-			0 10rpx 25rpx rgba(126, 83, 244, 0.35),
-			inset 0 2rpx 5rpx rgba(255, 255, 255, 0.45);
+	.tab-ico {
+		width: 66rpx;
+		height: 66rpx;
+		opacity: 0.45;
+		transition: opacity 0.25s ease, transform 0.25s ease;
 	}
-
-	/* ==================== HOME ICON ==================== */
-	.icon-home {
-		position: relative;
-		width: 27rpx;
-		height: 25rpx;
-		border: 4rpx solid var(--text-muted);
-		border-top: none;
-		border-radius: 3rpx 3rpx 6rpx 6rpx;
-		box-sizing: border-box;
-		margin-top: 12rpx;
+	/* 选中：图标弹起 + 底部紫色光晕 */
+	.tab-item.active .tab-ico {
+		opacity: 1;
+		transform: translateY(-6rpx);
 	}
-	.icon-home::before {
+	.tab-item.active .icon-wrap::after {
 		content: '';
 		position: absolute;
-		width: 19rpx;
-		height: 19rpx;
-		left: 0;
-		top: -10rpx;
-		border-top: 4rpx solid var(--text-muted);
-		border-left: 4rpx solid var(--text-muted);
-		transform: rotate(45deg);
-		border-radius: 3rpx;
-	}
-	.icon-home::after {
-		content: '';
-		position: absolute;
-		width: 8rpx;
-		height: 12rpx;
-		bottom: 0;
-		left: 6rpx;
-		border: 3rpx solid var(--text-muted);
-		border-bottom: none;
-		border-radius: 5rpx 5rpx 0 0;
-	}
-	.active .icon-home,
-	.active .icon-home::before,
-	.active .icon-home::after { border-color: #FFFFFF; }
-
-	/* ==================== COMPASS ICON ==================== */
-	.icon-compass {
-		position: relative;
-		width: 36rpx;
-		height: 36rpx;
-		border: 4rpx solid var(--text-muted);
-		border-radius: 50%;
-		box-sizing: border-box;
-	}
-	.icon-compass::before {
-		content: '';
-		position: absolute;
-		left: 10rpx;
-		top: 4rpx;
-		width: 0;
-		height: 0;
-		border-left: 6rpx solid transparent;
-		border-right: 6rpx solid transparent;
-		border-bottom: 17rpx solid #9679E9;
-		transform: rotate(35deg);
-	}
-	.icon-compass::after {
-		content: '';
-		position: absolute;
-		left: 10rpx;
-		bottom: 4rpx;
-		width: 0;
-		height: 0;
-		border-left: 6rpx solid transparent;
-		border-right: 6rpx solid transparent;
-		border-top: 13rpx solid #B6A5EF;
-		transform: rotate(35deg);
-	}
-
-	/* ==================== MESSAGE ICON ==================== */
-	.icon-message {
-		position: relative;
-		width: 38rpx;
-		height: 29rpx;
-		border: 4rpx solid var(--text-muted);
-		border-radius: 50%;
-		box-sizing: border-box;
-	}
-	.icon-message::after {
-		content: '';
-		position: absolute;
-		left: 3rpx;
+		left: 50%;
 		bottom: -8rpx;
-		width: 10rpx;
-		height: 10rpx;
-		border-left: 4rpx solid var(--text-muted);
-		transform: skew(-25deg);
+		transform: translateX(-50%);
+		width: 84rpx;
+		height: 24rpx;
+		border-radius: 50%;
+		background: radial-gradient(ellipse, rgba(128, 92, 250, 0.30) 0%, rgba(128, 92, 250, 0) 72%);
 	}
+
 	/* 消息角标 */
 	.message-wrap { position: relative; }
 	.message-badge {
 		position: absolute;
-		top: -5rpx;
-		right: -12rpx;
+		top: -6rpx;
+		right: -10rpx;
 		min-width: 30rpx;
 		height: 30rpx;
 		padding: 0 7rpx;
@@ -320,48 +229,18 @@
 		justify-content: center;
 		border: 3rpx solid #FFFFFF;
 		box-shadow: 0 4rpx 10rpx rgba(255, 112, 46, 0.25);
+		z-index: 2;
 	}
-
-	/* ==================== USER ICON ==================== */
-	.icon-user {
-		position: relative;
-		width: 20rpx;
-		height: 20rpx;
-		border: 4rpx solid var(--text-muted);
-		border-radius: 50%;
-		margin-top: -12rpx;
-	}
-	.icon-user::after {
-		content: '';
-		position: absolute;
-		width: 32rpx;
-		height: 18rpx;
-		left: -10rpx;
-		top: 26rpx;
-		border: 4rpx solid var(--text-muted);
-		border-radius: 20rpx 20rpx 8rpx 8rpx;
-		border-bottom: none;
-		box-sizing: border-box;
-	}
-
-	/* ==================== 选中态图标变白 ==================== */
-	.active .icon-compass,
-	.active .icon-message,
-	.active .icon-user { border-color: #FFFFFF; }
-	.active .icon-message::after { border-color: #FFFFFF; }
-	.active .icon-user::after { border-color: #FFFFFF; }
-	.active .icon-compass::before { border-bottom-color: #FFFFFF; }
-	.active .icon-compass::after { border-top-color: #FFFFFF; }
 
 	/* ==================== 文字 ==================== */
 	.tab-text {
-		margin-top: 5rpx;
+		margin-top: 6rpx;
 		font-size: 23rpx;
 		color: var(--text-muted);
 		font-weight: 500;
 		line-height: 34rpx;
 	}
-	.active .tab-text { color: #7951F4; font-weight: 700; }
+	.active .tab-text { color: #6C3FF2; font-weight: 700; }
 	/* 激活指示线 */
 	.active-line {
 		width: 42rpx;
@@ -372,60 +251,50 @@
 		box-shadow: 0 3rpx 10rpx rgba(128, 92, 250, 0.25);
 	}
 
-	/* ==================== 中央悬浮发布按钮 ==================== */
+	/* ==================== 中央 U 星球发布键 ==================== */
 	.publish-center {
 		position: absolute;
 		left: 50%;
-		top: 40rpx;
+		top: 16rpx;
 		transform: translateX(-50%);
-		width: 120rpx;
-		height: 150rpx;
+		width: 160rpx;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		z-index: 20;
 	}
-	.publish-orbit {
+	/* 呼吸光晕（径向渐变，不用 filter，性能友好） */
+	.publish-glow {
 		position: absolute;
 		top: -6rpx;
 		left: 50%;
 		transform: translateX(-50%);
-		width: 104rpx;
-		height: 104rpx;
+		width: 160rpx;
+		height: 160rpx;
 		border-radius: 50%;
-		border: 2rpx solid rgba(178, 151, 255, 0.35);
-		box-shadow:
-			0 0 0 8rpx rgba(180, 154, 255, 0.10),
-			0 6rpx 20rpx rgba(132, 91, 250, 0.16);
+		background: radial-gradient(circle, rgba(154, 120, 255, 0.30) 0%, rgba(154, 120, 255, 0.12) 46%, rgba(154, 120, 255, 0) 70%);
+		animation: glowPulse 3.2s ease-in-out infinite;
 	}
-	.publish-button {
+	@keyframes glowPulse {
+		0%, 100% { opacity: 0.75; transform: translateX(-50%) scale(1); }
+		50% { opacity: 1; transform: translateX(-50%) scale(1.06); }
+	}
+	/* U 星球 logo：立体星球 + 光环 + 星芒，本身就是发布按钮主体 */
+	.publish-logo {
 		position: relative;
-		width: 80rpx;
-		height: 80rpx;
-		border-radius: 50%;
-		background: linear-gradient(145deg, #A98BFF 0%, #8964FC 55%, #754AF0 100%);
-		box-shadow:
-			0 12rpx 26rpx rgba(114, 73, 231, 0.4),
-			inset 0 3rpx 6rpx rgba(255, 255, 255, 0.45);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-	.plus-icon {
-		color: #FFFFFF;
-		font-size: 56rpx;
-		font-weight: 300;
-		line-height: 1;
-		margin-top: -5rpx;
+		width: 112rpx;
+		height: 112rpx;
+		z-index: 2;
 	}
 	.publish-text {
-		margin-top: 8rpx;
+		margin-top: 0rpx;
 		font-size: 23rpx;
-		color: #7951F4;
+		color: #6C3FF2;
 		font-weight: 700;
+		z-index: 2;
 	}
 
 	/* ==================== 点击反馈 ==================== */
-	.tab-item:active .icon-wrap { transform: scale(0.92); }
-	.publish-center:active .publish-button { transform: scale(0.92); }
+	.tab-item:active .tab-ico { transform: scale(0.92); }
+	.publish-center:active .publish-logo { transform: scale(0.92); }
 </style>
