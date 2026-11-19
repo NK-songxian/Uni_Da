@@ -12,6 +12,7 @@ _archive/
 # 临时预览 / 自检生成物
 preview.html
 preview_discover.html
+preview_tabbar.html
 _discover.css
 _sync.scss
 _sync.css
