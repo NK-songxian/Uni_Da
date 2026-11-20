@@ -1,34 +1,60 @@
 <template>
-	<view class="publish unida-page">
-		<!-- 头部 -->
-		<view class="publish__hero">
-			<view class="publish__hero-deco">✦</view>
-			<text class="publish__title">发布中心</text>
-			<text class="publish__sub">选一种方式，开启你的校园故事 ✨</text>
+	<view class="pb">
+		<view class="pb__safe" :style="{ paddingTop: statusBar + 'px' }"></view>
+
+		<!-- 顶栏 -->
+		<view class="pb__top">
+			<text class="pb__title">发布中心</text>
+			<image class="pb__brand" src="/static/unida/bubbles/brand-badge-u.webp" mode="aspectFit" />
 		</view>
 
-		<!-- 六大发布入口 -->
-		<view class="publish__grid">
-			<view
-				class="publish__item"
-				v-for="(item, i) in types"
-				:key="i"
-				@click="onPublish(item)"
-			>
-				<view class="publish__icon" :style="{ background: item.bg }">
-					<text class="publish__emoji">{{ item.icon }}</text>
+		<!-- 云朵框 hero -->
+		<view class="pb__hero">
+			<image class="pb__hero-frame" src="/static/unida/bubbles/frame-unida-cloud.webp" mode="widthFix" />
+			<view class="pb__hero-txt">
+				<text class="pb__hero-t">选一种方式，开启你的校园故事</text>
+				<text class="pb__hero-s">清晰的标题 · 真实的封面 · 明确的时间地点</text>
+			</view>
+			<view class="pb__spark pb__spark--a"></view>
+			<view class="pb__spark pb__spark--b"></view>
+		</view>
+
+		<!-- 发布入口 2×3 -->
+		<view class="pb__grid">
+			<view class="pb__card" v-for="(item, i) in types" :key="i" @click="onType(i)">
+				<view class="pb__cardhead">
+					<view class="pb__ico" :class="'pb__ico--' + item.tone">
+						<image class="pb__ico-img" :src="item.icon" mode="aspectFit" />
+					</view>
+					<image class="pb__chev" src="/static/icons-dark/chevron.png" mode="aspectFit" />
 				</view>
-				<text class="publish__label">{{ item.label }}</text>
-				<text class="publish__desc">{{ item.desc }}</text>
+				<text class="pb__name">{{ item.label }}</text>
+				<text class="pb__desc">{{ item.desc }}</text>
 			</view>
 		</view>
 
-		<!-- 发布提示卡 -->
-		<view class="publish__tip unida-card">
-			<text class="publish__tip-title">💡 发布小贴士</text>
-			<text class="publish__tip-text">清晰的标题、真实的活动封面、明确的时间和地点，能帮你更快找到同频搭子哦～</text>
+		<!-- 热门标签 -->
+		<view class="pb__sect">
+			<view class="pb__spark pb__spark--c"></view>
+			<text class="pb__sect-t">大家都在发</text>
+			<text class="pb__sect-s">点标签，搭子更快找到你</text>
+		</view>
+		<scroll-view class="pb__lscroll" scroll-x="true">
+			<view class="pb__lrow">
+				<image class="pb__lab" v-for="(lab, i) in labels" :key="i" :src="lab.icon" mode="heightFix" @click="onLabel(i)" />
+			</view>
+		</scroll-view>
+
+		<!-- 小贴士 -->
+		<view class="pb__tip">
+			<view class="pb__tip-ico"><image class="pb__tip-img" src="/static/icons-dark/bulb.png" mode="aspectFit" /></view>
+			<view class="pb__tip-body">
+				<text class="pb__tip-t">发布小贴士</text>
+				<text class="pb__tip-s">写清楚做什么、什么时候、在哪儿，再选几个同频标签，搭子会主动来找你。</text>
+			</view>
 		</view>
 
+		<view class="pb__bottom-space"></view>
 		<unida-tabbar :current="2" />
 	</view>
 </template>
@@ -40,64 +66,129 @@
 		components: { unidaTabbar },
 		data() {
 			return {
+				statusBar: 0,
 				types: [
-					{ label: '找搭子', desc: '找人一起做事', icon: '🤝', bg: 'linear-gradient(135deg,#7B61FF,#B59BFF)', form: '找搭子' },
-					{ label: '发起活动', desc: '组局多人活动', icon: '🎪', bg: 'linear-gradient(135deg,#FF8A3D,#FFD76A)', form: '活动' },
-					{ label: '技能教学', desc: '分享你的特长', icon: '🎸', bg: 'linear-gradient(135deg,#F472B6,#FBCFE8)', form: '教学' },
-					{ label: '跑腿需求', desc: '发布互助任务', icon: '🛵', bg: 'linear-gradient(135deg,#34D399,#86EFAC)', form: '跑腿' },
-					{ label: '校园动态', desc: '分享校园生活', icon: '📝', bg: 'linear-gradient(135deg,#5B8DEF,#93C5FD)', form: '动态' },
-					{ label: '活动招募', desc: '为活动招人', icon: '📣', bg: 'linear-gradient(135deg,#A78BFA,#DDD6FE)', form: '招募' }
+					{ label: '找搭子', desc: '自习·吃饭·运动，找同频伙伴', icon: '/static/icons-dark/buddy.png', tone: 'purple' },
+					{ label: '发起活动', desc: '组一场多人校园活动', icon: '/static/icons-dark/calendar.png', tone: 'orange' },
+					{ label: '技能教学', desc: '分享你的特长与课程', icon: '/static/icons-dark/bulb.png', tone: 'pink' },
+					{ label: '跑腿需求', desc: '发布互助跑腿任务', icon: '/static/icons-dark/box.png', tone: 'green' },
+					{ label: '校园动态', desc: '分享此刻的校园生活', icon: '/static/icons-dark/book.png', tone: 'sky' },
+					{ label: '活动招募', desc: '为你的活动招募队友', icon: '/static/icons-dark/flame.png', tone: 'sun' }
+				],
+				labels: [
+					{ icon: '/static/unida/bubbles/label-hot.webp', name: '热门' },
+					{ icon: '/static/unida/bubbles/label-new.webp', name: '新活动' },
+					{ icon: '/static/unida/bubbles/label-study.webp', name: '学习' },
+					{ icon: '/static/unida/bubbles/label-sport.webp', name: '运动' },
+					{ icon: '/static/unida/bubbles/label-fun.webp', name: '娱乐' },
+					{ icon: '/static/unida/bubbles/label-help.webp', name: '互助' },
+					{ icon: '/static/unida/bubbles/label-campus.webp', name: '校园' },
+					{ icon: '/static/unida/bubbles/label-rec.webp', name: '推荐' },
+					{ icon: '/static/unida/bubbles/label-sync.webp', name: '同频' },
+					{ icon: '/static/unida/bubbles/label-limit.webp', name: '限时' }
 				]
 			};
 		},
+		onLoad() {
+			const sys = uni.getSystemInfoSync();
+			this.statusBar = sys && sys.statusBarHeight || 0;
+		},
 		methods: {
-			onPublish(item) {
-				uni.showToast({ title: '「' + item.label + '」表单待开发', icon: 'none' });
+			onType(i) {
+				uni.showToast({ title: '「' + this.types[i].label + '」表单待开发', icon: 'none' });
+			},
+			onLabel(i) {
+				uni.showToast({ title: '标签「' + this.labelNames[i] + '」已带上（示例）', icon: 'none' });
 			}
 		}
 	};
 </script>
 
 <style lang="scss" scoped>
-	@import '@/common/unida-global.scss';
-	.publish__hero {
-		position: relative;
-		padding: 70rpx 40rpx 50rpx;
-		background: linear-gradient(135deg, #7B61FF, #B59BFF);
-		border-radius: 0 0 44rpx 44rpx;
-		overflow: hidden;
-	}
-	.publish__hero-deco { position: absolute; right: 60rpx; top: 50rpx; color: rgba(255,255,255,0.5); font-size: 56rpx; }
-	.publish__title { display: block; font-size: 48rpx; font-weight: 800; color: #fff; }
-	.publish__sub { display: block; margin-top: 12rpx; font-size: 26rpx; color: rgba(255,255,255,0.9); }
+	@import '@/common/unida-tokens.scss';
 
-	.publish__grid {
-		display: flex;
-		flex-wrap: wrap;
-		padding: 32rpx 16rpx 0;
-	}
-	.publish__item {
-		width: 33.33%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		padding: 20rpx 8rpx 30rpx;
-	}
-	.publish__icon {
-		width: 110rpx;
-		height: 110rpx;
-		border-radius: 32rpx;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		box-shadow: 0 10rpx 24rpx rgba(123,97,255,0.16);
-	}
-	.publish__emoji { font-size: 54rpx; }
-	.publish__label { margin-top: 18rpx; font-size: 28rpx; font-weight: 700; color: $unida-text; }
-	.publish__desc { margin-top: 6rpx; font-size: 22rpx; color: $unida-text-sub; }
-	.publish__item:active .publish__icon { transform: scale(0.92); }
+	.pb { min-height: 100vh; background: $c-mist; }
 
-	.publish__tip { margin: 16rpx 24rpx; display: flex; flex-direction: column; }
-	.publish__tip-title { font-size: 28rpx; font-weight: 700; color: $unida-primary; }
-	.publish__tip-text { margin-top: 12rpx; font-size: 24rpx; color: $unida-text-sub; line-height: 1.6; }
+	/* ---------- 顶栏 ---------- */
+	.pb__top { display: flex; align-items: center; padding: 24rpx $page-x 0; }
+	.pb__title { font-size: 44rpx; font-weight: 800; color: $c-ink; flex: 1; }
+	.pb__brand { width: 76rpx; height: 76rpx; }
+
+	/* ---------- 云朵 hero ---------- */
+	.pb__hero { position: relative; margin: 20rpx $page-x 0; }
+	.pb__hero-frame { display: block; width: 686rpx; }
+	.pb__hero-txt {
+		position: absolute; left: 0; right: 0; top: 50%;
+		transform: translateY(-52%);
+		display: flex; flex-direction: column; align-items: center;
+	}
+	.pb__hero-t { font-size: 30rpx; font-weight: 800; color: $c-ink; }
+	.pb__hero-s { margin-top: 12rpx; font-size: 20rpx; color: $t-sub; letter-spacing: 1rpx; }
+	.pb__spark { position: absolute; border-radius: 3rpx; transform: rotate(45deg); }
+	.pb__spark--a { right: 66rpx; top: -12rpx; width: 16rpx; height: 16rpx; background: $c-sun; }
+	.pb__spark--b { right: 46rpx; top: 10rpx; width: 9rpx; height: 9rpx; background: $c-primary; opacity: 0.7; }
+	.pb__spark--c { left: -20rpx; top: -8rpx; width: 13rpx; height: 13rpx; background: $c-sun; }
+
+	/* ---------- 入口卡 ---------- */
+	.pb__grid { display: flex; flex-wrap: wrap; justify-content: space-between; margin: 24rpx $page-x 0; }
+	.pb__card {
+		width: 335rpx;
+		box-sizing: border-box;
+		background: $c-white;
+		border-radius: $r-md;
+		box-shadow: $sh-card;
+		padding: 24rpx 26rpx 26rpx;
+		margin-bottom: 16rpx;
+		display: flex; flex-direction: column;
+	}
+	.pb__card:active { transform: scale(0.97); }
+	.pb__cardhead { display: flex; align-items: flex-start; justify-content: space-between; }
+	.pb__ico {
+		width: 84rpx; height: 84rpx;
+		border-radius: 26rpx;
+		display: flex; align-items: center; justify-content: center;
+		flex-shrink: 0;
+	}
+	.pb__ico--purple { background: rgba(128, 92, 250, 0.13); }
+	.pb__ico--orange { background: rgba(255, 155, 119, 0.16); }
+	.pb__ico--pink { background: rgba(244, 114, 182, 0.14); }
+	.pb__ico--green { background: rgba(41, 202, 131, 0.14); }
+	.pb__ico--sky { background: rgba(105, 185, 245, 0.16); }
+	.pb__ico--sun { background: rgba(255, 201, 79, 0.18); }
+	.pb__ico-img { width: 44rpx; height: 44rpx; }
+	.pb__name { display: block; margin-top: 20rpx; font-size: 30rpx; font-weight: 700; color: $t-main; }
+	.pb__desc { display: block; margin-top: 8rpx; font-size: 21rpx; color: $t-sub; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	.pb__chev { width: 26rpx; height: 26rpx; opacity: 0.35; }
+
+	/* ---------- 热门标签 ---------- */
+	.pb__sect { display: flex; align-items: baseline; margin: 28rpx $page-x 0; position: relative; }
+	.pb__sect-t { font-size: 32rpx; font-weight: 800; color: $c-ink; }
+	.pb__sect-s { margin-left: 14rpx; font-size: 20rpx; color: $t-tertiary; letter-spacing: 1rpx; }
+	.pb__lscroll { width: 750rpx; margin-top: 18rpx; white-space: nowrap; }
+	.pb__lrow { display: inline-flex; align-items: center; padding: 6rpx $page-x; }
+	.pb__lab { height: 84rpx; margin-right: 18rpx; flex-shrink: 0; }
+	.pb__lab:active { opacity: 0.8; }
+
+	/* ---------- 小贴士 ---------- */
+	.pb__tip {
+		margin: 28rpx $page-x 0;
+		background: $c-white;
+		border-radius: $r-md;
+		box-shadow: $sh-card;
+		padding: 24rpx 26rpx;
+		display: flex; align-items: flex-start;
+	}
+	.pb__tip-ico {
+		width: 64rpx; height: 64rpx;
+		border-radius: 20rpx;
+		background: rgba(255, 201, 79, 0.2);
+		display: flex; align-items: center; justify-content: center;
+		flex-shrink: 0;
+	}
+	.pb__tip-img { width: 36rpx; height: 36rpx; }
+	.pb__tip-body { margin-left: 20rpx; display: flex; flex-direction: column; }
+	.pb__tip-t { font-size: 26rpx; font-weight: 700; color: $t-main; }
+	.pb__tip-s { margin-top: 10rpx; font-size: 22rpx; color: $t-sub; line-height: 1.7; }
+
+	.pb__bottom-space { height: 200rpx; }
 </style>
