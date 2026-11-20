@@ -14,7 +14,6 @@
 			>
 				<view class="icon-wrap"><image class="tab-ico" src="/static/unida/tabbar/tab-home.png" mode="aspectFit" /></view>
 				<text class="tab-text">首页</text>
-				<view v-if="activeIndex === 0" class="active-line"></view>
 			</view>
 
 			<!-- 发现 -->
@@ -25,7 +24,6 @@
 			>
 				<view class="icon-wrap"><image class="tab-ico" src="/static/unida/tabbar/tab-discover.png" mode="aspectFit" /></view>
 				<text class="tab-text">发现</text>
-				<view v-if="activeIndex === 1" class="active-line"></view>
 			</view>
 
 			<!-- 中间留白（凹口区，U 星球独立悬浮） -->
@@ -44,7 +42,6 @@
 					</view>
 				</view>
 				<text class="tab-text">消息</text>
-				<view v-if="activeIndex === 3" class="active-line"></view>
 			</view>
 
 			<!-- 我的 -->
@@ -55,7 +52,6 @@
 			>
 				<view class="icon-wrap"><image class="tab-ico" src="/static/unida/tabbar/tab-mine.png" mode="aspectFit" /></view>
 				<text class="tab-text">我的</text>
-				<view v-if="activeIndex === 4" class="active-line"></view>
 			</view>
 		</view>
 
@@ -113,14 +109,14 @@
 </script>
 
 <style lang="scss" scoped>
-	/* ==================== 容器：跟随白栏图片高度 200rpx ==================== */
+	/* ==================== 容器：跟随白栏图片高度 170rpx ==================== */
 	.unida-tabbar {
 		position: fixed;
 		left: 0;
 		right: 0;
 		bottom: 0;
-		height: calc(200rpx + env(safe-area-inset-bottom));
-		height: calc(200rpx + constant(safe-area-inset-bottom));
+		height: calc(170rpx + env(safe-area-inset-bottom));
+		height: calc(170rpx + constant(safe-area-inset-bottom));
 		z-index: 9999;
 		box-sizing: border-box;
 		padding-bottom: env(safe-area-inset-bottom);
@@ -128,34 +124,35 @@
 	}
 
 	/* ==================== U 型凹槽白栏（图片镂空，真机必渲染） ==================== */
-	/* 图片 750×200@2x，满屏宽 750rpx → 高 200rpx；顶部两肩 13rpx、谷底 59rpx，
+	/* 图片 750×170@2x，满屏宽 750rpx → 高 170rpx；顶部两肩 13rpx、谷底 59rpx，
 	   谷区透明露出页面背景；阴影已烘焙进 PNG，跟随凹槽曲线 */
 	.tabbar-sheet {
 		position: absolute;
 		left: 0;
 		bottom: 0;
 		width: 100%;
-		height: 200rpx;
+		height: 170rpx;
 	}
 
-	/* ==================== 导航布局：图标+文字排在谷底以下白栏主体 ==================== */
+	/* ==================== 导航布局：图标+文字填满谷底以下白栏主体 ==================== */
 	.tabbar-content {
 		position: absolute;
 		left: 0;
 		right: 0;
 		bottom: 0;
-		height: 130rpx;
+		height: 111rpx;
 		display: grid;
 		grid-template-columns: repeat(5, 1fr);
-		align-items: center;
+		align-items: start;
+		padding-top: 2rpx;
 		z-index: 5;
 	}
 	.tab-item {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
-		height: 100%;
+		justify-content: flex-start;
+		height: auto;
 		position: relative;
 		box-sizing: border-box;
 	}
@@ -163,8 +160,8 @@
 
 	/* ==================== 3D 立体图标 ==================== */
 	.icon-wrap {
-		width: 56rpx;
-		height: 56rpx;
+		width: 62rpx;
+		height: 62rpx;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -172,8 +169,8 @@
 		transition: transform 0.25s ease;
 	}
 	.tab-ico {
-		width: 52rpx;
-		height: 52rpx;
+		width: 60rpx;
+		height: 60rpx;
 		opacity: 0.55;
 		transition: opacity 0.25s ease, transform 0.25s ease;
 	}
@@ -205,29 +202,19 @@
 
 	/* ==================== 文字 ==================== */
 	.tab-text {
-		margin-top: 6rpx;
-		font-size: 23rpx;
+		margin-top: 4rpx;
+		font-size: 25rpx;
 		color: #88809F;
 		font-weight: 500;
 		line-height: 34rpx;
 	}
 	.active .tab-text { color: #6C3FF2; font-weight: 700; }
-	/* 激活指示线 */
-	.active-line {
-		width: 42rpx;
-		height: 9rpx;
-		margin-top: 4rpx;
-		border-radius: 20rpx;
-		background: linear-gradient(90deg, #B69AFF, #805CFA);
-		box-shadow: 0 3rpx 10rpx rgba(128, 92, 250, 0.25);
-	}
-
-	/* ==================== 中央 U 星球发布球（坐进 U 型谷） ==================== */
+/* ==================== 中央 U 星球发布球（坐进 U 型谷） ==================== */
 	/* 谷两肩 13rpx、谷底 59rpx；球心落在谷底稍上，直径 108rpx，上沿露出谷口 */
 	.publish-center {
 		position: absolute;
 		left: 50%;
-		top: 14rpx;
+		top: 22rpx;
 		transform: translateX(-50%);
 		width: 160rpx;
 		display: flex;
@@ -240,8 +227,8 @@
 		height: 108rpx;
 	}
 	.publish-text {
-		margin-top: 2rpx;
-		font-size: 23rpx;
+		margin-top: 0rpx;
+		font-size: 25rpx;
 		color: #6C3FF2;
 		font-weight: 700;
 		line-height: 30rpx;

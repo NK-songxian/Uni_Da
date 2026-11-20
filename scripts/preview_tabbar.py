@@ -26,11 +26,11 @@ img {{ display:block; }}
 <div class="phone">
   <div class="fake">模拟页面卡片——检查 U 型凹槽是否干净、发布球是否坐进谷、文字是否可读</div>
   <view class="unida-tabbar" style="width:375px">
-    <img class="tabbar-sheet" src="static/unida/tabbar/tabbar-sheet.png" style="width:375px;height:100px">
+    <img class="tabbar-sheet" src="static/unida/tabbar/tabbar-sheet.png" style="width:375px;height:85px">
     <view class="tabbar-content">
       <view class="tab-item active" style="pointer-events:none">
         <view class="icon-wrap"><img class="tab-ico" src="static/unida/tabbar/tab-home.png" style="object-fit:contain"></view>
-        <text class="tab-text">首页</text><view class="active-line"></view>
+        <text class="tab-text">首页</text>
       </view>
       <view class="tab-item" style="pointer-events:none">
         <view class="icon-wrap"><img class="tab-ico" src="static/unida/tabbar/tab-discover.png" style="object-fit:contain"></view>

@@ -11,11 +11,12 @@ from PIL import Image, ImageFilter
 ROOT = r"H:\UniDA\unida"
 OUT = os.path.join(ROOT, "static", "unida", "tabbar", "tabbar-sheet.png")
 
-W, H = 750, 200          # @2x 高清；widthFix 满屏宽时显示 750rpx × 200rpx
+W, H = 750, 170          # @2x 高清；widthFix 满屏宽时显示 750rpx × 170rpx
+                         # 仅压缩谷底以下空白（200→170），谷形参数 BASE_Y/DEPTH/HALF_W/CORNER 不变
 CX = W // 2
-BASE_Y = 26              # 白栏顶边两肩（@2x px）= 13rpx
+BASE_Y = 26              # 白栏顶边两肩（@2x px）
 HALF_W = 170             # 凹槽半宽（@2x px）——谷口宽 340px@2x = 170rpx
-DEPTH = 92               # 凹槽深度（@2x px）= 46rpx，谷底 y=118px=59rpx
+DEPTH = 92               # 凹槽深度（@2x px），谷底 y=118px
 CORNER = 44              # 白栏顶部两角圆角半径（@2x px）
 
 
