@@ -1,7 +1,7 @@
 <template>
-	<!-- UNIDA 专属底部导航 V4：纯 CSS 凹槽底座（开源通用做法，零图片） + U 星球发布键 + 3D 立体图标 -->
+	<!-- UNIDA 专属底部导航 V5：完整白栏 + 悬浮圆形发布键（无波浪、无光晕脏斑、无 mask 兼容坑） -->
 	<view class="unida-tabbar">
-		<!-- 白色圆角底座：mask 径向渐变在中上真挖穿一个圆凹口，U 星球悬浮其中 -->
+		<!-- 白色圆角底座：完整无挖洞，视觉干净统一 -->
 		<view class="tabbar-sheet"></view>
 
 		<!-- 导航内容 -->
@@ -59,10 +59,11 @@
 			</view>
 		</view>
 
-		<!-- 中央 U 星球发布键（悬浮凹口，呼吸光晕） -->
+		<!-- 中央 U 星球发布键：悬浮圆形实体底盘，无光晕脏斑 -->
 		<view class="publish-center" @tap="onPublishTap">
-			<view class="publish-glow"></view>
-			<image class="publish-logo" src="/static/unida/tabbar/publish-logo.png" mode="aspectFit" />
+			<view class="publish-disc">
+				<image class="publish-logo" src="/static/unida/tabbar/publish-logo.png" mode="aspectFit" />
+			</view>
 			<text class="publish-text">发布</text>
 		</view>
 	</view>
@@ -120,57 +121,53 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		height: calc(156rpx + env(safe-area-inset-bottom));
-		height: calc(156rpx + constant(safe-area-inset-bottom));
+		height: calc(132rpx + env(safe-area-inset-bottom));
+		height: calc(132rpx + constant(safe-area-inset-bottom));
 		z-index: 9999;
 		box-sizing: border-box;
 		padding-bottom: env(safe-area-inset-bottom);
 		padding-bottom: constant(safe-area-inset-bottom);
 	}
 
-	/* ==================== 凹槽底座（纯 CSS，开源通用做法） ==================== */
+	/* ==================== 完整白栏（无挖洞、无遮罩，干净统一） ==================== */
 	.tabbar-sheet {
 		position: absolute;
 		left: 0;
 		right: 0;
 		bottom: 0;
 		height: 132rpx;
-		background: linear-gradient(180deg, #FFFFFF 0%, #FBF8FF 100%);
-		border-radius: 44rpx 44rpx 0 0;
-		box-shadow: 0 -8rpx 30rpx rgba(123, 97, 255, 0.10);
-		/* 中上挖穿一个圆凹口（圆心在顶边中线，半径 66rpx），U 星球悬浮其中；
-		   mask 是 uview 等开源凹槽 tabbar 的标准实现，小程序双内核均支持 */
-		-webkit-mask: radial-gradient(circle at 50% 0, transparent 0 66rpx, #000 74rpx);
-		mask: radial-gradient(circle at 50% 0, transparent 0 66rpx, #000 74rpx);
+		background: linear-gradient(180deg, #FFFFFF 0%, #FCFAFF 100%);
+		border-radius: 40rpx 40rpx 0 0;
+		box-shadow: 0 -6rpx 24rpx rgba(123, 97, 255, 0.08);
 	}
 
-	/* ==================== 导航布局 ==================== */
+	/* ==================== 导航布局：图标+文字全部在白栏内 ==================== */
 	.tabbar-content {
 		position: absolute;
 		left: 0;
 		right: 0;
-		top: 40rpx;
-		height: 112rpx;
+		bottom: 0;
+		height: 132rpx;
 		display: grid;
 		grid-template-columns: repeat(5, 1fr);
-		align-items: start;
+		align-items: center;
 		z-index: 5;
 	}
 	.tab-item {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: flex-start;
+		justify-content: center;
+		height: 100%;
 		position: relative;
-		padding-top: 8rpx;
 		box-sizing: border-box;
 	}
 	.publish-space { pointer-events: none; }
 
 	/* ==================== 3D 立体图标 ==================== */
 	.icon-wrap {
-		width: 66rpx;
-		height: 66rpx;
+		width: 58rpx;
+		height: 58rpx;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -178,26 +175,15 @@
 		transition: transform 0.25s ease;
 	}
 	.tab-ico {
-		width: 62rpx;
-		height: 62rpx;
+		width: 54rpx;
+		height: 54rpx;
 		opacity: 0.55;
 		transition: opacity 0.25s ease, transform 0.25s ease;
 	}
-	/* 选中：图标弹起 + 底部紫色光晕 */
+	/* 选中：仅图标上浮+高亮，不再加光斑（光斑在白底上成脏椭圆） */
 	.tab-item.active .tab-ico {
 		opacity: 1;
-		transform: translateY(-6rpx);
-	}
-	.tab-item.active .icon-wrap::after {
-		content: '';
-		position: absolute;
-		left: 50%;
-		bottom: -8rpx;
-		transform: translateX(-50%);
-		width: 84rpx;
-		height: 24rpx;
-		border-radius: 50%;
-		background: radial-gradient(ellipse, rgba(128, 92, 250, 0.30) 0%, rgba(128, 92, 250, 0) 72%);
+		transform: translateY(-4rpx);
 	}
 
 	/* 消息角标 */
@@ -240,12 +226,11 @@
 		box-shadow: 0 3rpx 10rpx rgba(128, 92, 250, 0.25);
 	}
 
-	/* ==================== 中央 U 星球发布键 ==================== */
-	/* 凹口圆心在 sheet 顶边中线（距 tabbar 顶 24rpx），球心与其重合 */
+	/* ==================== 中央 U 星球发布键（悬浮实体圆，无光晕） ==================== */
 	.publish-center {
 		position: absolute;
 		left: 50%;
-		top: -32rpx;
+		top: -40rpx;
 		transform: translateX(-50%);
 		width: 160rpx;
 		display: flex;
@@ -253,34 +238,29 @@
 		align-items: center;
 		z-index: 20;
 	}
-	/* 呼吸光晕（径向渐变，不用 filter，性能友好） */
-	.publish-glow {
-		position: absolute;
-		top: 44rpx;
-		left: 50%;
-		transform: translateX(-50%);
-		width: 168rpx;
-		height: 168rpx;
+	/* 白色实体圆盘：清晰边界 + 品牌紫描边 + 轻投影，不弥散不脏 */
+	.publish-disc {
+		width: 108rpx;
+		height: 108rpx;
 		border-radius: 50%;
-		background: radial-gradient(circle, rgba(154, 120, 255, 0.32) 0%, rgba(154, 120, 255, 0.12) 46%, rgba(154, 120, 255, 0) 70%);
-		animation: glowPulse 3.2s ease-in-out infinite;
-	}
-	@keyframes glowPulse {
-		0%, 100% { opacity: 0.75; transform: translateX(-50%) scale(1); }
-		50% { opacity: 1; transform: translateX(-50%) scale(1.06); }
+		background: #FFFFFF;
+		box-sizing: border-box;
+		border: 5rpx solid #7B61FF;
+		box-shadow: 0 8rpx 22rpx rgba(123, 97, 255, 0.28);
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 	.publish-logo {
-		position: relative;
-		width: 112rpx;
-		height: 112rpx;
-		z-index: 2;
+		width: 88rpx;
+		height: 88rpx;
 	}
 	.publish-text {
-		margin-top: 4rpx;
+		margin-top: 6rpx;
 		font-size: 23rpx;
 		color: #6C3FF2;
 		font-weight: 700;
-		z-index: 2;
+		line-height: 32rpx;
 	}
 
 	/* ==================== 点击反馈 ==================== */

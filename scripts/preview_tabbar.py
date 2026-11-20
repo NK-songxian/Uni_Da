@@ -19,15 +19,14 @@ HTML = f"""<!DOCTYPE html><html><head><meta charset="utf-8">
 body {{ background:#ddd; font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; }}
 .phone {{ width:375px; height:760px; margin:20px auto; background:#F5F0FF; position:relative; overflow:hidden; border-radius:24px; }}
 img {{ display:block; }}
-/* 模拟页面底部内容，检验谷区透出效果 */
+/* 模拟页面底部内容 */
 .fake {{ position:absolute; left:20px; right:20px; top:560px; height:120px; background:#fff; border-radius:14px; padding:12px; color:#2A2440; font-size:14px; }}
 {css}
 </style></head><body>
 <div class="phone">
-  <div class="fake">模拟页面卡片内容——检查它透过波浪谷区是否可辨、发布文字是否可读</div>
+  <div class="fake">模拟页面卡片内容——检查 V5 完整白栏是否干净、发布圆盘是否清晰、文字是否可读</div>
   <view class="unida-tabbar" style="width:375px">
-    <view class="wave-solid"></view>
-    <img class="wave-bg" src="static/art/wave-tab-v2.png" style="object-fit:fill">
+    <view class="tabbar-sheet"></view>
     <view class="tabbar-content">
       <view class="tab-item active" style="pointer-events:none">
         <view class="icon-wrap"><img class="tab-ico" src="static/unida/tabbar/tab-home.png" style="object-fit:contain"></view>
@@ -48,8 +47,9 @@ img {{ display:block; }}
       </view>
     </view>
     <view class="publish-center" style="pointer-events:none">
-      <view class="publish-glow"></view>
-      <img class="publish-logo" src="static/unida/tabbar/publish-logo.png" style="object-fit:contain">
+      <view class="publish-disc">
+        <img class="publish-logo" src="static/unida/tabbar/publish-logo.png" style="object-fit:contain">
+      </view>
       <text class="publish-text">发布</text>
     </view>
   </view>
