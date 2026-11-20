@@ -1,50 +1,140 @@
 <template>
-	<view class="mine unida-page unida-page--tab">
-		<!-- 头部渐变 + 用户信息 -->
-		<view class="mine__hero">
-			<view class="mine__blob"></view>
-			<view class="mine__top">
-				<text class="mine__title">我的</text>
-				<text class="mine__setting" @click="onSetting">⚙️</text>
-			</view>
-			<view class="mine__user" @click="onEditProfile">
-				<view class="mine__avatar">😄</view>
-				<view class="mine__info">
-					<text class="mine__name">校园小伙伴</text>
-					<text class="mine__school">🎓 阳光大学 · 已认证</text>
+	<view class="mn">
+		<!-- 沉浸式校园插画头部（含品牌导航） -->
+		<view class="mn__safe" :style="{ paddingTop: statusBar + 'px' }"></view>
+		<view class="mn__head">
+			<image class="mn__strip" src="/static/unida/mine/header-strip.webp" mode="widthFix" />
+			<view class="mn__navzone mn__navzone--search" @click="onSearch"></view>
+			<view class="mn__navzone mn__navzone--bell" @click="onBell"></view>
+		</view>
+
+		<!-- 个人名片卡（UNIDA 元素整卡） -->
+		<view class="mn__hero">
+			<image class="mn__hero-img" src="/static/unida/mine/hero-card.webp" mode="widthFix" />
+			<view class="mn__tap mn__tap--edit" @click="onEdit"></view>
+			<view class="mn__tap mn__tap--s1" data-stat="0" @click="onStatTap"></view>
+			<view class="mn__tap mn__tap--s2" data-stat="1" @click="onStatTap"></view>
+			<view class="mn__tap mn__tap--s3" data-stat="2" @click="onStatTap"></view>
+			<view class="mn__tap mn__tap--s4" data-stat="3" @click="onStatTap"></view>
+		</view>
+
+		<!-- 我的校园生活 -->
+		<view class="mn__card">
+			<view class="mn__cardhead">
+				<view class="mn__cardtitle">
+					<text class="mn__ct">我的校园生活</text>
+					<view class="mn__uline"></view>
 				</view>
-				<text class="mine__arrow">›</text>
+				<text class="mn__cardsub">一站式管理我的校园体验</text>
+			</view>
+			<view class="mn__liferow">
+				<view class="mn__life" v-for="(it, i) in lifeItems" :key="i" @click="onLife(i)">
+					<image class="mn__life-ico" :src="it.icon" mode="aspectFit" />
+					<text class="mn__life-t">{{ it.label }}</text>
+				</view>
 			</view>
 		</view>
 
-		<!-- 积分卡 -->
-		<view class="mine__points unida-card">
-			<view class="mine__points-left">
-				<text class="mine__points-label">我的积分</text>
-				<text class="mine__points-num">2,480 <text class="mine__points-unit">分</text></text>
+		<!-- 我的小组件 -->
+		<view class="mn__sect">
+			<view class="mn__sect-l">
+				<view class="mn__spark mn__spark--a"></view>
+				<view class="mn__spark mn__spark--b"></view>
+				<text class="mn__sect-t">我的小组件</text>
+				<text class="mn__sect-sub">我的成长 · 我的节奏 · 我的小宇宙</text>
 			</view>
-			<view class="mine__points-badge">🥇 Lv.6 活力达人</view>
-			<view class="mine__points-btn" @click="onPoints">去签到 +5 →</view>
+			<view class="mn__manage" @click="onManage">管理组件</view>
+		</view>
+		<view class="mn__grid">
+			<!-- 本周目标 -->
+			<view class="mn__widget" @click="onGoal">
+				<view class="mn__whead">
+					<view class="mn__wbadge"><image class="mn__wbadge-ico" src="/static/icons-dark/flame.png" mode="aspectFit" /></view>
+					<text class="mn__wt">本周目标</text>
+					<image class="mn__chev" src="/static/icons-dark/chevron.png" mode="aspectFit" />
+				</view>
+				<view class="mn__wbody">
+					<view class="mn__wmain">
+						<view class="mn__goalnum"><text class="mn__goal-big">3</text><text class="mn__goal-sub">/5</text><text class="mn__goal-tip">项已完成</text></view>
+						<view class="mn__bar"><view class="mn__bar-fill mn__bar-fill--60"></view></view>
+					</view>
+					<image class="mn__wdeco mn__wdeco--clip" src="/static/unida/mine/w-clip.png" mode="aspectFit" />
+				</view>
+			</view>
+			<!-- 连续签到 -->
+			<view class="mn__widget" @click="onCheckin">
+				<view class="mn__whead">
+					<view class="mn__wbadge"><image class="mn__wbadge-ico" src="/static/icons-dark/calendar.png" mode="aspectFit" /></view>
+					<text class="mn__wt">连续签到</text>
+					<image class="mn__chev" src="/static/icons-dark/chevron.png" mode="aspectFit" />
+				</view>
+				<view class="mn__wbody">
+					<view class="mn__wmain">
+						<view class="mn__streak"><text class="mn__streak-big">7</text><text class="mn__streak-day">天</text></view>
+						<text class="mn__streak-tip">再签 3 天得成长徽章！</text>
+					</view>
+					<image class="mn__wdeco mn__wdeco--mascot" src="/static/unida/mine/w-mascot.png" mode="aspectFit" />
+				</view>
+			</view>
+			<!-- 活动日历 -->
+			<view class="mn__widget" @click="onCal">
+				<view class="mn__whead">
+					<view class="mn__wbadge"><image class="mn__wbadge-ico" src="/static/icons-dark/clock.png" mode="aspectFit" /></view>
+					<text class="mn__wt">活动日历</text>
+					<view class="mn__mon"><text class="mn__mon-t">1月</text></view>
+					<image class="mn__chev" src="/static/icons-dark/chevron.png" mode="aspectFit" />
+				</view>
+				<view class="mn__wbody">
+					<view class="mn__cal">
+						<view class="mn__cal-week"><text v-for="(w, i) in weekHead" :key="i" class="mn__cal-w">{{ w }}</text></view>
+						<view class="mn__cal-dates">
+							<view v-for="(d, i) in dateArr" :key="i" class="mn__cal-cell" :class="{ 'mn__cal-cell--on': d === 22 }">
+								<text class="mn__cal-d">{{ d }}</text>
+								<view class="mn__cal-dots" v-if="d === 22"><view class="mn__dot mn__dot--y"></view><view class="mn__dot mn__dot--p"></view></view>
+							</view>
+						</view>
+					</view>
+					<image class="mn__wdeco mn__wdeco--cal" src="/static/unida/mine/w-cal.png" mode="aspectFit" />
+				</view>
+			</view>
+			<!-- 成长徽章 -->
+			<view class="mn__widget" @click="onBadge">
+				<view class="mn__whead">
+					<view class="mn__wbadge"><image class="mn__wbadge-ico" src="/static/icons-dark/heart.png" mode="aspectFit" /></view>
+					<text class="mn__wt">成长徽章</text>
+					<image class="mn__chev" src="/static/icons-dark/chevron.png" mode="aspectFit" />
+				</view>
+				<view class="mn__wbody">
+					<view class="mn__wmain">
+						<view class="mn__lvrow"><text class="mn__lv">Lv.4</text><text class="mn__lv-name">活跃成长者</text></view>
+						<view class="mn__bar"><view class="mn__bar-fill mn__bar-fill--68"></view></view>
+						<view class="mn__growth"><text class="mn__growth-l">成长值</text><text class="mn__growth-v">680</text><text class="mn__growth-s">/ 1,000</text></view>
+					</view>
+					<image class="mn__wdeco mn__wdeco--badge" src="/static/unida/mine/w-badge.png" mode="aspectFit" />
+				</view>
+			</view>
 		</view>
 
-		<!-- 数据概览 -->
-		<view class="mine__stats unida-card">
-			<view class="mine__stat" v-for="(s, i) in stats" :key="i" @click="onStat(s)">
-				<text class="mine__stat-num">{{ s.num }}</text>
-				<text class="mine__stat-label">{{ s.label }}</text>
+		<!-- 快捷列表 -->
+		<view class="mn__card mn__list">
+			<view class="mn__lrow" v-for="(r, i) in listRows" :key="i" @click="onListRow(i)">
+				<image class="mn__lrow-ico" :src="r.icon" mode="aspectFit" />
+				<text class="mn__lrow-t">{{ r.label }}</text>
+				<view class="mn__count"><text class="mn__count-n">{{ r.count }}</text></view>
+				<image class="mn__chev mn__chev--row" src="/static/icons-dark/chevron.png" mode="aspectFit" />
 			</view>
 		</view>
 
-		<!-- 功能列表 -->
-		<view class="mine__group unida-card">
-			<view class="mine__row" v-for="(r, i) in rows" :key="i" @click="onRow(r)">
-				<text class="mine__row-icon">{{ r.icon }}</text>
-				<text class="mine__row-label">{{ r.label }}</text>
-				<text v-if="r.tip" class="mine__row-tip">{{ r.tip }}</text>
-				<text class="mine__row-arrow">›</text>
+		<!-- 设置 -->
+		<view class="mn__card mn__list">
+			<view class="mn__lrow" v-for="(r, i) in setRows" :key="i" @click="onSetRow(i)">
+				<image class="mn__lrow-ico" :src="r.icon" mode="aspectFit" />
+				<text class="mn__lrow-t">{{ r.label }}</text>
+				<image class="mn__chev mn__chev--row" src="/static/icons-dark/chevron.png" mode="aspectFit" />
 			</view>
 		</view>
 
+		<view class="mn__bottom-space"></view>
 		<unida-tabbar :current="4" />
 	</view>
 </template>
@@ -56,113 +146,202 @@
 		components: { unidaTabbar },
 		data() {
 			return {
-				stats: [
-					{ num: 6, label: '我的发布' },
-					{ num: 12, label: '我的搭子' },
-					{ num: 8, label: '我的预约' },
-					{ num: 3, label: '收藏' }
+				statusBar: 0,
+				lifeItems: [
+					{ icon: '/static/unida/mine/life-act.png', label: '我的活动' },
+					{ icon: '/static/unida/mine/life-team.png', label: '我的组队' },
+					{ icon: '/static/unida/mine/life-fav.png', label: '我的收藏' },
+					{ icon: '/static/unida/mine/life-pub.png', label: '我的发布' },
+					{ icon: '/static/unida/mine/life-sign.png', label: '我的报名' }
 				],
-				rows: [
-					{ icon: '🎓', label: '校园认证', tip: '已认证' },
-					{ icon: '📋', label: '我的订单' },
-					{ icon: '⭐', label: '我的评价' },
-					{ icon: '🏅', label: '我的勋章' },
-					{ icon: '👥', label: '我的关注' },
-					{ icon: '🛡️', label: '隐私管理' },
-					{ icon: '❓', label: '举报与反馈' }
+				weekHead: ['一', '二', '三', '四', '五', '六', '日'],
+				dateArr: [20, 21, 22, 23, 24, 25, 26],
+				listRows: [
+					{ icon: '/static/unida/mine/row-pub.png', label: '我的发布', count: 36 },
+					{ icon: '/static/unida/mine/row-buddy.png', label: '我的搭子', count: 128 },
+					{ icon: '/static/unida/mine/row-fav.png', label: '我的收藏', count: 42 },
+					{ icon: '/static/unida/mine/row-order.png', label: '我的报名', count: 12 }
+				],
+				setRows: [
+					{ icon: '/static/unida/mine/row-set.png', label: '设置' },
+					{ icon: '/static/unida/mine/row-help.png', label: '帮助与反馈' }
 				]
 			};
 		},
+		onLoad() {
+			const sys = uni.getSystemInfoSync();
+			this.statusBar = sys && sys.statusBarHeight || 0;
+		},
 		methods: {
-			onSetting() { uni.showToast({ title: '设置待开发', icon: 'none' }); },
-			onEditProfile() { uni.showToast({ title: '编辑资料待开发', icon: 'none' }); },
-			onPoints() { uni.showToast({ title: '积分中心待开发', icon: 'none' }); },
-			onStat(s) { uni.showToast({ title: s.label + ' 待开发', icon: 'none' }); },
-			onRow(r) { uni.showToast({ title: r.label + ' 待开发', icon: 'none' }); }
+			onToast(name) { uni.showToast({ title: name + '待开发', icon: 'none' }); },
+			onSearch() { this.onToast('搜索'); },
+			onBell() { this.onToast('消息通知'); },
+			onEdit() { uni.showToast({ title: '编辑资料待开发', icon: 'none' }); },
+			onStatTap(e) {
+				const i = Number(e.currentTarget.dataset.stat);
+				const map = ['我的发布', '我的搭子', '关注', '粉丝'];
+				uni.showToast({ title: map[i] + '待开发', icon: 'none' });
+			},
+			onLife(i) {
+				if (i === 0 || i === 4) { uni.navigateTo({ url: '/pages/my-orders/my-orders' }); return; }
+				this.onToast(this.lifeItems[i].label);
+			},
+			onListRow(i) {
+				if (i === 3) { uni.navigateTo({ url: '/pages/my-orders/my-orders' }); return; }
+				this.onToast(this.listRows[i].label);
+			},
+			onSetRow(i) { this.onToast(this.setRows[i].label); },
+			onCheckin() { uni.showToast({ title: '签到日历待开发', icon: 'none' }); },
+			onGoal() { this.onToast('本周目标'); },
+			onCal() { this.onToast('活动日历'); },
+			onBadge() { this.onToast('成长徽章'); },
+			onManage() { this.onToast('组件管理'); }
 		}
 	};
 </script>
 
 <style lang="scss" scoped>
-	@import '@/common/unida-global.scss';
-	.mine__hero {
-		position: relative;
-		padding: 60rpx 32rpx 80rpx;
-		background: linear-gradient(135deg, #7B61FF, #B59BFF);
-		border-radius: 0 0 44rpx 44rpx;
-		overflow: hidden;
-	}
-	.mine__blob {
-		position: absolute;
-		right: -60rpx;
-		top: -40rpx;
-		width: 260rpx;
-		height: 260rpx;
-		border-radius: 50%;
-		background: rgba(255,255,255,0.15);
-	}
-	.mine__top { display: flex; align-items: center; justify-content: space-between; position: relative; }
-	.mine__title { font-size: 44rpx; font-weight: 800; color: #fff; }
-	.mine__setting { font-size: 40rpx; }
-	.mine__user { display: flex; align-items: center; margin-top: 44rpx; position: relative; }
-	.mine__avatar {
-		width: 120rpx;
-		height: 120rpx;
-		border-radius: 50%;
-		background: #fff;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 64rpx;
-		border: 4rpx solid rgba(255,255,255,0.6);
-		margin-right: 24rpx;
-	}
-	.mine__info { flex: 1; display: flex; flex-direction: column; }
-	.mine__name { font-size: 36rpx; font-weight: 800; color: #fff; }
-	.mine__school { margin-top: 10rpx; font-size: 24rpx; color: rgba(255,255,255,0.9); }
-	.mine__arrow { font-size: 48rpx; color: #fff; }
+	@import '@/common/unida-tokens.scss';
 
-	.mine__points {
-		margin: -48rpx 24rpx 0;
-		position: relative;
-		display: flex;
-		align-items: center;
-		flex-wrap: wrap;
+	.mn { min-height: 100vh; background: $c-mist; }
+
+	/* ---------- 头部 ---------- */
+	.mn__head { position: relative; }
+	.mn__strip { display: block; width: 750rpx; height: 152rpx; }
+	.mn__navzone { position: absolute; top: 6rpx; height: 64rpx; }
+	.mn__navzone--search { left: 176rpx; width: 320rpx; }
+	.mn__navzone--bell { left: 636rpx; width: 72rpx; }
+
+	/* ---------- 个人名片 ---------- */
+	.mn__hero { position: relative; width: 706rpx; margin: 16rpx auto 0; }
+	.mn__hero-img { display: block; width: 706rpx; height: 322rpx; }
+	.mn__tap { position: absolute; }
+	.mn__tap--edit { left: 76%; top: 37%; width: 23%; height: 13%; }
+	.mn__tap--s1 { left: 3%; top: 60%; width: 23%; height: 26%; }
+	.mn__tap--s2 { left: 27%; top: 60%; width: 23%; height: 26%; }
+	.mn__tap--s3 { left: 51%; top: 60%; width: 23%; height: 26%; }
+	.mn__tap--s4 { left: 75%; top: 60%; width: 23%; height: 26%; }
+
+	/* ---------- 通用卡片 ---------- */
+	.mn__card {
+		margin: 24rpx $page-x 0;
+		background: $c-white;
+		border-radius: $r-lg;
+		box-shadow: $sh-card;
+		padding: 28rpx 28rpx;
 	}
-	.mine__points-left { display: flex; flex-direction: column; }
-	.mine__points-label { font-size: 24rpx; color: $unida-text-sub; }
-	.mine__points-num { font-size: 44rpx; font-weight: 800; color: $unida-orange; }
-	.mine__points-unit { font-size: 24rpx; }
-	.mine__points-badge {
+	.mn__cardhead { display: flex; align-items: flex-end; justify-content: space-between; }
+	.mn__cardtitle { position: relative; }
+	.mn__ct { font-size: 34rpx; font-weight: 800; color: $t-main; }
+	.mn__uline {
+		position: absolute; left: 2rpx; bottom: -8rpx;
+		width: 88rpx; height: 10rpx; border-radius: $r-pill;
+		background: $c-ice; opacity: 0.9;
+	}
+	.mn__cardsub { font-size: 22rpx; color: $t-tertiary; }
+
+	/* ---------- 我的校园生活 ---------- */
+	.mn__liferow { display: flex; margin-top: 34rpx; }
+	.mn__life { flex: 1; display: flex; flex-direction: column; align-items: center; }
+	.mn__life-ico { width: 72rpx; height: 70rpx; }
+	.mn__life-t { margin-top: 14rpx; font-size: 24rpx; color: $t-main; font-weight: 500; }
+
+	/* ---------- 小组件标题行 ---------- */
+	.mn__sect { display: flex; align-items: center; margin: 36rpx $page-x 0; position: relative; }
+	.mn__sect-l { display: flex; align-items: baseline; position: relative; }
+	.mn__spark {
+		position: absolute; border-radius: 3rpx;
+	}
+	.mn__spark--a { left: -20rpx; top: -14rpx; width: 14rpx; height: 14rpx; background: $c-sun; transform: rotate(45deg); }
+	.mn__spark--b { left: -30rpx; top: 4rpx; width: 8rpx; height: 8rpx; background: $c-primary; transform: rotate(45deg); opacity: 0.7; }
+	.mn__sect-t { font-size: 34rpx; font-weight: 800; color: $c-ink; }
+	.mn__sect-sub { margin-left: 16rpx; font-size: 22rpx; color: $t-tertiary; }
+	.mn__manage {
 		margin-left: auto;
-		font-size: 22rpx;
-		color: #a97b12;
-		background: rgba(255,215,106,0.3);
-		padding: 10rpx 18rpx;
-		border-radius: 999rpx;
-	}
-	.mine__points-btn {
-		width: 100%;
-		margin-top: 20rpx;
-		text-align: center;
-		padding: 18rpx;
-		border-radius: 16rpx;
-		background: rgba(123,97,255,0.08);
-		color: $unida-primary;
-		font-size: 26rpx;
+		padding: 12rpx 26rpx;
+		background: $g-cta;
+		border-radius: $r-pill;
+		color: $c-white;
+		font-size: 24rpx;
 		font-weight: 600;
+		box-shadow: $sh-float;
 	}
 
-	.mine__stats { display: flex; margin: 20rpx 24rpx; padding: 28rpx 0; }
-	.mine__stat { flex: 1; display: flex; flex-direction: column; align-items: center; }
-	.mine__stat-num { font-size: 36rpx; font-weight: 800; color: $unida-primary; }
-	.mine__stat-label { margin-top: 8rpx; font-size: 22rpx; color: $unida-text-sub; }
+	/* ---------- 小组件网格 ---------- */
+	.mn__grid { display: flex; flex-wrap: wrap; justify-content: space-between; margin: 20rpx $page-x 0; }
+	.mn__widget {
+		width: 343rpx;
+		background: $c-white;
+		border-radius: $r-md;
+		box-shadow: $sh-card;
+		padding: 24rpx 24rpx 20rpx;
+		margin-bottom: 16rpx;
+	}
+	.mn__whead { display: flex; align-items: center; }
+	.mn__wbadge {
+		width: 44rpx; height: 44rpx; border-radius: 14rpx;
+		background: rgba(128, 92, 250, 0.12);
+		display: flex; align-items: center; justify-content: center;
+	}
+	.mn__wbadge-ico { width: 26rpx; height: 26rpx; }
+	.mn__wt { margin-left: 12rpx; font-size: 26rpx; font-weight: 700; color: $t-main; flex: 1; }
+	.mn__mon { margin-right: 8rpx; }
+	.mn__mon-t { font-size: 22rpx; color: $t-sub; font-family: $ff-num; font-weight: 600; }
+	.mn__chev { width: 24rpx; height: 24rpx; opacity: 0.5; }
+	.mn__wbody { display: flex; align-items: flex-end; margin-top: 20rpx; position: relative; }
+	.mn__wmain { flex: 1; min-width: 0; }
 
-	.mine__group { margin: 20rpx 24rpx; padding: 8rpx 24rpx; }
-	.mine__row { display: flex; align-items: center; padding: 24rpx 0; border-bottom: 2rpx solid $unida-divider; }
-	.mine__row:last-child { border-bottom: none; }
-	.mine__row-icon { font-size: 36rpx; margin-right: 20rpx; }
-	.mine__row-label { flex: 1; font-size: 28rpx; color: $unida-text; }
-	.mine__row-tip { font-size: 22rpx; color: $unida-green; margin-right: 12rpx; }
-	.mine__row-arrow { font-size: 36rpx; color: $unida-text-sub; }
+	.mn__goalnum { display: flex; align-items: baseline; }
+	.mn__goal-big { font-family: $ff-num; font-size: 56rpx; font-weight: 800; color: $c-ink; }
+	.mn__goal-sub { font-family: $ff-num; font-size: 28rpx; color: $t-sub; margin-left: 2rpx; }
+	.mn__goal-tip { margin-left: 14rpx; font-size: 22rpx; color: $t-sub; }
+	.mn__bar { margin-top: 18rpx; height: 14rpx; border-radius: $r-pill; background: $c-ice; overflow: hidden; }
+	.mn__bar-fill { height: 100%; border-radius: $r-pill; background: $g-brand; }
+	.mn__bar-fill--60 { width: 60%; }
+	.mn__bar-fill--68 { width: 68%; }
+	.mn__wdeco--clip { width: 104rpx; height: 118rpx; margin-left: 6rpx; }
+
+	.mn__streak { display: flex; align-items: baseline; }
+	.mn__streak-big { font-family: $ff-num; font-size: 56rpx; font-weight: 800; color: $c-ink; }
+	.mn__streak-day { font-size: 26rpx; color: $t-main; font-weight: 600; margin-left: 6rpx; }
+	.mn__streak-tip { display: block; margin-top: 14rpx; font-size: 19rpx; color: $c-peach; font-weight: 600; white-space: nowrap; }
+	.mn__wdeco--mascot { width: 104rpx; height: 110rpx; margin-left: 4rpx; flex-shrink: 0; }
+
+	.mn__cal-week { display: flex; justify-content: space-between; }
+	.mn__cal-w { width: 34rpx; text-align: center; font-size: 20rpx; color: $t-tertiary; }
+	.mn__cal-dates { display: flex; justify-content: space-between; margin-top: 10rpx; }
+	.mn__cal-cell { width: 34rpx; height: 44rpx; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+	.mn__cal-cell--on { background: $g-cta; border-radius: 12rpx; }
+	.mn__cal-d { font-size: 22rpx; color: $t-main; font-family: $ff-num; }
+	.mn__cal-cell--on .mn__cal-d { color: $c-white; font-weight: 700; }
+	.mn__cal-dots { display: flex; margin-top: 3rpx; }
+	.mn__dot { width: 8rpx; height: 8rpx; border-radius: 50%; margin: 0 2rpx; }
+	.mn__dot--y { background: $c-sun; }
+	.mn__dot--p { background: $c-purple-light; }
+	.mn__wdeco--cal { width: 96rpx; height: 96rpx; margin-left: 8rpx; }
+
+	.mn__lvrow { display: flex; align-items: baseline; white-space: nowrap; }
+	.mn__lv { font-family: $ff-num; font-size: 44rpx; font-weight: 800; color: $c-ink; }
+	.mn__lv-name { margin-left: 12rpx; font-size: 22rpx; color: $t-main; font-weight: 600; }
+	.mn__growth { display: flex; align-items: baseline; margin-top: 10rpx; }
+	.mn__growth-l { font-size: 20rpx; color: $t-tertiary; }
+	.mn__growth-v { font-family: $ff-num; font-size: 26rpx; font-weight: 700; color: $c-primary; margin-left: 8rpx; }
+	.mn__growth-s { font-family: $ff-num; font-size: 20rpx; color: $t-tertiary; margin-left: 2rpx; }
+	.mn__wdeco--badge { width: 92rpx; height: 100rpx; margin-left: 6rpx; flex-shrink: 0; }
+
+	/* ---------- 快捷列表 / 设置 ---------- */
+	.mn__list { padding: 6rpx 28rpx; }
+	.mn__lrow { display: flex; align-items: center; padding: 26rpx 0; border-bottom: 2rpx solid $c-line; }
+	.mn__lrow:last-child { border-bottom: none; }
+	.mn__lrow-ico { width: 44rpx; height: 40rpx; }
+	.mn__lrow-t { flex: 1; margin-left: 22rpx; font-size: 28rpx; color: $t-main; font-weight: 500; }
+	.mn__count {
+		min-width: 56rpx; padding: 4rpx 16rpx;
+		background: $c-mist; border-radius: $r-pill;
+		display: flex; justify-content: center;
+	}
+	.mn__count-n { font-family: $ff-num; font-size: 24rpx; font-weight: 700; color: $c-primary; }
+	.mn__chev--row { width: 28rpx; height: 28rpx; opacity: 0.35; margin-left: 16rpx; }
+
+	.mn__bottom-space { height: 200rpx; }
 </style>
