@@ -86,6 +86,6 @@ $dur-fast:         120ms;
 $dur-base:         320ms;
 
 // ---------- tabbar 尺寸（改这里就能整体调整导航高度）
-$tabbar-h:         156rpx;
-$tabbar-icon:      48rpx;
-$publish-d:        80rpx;
+$tabbar-h:         170rpx;     // V7：图片镂空 U 型凹槽白栏高度
+$tabbar-icon:      60rpx;      // V7：放大后的图标
+$publish-d:        108rpx;     // V7：发布球直径

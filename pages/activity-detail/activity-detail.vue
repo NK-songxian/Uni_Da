@@ -1,71 +1,117 @@
 <template>
 	<view class="ad unida-page">
-		<!-- 自定义导航 -->
-		<view class="ad__nav">
-			<text class="ad__nav-btn" @click="goBack">‹</text>
-			<text class="ad__nav-title">活动详情</text>
-			<text class="ad__nav-btn" @click="onShare">⋯</text>
-		</view>
-
-		<!-- 封面 -->
+		<!-- ══════════ 沉浸式封面（统一插画，满幅铺底） ══════════ -->
 		<view class="ad__cover">
-			<text class="ad__cover-emoji">🎪</text>
-			<view class="ad__cover-status">🔥 报名中</view>
+			<image class="ad__cover-img" src="/static/art/art-guitar.jpg" mode="aspectFill" />
+			<view class="ad__cover-shade"></view>
+
+			<!-- 透明浮层导航（无框无投影，白字+深描边保证可读） -->
+			<view class="ad__nav" :style="{ paddingTop: statusBar + 'px' }">
+				<view class="ad__nav-btn" @click="goBack">
+					<image class="ad__nav-ico" src="/static/icons-dark/back.png" mode="aspectFit" />
+				</view>
+				<text class="ad__nav-title">活动详情</text>
+				<view class="ad__nav-btn" @click="onShare">
+					<image class="ad__nav-ico" src="/static/icons-dark/bell.png" mode="aspectFit" />
+				</view>
+			</view>
+
+			<!-- 状态徽章（阳光黄，玻璃质感） -->
+			<view class="ad__cover-status">
+				<image class="ad__cover-status-ico" src="/static/icons-dark/flame.png" mode="aspectFit" />
+				<text class="ad__cover-status-t">报名中</text>
+			</view>
 		</view>
 
-		<!-- 主体信息卡 -->
-		<view class="ad__main unida-card">
+		<!-- ══════════ 主体信息卡（叠压封面） ══════════ -->
+		<view class="ad__main">
 			<view class="ad__title-row">
 				<text class="ad__title">校园草地音乐会 · 一起嗨翻周末</text>
-				<view class="ad__fav" @click="faved = !faved">{{ faved ? '❤️' : '🤍' }}</view>
+				<view class="ad__fav" @click="faved = !faved">
+					<image class="ad__fav-ico" :class="{ 'ad__fav-ico--on': faved }" src="/static/icons-dark/heart.png" mode="aspectFit" />
+				</view>
 			</view>
 			<view class="ad__tags">
-				<text class="unida-tag unida-tag--purple">校园活动</text>
-				<text class="unida-tag unida-tag--orange">🔥 热门</text>
-				<text class="unida-tag unida-tag--green">免费</text>
+				<text class="ad__tag ad__tag--purple">校园活动</text>
+				<text class="ad__tag ad__tag--orange">热门</text>
+				<text class="ad__tag ad__tag--green">免费</text>
 			</view>
+
+			<!-- 时间 / 地点：线性图标 + 墨紫数值 -->
 			<view class="ad__meta">
-				<view class="ad__meta-item"><text class="ad__meta-icon">🕒</text><view><text class="ad__meta-label">活动时间</text><text class="ad__meta-value">本周六 19:00 - 21:00</text></view></view>
-				<view class="ad__meta-item"><text class="ad__meta-icon">📍</text><view><text class="ad__meta-label">活动地点</text><text class="ad__meta-value">中心草坪广场</text></view></view>
+				<view class="ad__meta-item">
+					<view class="ad__meta-ico"><image src="/static/icons-dark/clock.png" mode="aspectFit" /></view>
+					<view class="ad__meta-col">
+						<text class="ad__meta-label">活动时间</text>
+						<text class="ad__meta-value">本周六 19:00 - 21:00</text>
+					</view>
+				</view>
+				<view class="ad__meta-item">
+					<view class="ad__meta-ico"><image src="/static/icons-dark/pin.png" mode="aspectFit" /></view>
+					<view class="ad__meta-col">
+						<text class="ad__meta-label">活动地点</text>
+						<text class="ad__meta-value">中心草坪广场</text>
+					</view>
+				</view>
+			</view>
+
+			<!-- 报名进度 -->
+			<view class="ad__progress">
+				<view class="ad__progress-head">
+					<text class="ad__progress-t">报名进度</text>
+					<text class="ad__progress-n">{{ joined }}<text class="ad__progress-slash"> / </text>{{ total }} 人</text>
+				</view>
+				<view class="ad__progress-track"><view class="ad__progress-fill" :style="{ width: pct + '%' }"></view></view>
 			</view>
 		</view>
 
-		<!-- 发起人 -->
-		<view class="ad__organizer unida-card" @click="goUser">
-			<view class="ad__org-avatar">🎸</view>
+		<!-- ══════════ 发起人 ══════════ -->
+		<view class="ad__card ad__organizer" @click="goUser">
+			<view class="ad__org-avatar">林</view>
 			<view class="ad__org-info">
-				<text class="ad__org-name">音乐社 · 小林</text>
-				<text class="ad__org-sub">🎓 已认证 · ⭐ 4.9 分</text>
+				<view class="ad__org-name-row">
+					<text class="ad__org-name">音乐社 · 小林</text>
+					<view class="ad__org-verified"><image src="/static/icons-dark/buddy.png" mode="aspectFit" /></view>
+				</view>
+				<text class="ad__org-sub">已认证 · 4.9 分</text>
 			</view>
-			<text class="ad__org-arrow">›</text>
+			<image class="ad__org-arrow" src="/static/icons-dark/chevron.png" mode="aspectFit" />
 		</view>
 
-		<!-- 报名人员 -->
-		<view class="ad__members unida-card">
-			<view class="ad__subhead"><text class="ad__subhead-title">报名人员</text><text class="ad__subhead-more">{{ joined }}/{{ total }} 人 · 查看全部 ›</text></view>
+		<!-- ══════════ 报名人员（几何头像，无 emoji） ══════════ -->
+		<view class="ad__card">
+			<view class="ad__subhead">
+				<text class="ad__subhead-title">报名人员</text>
+				<text class="ad__subhead-more">查看全部 ›</text>
+			</view>
 			<view class="ad__avatars">
-				<text class="ad__avatar" v-for="(a, i) in avatars" :key="i">{{ a }}</text>
-				<view class="ad__avatar ad__avatar--more">+{{ total - joined }}</view>
+				<view class="ad__avatar" v-for="(a, i) in members" :key="i" :style="{ background: a.bg }">{{ a.ch }}</view>
+				<view class="ad__avatar-more">+{{ total - joined }}</view>
+				<text class="ad__avatars-tip">已有 {{ joined }} 人加入</text>
 			</view>
 		</view>
 
-		<!-- 活动详情 -->
-		<view class="ad__desc unida-card">
+		<!-- ══════════ 活动详情 ══════════ -->
+		<view class="ad__card">
 			<view class="ad__subhead"><text class="ad__subhead-title">活动详情</text></view>
-			<text class="ad__desc-text">一起在草地上听歌、唱歌、认识新朋友！我们准备了音响、吉他和零食，欢迎会乐器或爱唱歌的同学加入，也欢迎来当观众～ 🎶</text>
+			<text class="ad__desc-text">一起在草地上听歌、唱歌、认识新朋友！我们准备了音响、吉他和零食，欢迎会乐器或爱唱歌的同学加入，也欢迎来当观众。</text>
 			<text class="ad__desc-text">请自带野餐垫，注意防蚊。活动结束后一起收拾场地哦～</text>
 		</view>
 
-		<!-- 费用说明 -->
-		<view class="ad__cost unida-card">
+		<!-- ══════════ 费用说明 ══════════ -->
+		<view class="ad__card">
 			<view class="ad__subhead"><text class="ad__subhead-title">费用说明</text></view>
-			<text class="ad__cost-text">免费参与 · 零食饮料 AA（预计 ¥15/人）</text>
+			<view class="ad__cost">
+				<text class="ad__cost-free">免费参与</text>
+				<text class="ad__cost-dot">·</text>
+				<text class="ad__cost-text">零食饮料 AA（预计 ¥15/人）</text>
+			</view>
 		</view>
 
-		<!-- 底部报名栏 -->
+		<!-- ══════════ 底部报名栏 ══════════ -->
 		<view class="ad__bottom">
 			<view class="ad__bottom-left" @click="onContact">
-				<text class="ad__bottom-icon">💬</text>
+				<view class="ad__bottom-ico"><image src="/static/icons-dark/message.png" mode="aspectFit" /></view>
 				<text class="ad__bottom-label">联系</text>
 			</view>
 			<view class="ad__bottom-btn" @click="onBooking">立即报名</view>
@@ -77,11 +123,25 @@
 	export default {
 		data() {
 			return {
+				statusBar: 0,
 				faved: false,
 				joined: 36,
 				total: 50,
-				avatars: ['😄', '🤩', '😎', '👩‍🎓', '🧑‍🎓', '👨‍🎓']
+				members: [
+					{ ch: '陈', bg: 'linear-gradient(135deg,#A98BFF,#805CFA)' },
+					{ ch: '李', bg: 'linear-gradient(135deg,#FFC94F,#FF9B77)' },
+					{ ch: '王', bg: 'linear-gradient(135deg,#29CA83,#93EDCF)' },
+					{ ch: '周', bg: 'linear-gradient(135deg,#69B9F5,#A98BFF)' },
+					{ ch: '吴', bg: 'linear-gradient(135deg,#805CFA,#542DAF)' }
+				]
 			};
+		},
+		computed: {
+			pct() { return Math.round(this.joined / this.total * 100); }
+		},
+		onLoad() {
+			const sys = uni.getSystemInfoSync();
+			this.statusBar = (sys && (sys.statusBarHeight || 0)) || 0;
 		},
 		methods: {
 			goBack() { uni.navigateBack(); },
@@ -94,43 +154,158 @@
 </script>
 
 <style lang="scss" scoped>
-	@import '@/common/unida-global.scss';
-	.ad { padding-bottom: 160rpx; }
-	.ad__nav { height: 120rpx; padding: 60rpx 32rpx 0; display: flex; align-items: center; justify-content: space-between; position: absolute; left: 0; right: 0; top: 0; z-index: 10; }
-	.ad__nav-btn { width: 60rpx; height: 60rpx; border-radius: 50%; background: rgba(255,255,255,0.9); color: $unida-text; font-size: 40rpx; display: flex; align-items: center; justify-content: center; }
-	.ad__nav-title { font-size: 32rpx; font-weight: 700; color: #fff; text-shadow: 0 2rpx 8rpx rgba(0,0,0,0.2); }
-	.ad__cover { height: 480rpx; border-radius: 0 0 40rpx 40rpx; background: linear-gradient(135deg,#7B61FF,#B59BFF,#FFD76A); display: flex; align-items: center; justify-content: center; position: relative; }
-	.ad__cover-emoji { font-size: 180rpx; filter: drop-shadow(0 16rpx 24rpx rgba(0,0,0,0.15)); }
-	.ad__cover-status { position: absolute; left: 32rpx; bottom: 32rpx; background: $unida-orange; color: #fff; font-size: 24rpx; padding: 10rpx 24rpx; border-radius: 999rpx; }
-	.ad__main, .ad__organizer, .ad__members, .ad__desc, .ad__cost { margin: 20rpx 24rpx; }
-	.ad__main { margin-top: -40rpx; position: relative; }
+	@import '@/common/unida-tokens.scss';
+
+	.ad { padding-bottom: 180rpx; }
+
+	/* ══════════ 封面 ══════════ */
+	.ad__cover { position: relative; height: 720rpx; overflow: hidden; }
+	.ad__cover-img { position: absolute; inset: 0; width: 100%; height: 100%; }
+	.ad__cover-shade {
+		position: absolute; left: 0; right: 0; bottom: 0; height: 260rpx;
+		background: linear-gradient(180deg, rgba(57,0,126,0) 0%, rgba(57,0,126,0.28) 100%);
+	}
+	/* 透明浮层导航：白字 + 深描边，无框无投影 */
+	.ad__nav {
+		position: absolute; left: 0; right: 0; top: 0; z-index: 10;
+		display: flex; align-items: center; justify-content: space-between;
+		padding-left: $page-x; padding-right: $page-x; padding-bottom: 16rpx;
+	}
+	.ad__nav-btn {
+		width: 64rpx; height: 64rpx; border-radius: 50%;
+		display: flex; align-items: center; justify-content: center;
+	}
+	.ad__nav-ico { width: 40rpx; height: 40rpx; filter: brightness(0) invert(1); }
+	.ad__nav-title {
+		font-size: $fs-h3; font-weight: $fw-bold; color: #fff;
+		text-shadow: 0 2rpx 10rpx rgba(57,0,126,0.55); letter-spacing: 0.5rpx;
+	}
+	.ad__cover-status {
+		position: absolute; left: $page-x; bottom: 100rpx;
+		display: flex; align-items: center; flex-direction: row;
+		padding: 12rpx 26rpx; border-radius: $r-pill;
+		background: $g-glass; box-shadow: $sh-float;
+	}
+	.ad__cover-status-ico { width: 28rpx; height: 28rpx; margin-right: 10rpx; }
+	.ad__cover-status-t { font-size: $fs-caption; font-weight: $fw-bold; color: $c-ink; letter-spacing: 0.5rpx; }
+
+	/* ══════════ 主体信息卡（叠压封面） ══════════ */
+	.ad__main {
+		position: relative; z-index: 5; margin: -76rpx $page-x 0;
+		padding: 32rpx 28rpx; border-radius: $r-lg;
+		background: #fff; box-shadow: $sh-card;
+	}
 	.ad__title-row { display: flex; align-items: flex-start; justify-content: space-between; }
-	.ad__title { font-size: 34rpx; font-weight: 800; color: $unida-text; flex: 1; line-height: 1.4; }
-	.ad__fav { font-size: 44rpx; margin-left: 16rpx; }
-	.ad__tags { display: flex; gap: 12rpx; margin-top: 18rpx; flex-wrap: wrap; }
-	.ad__meta { margin-top: 28rpx; padding-top: 24rpx; border-top: 2rpx solid $unida-divider; }
-	.ad__meta-item { display: flex; align-items: flex-start; margin-bottom: 20rpx; }
-	.ad__meta-icon { font-size: 32rpx; margin-right: 16rpx; }
-	.ad__meta-item view { display: flex; flex-direction: column; }
-	.ad__meta-label { font-size: 22rpx; color: $unida-text-sub; }
-	.ad__meta-value { margin-top: 6rpx; font-size: 28rpx; color: $unida-text; font-weight: 600; }
+	.ad__title {
+		flex: 1; font-size: $fs-h2; font-weight: $fw-bold; color: $c-ink;
+		line-height: 1.42; letter-spacing: -0.8rpx;
+	}
+	.ad__fav { width: 56rpx; height: 56rpx; display: flex; align-items: center; justify-content: center; margin-left: 12rpx; }
+	.ad__fav-ico { width: 44rpx; height: 44rpx; opacity: 0.45; transition: opacity 0.2s ease; }
+	.ad__fav-ico--on { opacity: 1; }
+	.ad__tags { display: flex; flex-wrap: wrap; margin-top: 20rpx; }
+	.ad__tag {
+		font-size: $fs-micro; font-weight: $fw-semibold; letter-spacing: 0.3rpx;
+		padding: 8rpx 18rpx; border-radius: $r-pill; margin-right: 12rpx; margin-bottom: 8rpx;
+	}
+	.ad__tag--purple { color: $c-primary; background: rgba(128,92,250,0.10); }
+	.ad__tag--orange { color: $c-peach; background: rgba(255,155,119,0.14); }
+	.ad__tag--green { color: $c-mint; background: rgba(41,202,131,0.13); }
+	.ad__meta { margin-top: 28rpx; padding-top: 26rpx; border-top: 2rpx solid $c-line; }
+	.ad__meta-item { display: flex; align-items: center; margin-bottom: 22rpx; }
+	.ad__meta-item:last-child { margin-bottom: 0; }
+	.ad__meta-ico {
+		width: 64rpx; height: 64rpx; border-radius: 18rpx; flex-shrink: 0;
+		background: linear-gradient(150deg, rgba(169,139,255,0.16), rgba(128,92,250,0.08));
+		display: flex; align-items: center; justify-content: center; margin-right: 20rpx;
+	}
+	.ad__meta-ico image { width: 34rpx; height: 34rpx; }
+	.ad__meta-col { display: flex; flex-direction: column; }
+	.ad__meta-label { font-size: $fs-micro; color: $t-sub; letter-spacing: 0.3rpx; }
+	.ad__meta-value { margin-top: 6rpx; font-size: $fs-body; font-weight: $fw-semibold; color: $c-ink; letter-spacing: -0.2rpx; }
+
+	/* 报名进度 */
+	.ad__progress { margin-top: 28rpx; padding-top: 26rpx; border-top: 2rpx solid $c-line; }
+	.ad__progress-head { display: flex; align-items: baseline; justify-content: space-between; }
+	.ad__progress-t { font-size: $fs-caption; color: $t-sub; letter-spacing: 0.3rpx; }
+	.ad__progress-n { font-family: $ff-num; font-size: $fs-body; font-weight: $fw-bold; color: $c-primary; }
+	.ad__progress-slash { font-size: $fs-micro; color: $t-tertiary; }
+	.ad__progress-track { margin-top: 16rpx; height: 12rpx; border-radius: $r-pill; background: $c-line; overflow: hidden; }
+	.ad__progress-fill {
+		height: 100%; border-radius: $r-pill;
+		background: linear-gradient(90deg, $c-purple-light, $c-primary);
+		transition: width 0.4s $ease-out;
+	}
+
+	/* ══════════ 通用卡片区块 ══════════ */
+	.ad__card { margin: 24rpx $page-x 0; padding: 28rpx; border-radius: $r-lg; background: #fff; box-shadow: $sh-card; }
+	.ad__subhead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22rpx; }
+	.ad__subhead-title { font-size: $fs-h3; font-weight: $fw-bold; color: $c-ink; letter-spacing: -0.3rpx; }
+	.ad__subhead-more { font-size: $fs-caption; color: $t-sub; }
+
+	/* 发起人 */
 	.ad__organizer { display: flex; align-items: center; }
-	.ad__org-avatar { width: 88rpx; height: 88rpx; border-radius: 50%; background: linear-gradient(135deg,#FF8A3D,#FFD76A); display: flex; align-items: center; justify-content: center; font-size: 44rpx; margin-right: 20rpx; }
+	.ad__org-avatar {
+		width: 92rpx; height: 92rpx; border-radius: 50%; flex-shrink: 0;
+		background: linear-gradient(145deg, #A98BFF, #6C3FF2);
+		display: flex; align-items: center; justify-content: center;
+		font-size: 36rpx; font-weight: $fw-bold; color: #fff;
+		box-shadow: 0 8rpx 20rpx rgba(108,63,242,0.28); margin-right: 20rpx;
+	}
 	.ad__org-info { flex: 1; display: flex; flex-direction: column; }
-	.ad__org-name { font-size: 28rpx; font-weight: 700; color: $unida-text; }
-	.ad__org-sub { margin-top: 8rpx; font-size: 22rpx; color: $unida-text-sub; }
-	.ad__org-arrow { font-size: 40rpx; color: $unida-text-sub; }
-	.ad__subhead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20rpx; }
-	.ad__subhead-title { font-size: 28rpx; font-weight: 700; color: $unida-text; }
-	.ad__subhead-more { font-size: 22rpx; color: $unida-text-sub; }
-	.ad__avatars { display: flex; }
-	.ad__avatar { width: 68rpx; height: 68rpx; border-radius: 50%; background: linear-gradient(135deg,#B59BFF,#7B61FF); display: flex; align-items: center; justify-content: center; font-size: 36rpx; margin-right: -12rpx; border: 4rpx solid #fff; }
-	.ad__avatar--more { background: #efebf8; color: $unida-primary; font-size: 22rpx; font-weight: 700; }
-	.ad__desc-text { display: block; font-size: 26rpx; color: #4a4560; line-height: 1.8; margin-bottom: 12rpx; }
-	.ad__cost-text { font-size: 26rpx; color: $unida-orange; font-weight: 600; }
-	.ad__bottom { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; padding: 16rpx 24rpx calc(16rpx + env(safe-area-inset-bottom)); display: flex; align-items: center; box-shadow: 0 -6rpx 24rpx rgba(123,97,255,0.08); z-index: 20; }
-	.ad__bottom-left { width: 100rpx; display: flex; flex-direction: column; align-items: center; }
-	.ad__bottom-icon { font-size: 40rpx; }
-	.ad__bottom-label { font-size: 20rpx; color: $unida-text-sub; }
-	.ad__bottom-btn { flex: 1; height: 88rpx; border-radius: 999rpx; background: linear-gradient(135deg,#7B61FF,#B59BFF); color: #fff; font-size: 30rpx; font-weight: 700; display: flex; align-items: center; justify-content: center; box-shadow: 0 10rpx 24rpx rgba(123,97,255,0.28); }
+	.ad__org-name-row { display: flex; align-items: center; }
+	.ad__org-name { font-size: $fs-h3; font-weight: $fw-bold; color: $c-ink; letter-spacing: -0.3rpx; }
+	.ad__org-verified {
+		width: 30rpx; height: 30rpx; border-radius: 50%; margin-left: 10rpx;
+		background: $c-mint; display: flex; align-items: center; justify-content: center;
+	}
+	.ad__org-verified image { width: 20rpx; height: 20rpx; filter: brightness(0) invert(1); }
+	.ad__org-sub { margin-top: 8rpx; font-size: $fs-caption; color: $t-sub; letter-spacing: 0.2rpx; }
+	.ad__org-arrow { width: 32rpx; height: 32rpx; opacity: 0.4; }
+
+	/* 报名人员 */
+	.ad__avatars { display: flex; align-items: center; }
+	.ad__avatar {
+		width: 68rpx; height: 68rpx; border-radius: 50%;
+		display: flex; align-items: center; justify-content: center;
+		font-size: 26rpx; font-weight: $fw-bold; color: #fff;
+		border: 4rpx solid #fff; margin-right: -16rpx;
+	}
+	.ad__avatar-more {
+		width: 68rpx; height: 68rpx; border-radius: 50%; flex-shrink: 0;
+		display: flex; align-items: center; justify-content: center;
+		font-family: $ff-num; font-size: 24rpx; font-weight: $fw-bold; color: $c-primary;
+		background: rgba(128,92,250,0.10); border: 4rpx solid #fff; margin-left: 20rpx;
+	}
+	.ad__avatars-tip { margin-left: auto; font-size: $fs-micro; color: $t-tertiary; }
+
+	/* 详情 / 费用 */
+	.ad__desc-text { display: block; font-size: $fs-body; color: $t-main; line-height: 1.78; margin-bottom: 14rpx; letter-spacing: 0.2rpx; }
+	.ad__desc-text:last-child { margin-bottom: 0; }
+	.ad__cost { display: flex; align-items: center; }
+	.ad__cost-free { font-size: $fs-body; font-weight: $fw-bold; color: $c-mint; }
+	.ad__cost-dot { margin: 0 12rpx; color: $t-tertiary; }
+	.ad__cost-text { font-size: $fs-body; color: $t-main; }
+
+	/* ══════════ 底部报名栏 ══════════ */
+	.ad__bottom {
+		position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+		display: flex; align-items: center; padding: 18rpx $page-x;
+		padding-bottom: calc(18rpx + env(safe-area-inset-bottom));
+		background: rgba(255,255,255,0.96); box-shadow: 0 -6rpx 24rpx rgba(123,97,255,0.08);
+	}
+	.ad__bottom-left { width: 110rpx; display: flex; flex-direction: column; align-items: center; }
+	.ad__bottom-ico {
+		width: 64rpx; height: 64rpx; border-radius: 50%;
+		background: rgba(128,92,250,0.10); display: flex; align-items: center; justify-content: center;
+	}
+	.ad__bottom-ico image { width: 36rpx; height: 36rpx; }
+	.ad__bottom-label { margin-top: 6rpx; font-size: $fs-micro; color: $t-sub; }
+	.ad__bottom-btn {
+		flex: 1; height: 92rpx; border-radius: $r-pill;
+		background: $g-cta; box-shadow: $sh-float;
+		display: flex; align-items: center; justify-content: center;
+		font-size: $fs-h3; font-weight: $fw-bold; color: #fff; letter-spacing: 2rpx;
+	}
+	.ad__bottom-btn:active { opacity: 0.9; }
 </style>
