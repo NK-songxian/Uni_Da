@@ -11,18 +11,23 @@ _archive/
 
 # 临时预览 / 自检生成物
 preview.html
-preview_discover.html
-preview_tabbar.html
+preview_*.html
 _discover.css
 _sync.scss
 _sync.css
 _sync_disc.scss
 _sync_disc.css
+_sync_booking_conf.sql
+_sync_booking_confirm.scss
+_sync_booking_confirm.css
+_sync_booking_success.scss
+_sync_booking_success.css
 __pycache__/
 *.pyc
 
 # 视觉自检截图（过程产物，不进仓库；已跟踪的历史截图保留）
 docs/audit/*.png
+docs/audit/**/*.png
 
 # 系统文件
 .DS_Store
