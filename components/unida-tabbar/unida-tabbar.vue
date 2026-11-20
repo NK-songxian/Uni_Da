@@ -1,8 +1,8 @@
 <template>
-	<!-- UNIDA 专属底部导航 V5：完整白栏 + 悬浮圆形发布键（无波浪、无光晕脏斑、无 mask 兼容坑） -->
+	<!-- UNIDA 专属底部导航 V6：图片镂空 U 型凹槽白栏（真机必渲染） + U 星球发布球嵌谷 -->
 	<view class="unida-tabbar">
-		<!-- 白色圆角底座：完整无挖洞，视觉干净统一 -->
-		<view class="tabbar-sheet"></view>
+		<!-- 白栏顶部真挖 U 型谷（PNG 透明区），发布球坐进谷里；图片方案规避 mask 真机失效 -->
+		<image class="tabbar-sheet" src="/static/unida/tabbar/tabbar-sheet.png" mode="widthFix" />
 
 		<!-- 导航内容 -->
 		<view class="tabbar-content">
@@ -59,11 +59,9 @@
 			</view>
 		</view>
 
-		<!-- 中央 U 星球发布键：悬浮圆形实体底盘，无光晕脏斑 -->
+		<!-- 中央 U 星球发布球：坐进 U 型谷，谷是托盘，不再套圆盘 -->
 		<view class="publish-center" @tap="onPublishTap">
-			<view class="publish-disc">
-				<image class="publish-logo" src="/static/unida/tabbar/publish-logo.png" mode="aspectFit" />
-			</view>
+			<image class="publish-logo" src="/static/unida/tabbar/publish-logo.png" mode="aspectFit" />
 			<text class="publish-text">发布</text>
 		</view>
 	</view>
@@ -115,39 +113,38 @@
 </script>
 
 <style lang="scss" scoped>
-	/* ==================== 容器 ==================== */
+	/* ==================== 容器：跟随白栏图片高度 200rpx ==================== */
 	.unida-tabbar {
 		position: fixed;
 		left: 0;
 		right: 0;
 		bottom: 0;
-		height: calc(132rpx + env(safe-area-inset-bottom));
-		height: calc(132rpx + constant(safe-area-inset-bottom));
+		height: calc(200rpx + env(safe-area-inset-bottom));
+		height: calc(200rpx + constant(safe-area-inset-bottom));
 		z-index: 9999;
 		box-sizing: border-box;
 		padding-bottom: env(safe-area-inset-bottom);
 		padding-bottom: constant(safe-area-inset-bottom);
 	}
 
-	/* ==================== 完整白栏（无挖洞、无遮罩，干净统一） ==================== */
+	/* ==================== U 型凹槽白栏（图片镂空，真机必渲染） ==================== */
+	/* 图片 750×200@2x，满屏宽 750rpx → 高 200rpx；顶部两肩 13rpx、谷底 59rpx，
+	   谷区透明露出页面背景；阴影已烘焙进 PNG，跟随凹槽曲线 */
 	.tabbar-sheet {
 		position: absolute;
 		left: 0;
-		right: 0;
 		bottom: 0;
-		height: 132rpx;
-		background: linear-gradient(180deg, #FFFFFF 0%, #FCFAFF 100%);
-		border-radius: 40rpx 40rpx 0 0;
-		box-shadow: 0 -6rpx 24rpx rgba(123, 97, 255, 0.08);
+		width: 100%;
+		height: 200rpx;
 	}
 
-	/* ==================== 导航布局：图标+文字全部在白栏内 ==================== */
+	/* ==================== 导航布局：图标+文字排在谷底以下白栏主体 ==================== */
 	.tabbar-content {
 		position: absolute;
 		left: 0;
 		right: 0;
 		bottom: 0;
-		height: 132rpx;
+		height: 130rpx;
 		display: grid;
 		grid-template-columns: repeat(5, 1fr);
 		align-items: center;
@@ -166,8 +163,8 @@
 
 	/* ==================== 3D 立体图标 ==================== */
 	.icon-wrap {
-		width: 58rpx;
-		height: 58rpx;
+		width: 56rpx;
+		height: 56rpx;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -175,12 +172,11 @@
 		transition: transform 0.25s ease;
 	}
 	.tab-ico {
-		width: 54rpx;
-		height: 54rpx;
+		width: 52rpx;
+		height: 52rpx;
 		opacity: 0.55;
 		transition: opacity 0.25s ease, transform 0.25s ease;
 	}
-	/* 选中：仅图标上浮+高亮，不再加光斑（光斑在白底上成脏椭圆） */
 	.tab-item.active .tab-ico {
 		opacity: 1;
 		transform: translateY(-4rpx);
@@ -226,11 +222,12 @@
 		box-shadow: 0 3rpx 10rpx rgba(128, 92, 250, 0.25);
 	}
 
-	/* ==================== 中央 U 星球发布键（悬浮实体圆，无光晕） ==================== */
+	/* ==================== 中央 U 星球发布球（坐进 U 型谷） ==================== */
+	/* 谷两肩 13rpx、谷底 59rpx；球心落在谷底稍上，直径 108rpx，上沿露出谷口 */
 	.publish-center {
 		position: absolute;
 		left: 50%;
-		top: -40rpx;
+		top: 14rpx;
 		transform: translateX(-50%);
 		width: 160rpx;
 		display: flex;
@@ -238,29 +235,16 @@
 		align-items: center;
 		z-index: 20;
 	}
-	/* 白色实体圆盘：清晰边界 + 品牌紫描边 + 轻投影，不弥散不脏 */
-	.publish-disc {
+	.publish-logo {
 		width: 108rpx;
 		height: 108rpx;
-		border-radius: 50%;
-		background: #FFFFFF;
-		box-sizing: border-box;
-		border: 5rpx solid #7B61FF;
-		box-shadow: 0 8rpx 22rpx rgba(123, 97, 255, 0.28);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-	.publish-logo {
-		width: 88rpx;
-		height: 88rpx;
 	}
 	.publish-text {
-		margin-top: 6rpx;
+		margin-top: 2rpx;
 		font-size: 23rpx;
 		color: #6C3FF2;
 		font-weight: 700;
-		line-height: 32rpx;
+		line-height: 30rpx;
 	}
 
 	/* ==================== 点击反馈 ==================== */

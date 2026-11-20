@@ -24,9 +24,9 @@ img {{ display:block; }}
 {css}
 </style></head><body>
 <div class="phone">
-  <div class="fake">模拟页面卡片内容——检查 V5 完整白栏是否干净、发布圆盘是否清晰、文字是否可读</div>
+  <div class="fake">模拟页面卡片——检查 U 型凹槽是否干净、发布球是否坐进谷、文字是否可读</div>
   <view class="unida-tabbar" style="width:375px">
-    <view class="tabbar-sheet"></view>
+    <img class="tabbar-sheet" src="static/unida/tabbar/tabbar-sheet.png" style="width:375px;height:100px">
     <view class="tabbar-content">
       <view class="tab-item active" style="pointer-events:none">
         <view class="icon-wrap"><img class="tab-ico" src="static/unida/tabbar/tab-home.png" style="object-fit:contain"></view>
@@ -47,9 +47,7 @@ img {{ display:block; }}
       </view>
     </view>
     <view class="publish-center" style="pointer-events:none">
-      <view class="publish-disc">
-        <img class="publish-logo" src="static/unida/tabbar/publish-logo.png" style="object-fit:contain">
-      </view>
+      <img class="publish-logo" src="static/unida/tabbar/publish-logo.png" style="object-fit:contain">
       <text class="publish-text">发布</text>
     </view>
   </view>
