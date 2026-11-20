@@ -1,14 +1,8 @@
 <template>
 	<view class="mn">
-		<!-- 沉浸式校园插画头部（含品牌导航） -->
 		<view class="mn__safe" :style="{ paddingTop: statusBar + 'px' }"></view>
-		<view class="mn__head">
-			<image class="mn__strip" src="/static/unida/mine/header-strip.webp" mode="widthFix" />
-			<view class="mn__navzone mn__navzone--search" @click="onSearch"></view>
-			<view class="mn__navzone mn__navzone--bell" @click="onBell"></view>
-		</view>
 
-		<!-- 个人名片卡（UNIDA 元素整卡） -->
+		<!-- 个人名片卡（UNIDA 元素整卡，置顶） -->
 		<view class="mn__hero">
 			<image class="mn__hero-img" src="/static/unida/mine/hero-card.webp" mode="widthFix" />
 			<view class="mn__tap mn__tap--edit" @click="onEdit"></view>
@@ -174,8 +168,6 @@
 		},
 		methods: {
 			onToast(name) { uni.showToast({ title: name + '待开发', icon: 'none' }); },
-			onSearch() { this.onToast('搜索'); },
-			onBell() { this.onToast('消息通知'); },
 			onEdit() { uni.showToast({ title: '编辑资料待开发', icon: 'none' }); },
 			onStatTap(e) {
 				const i = Number(e.currentTarget.dataset.stat);
@@ -206,14 +198,7 @@
 	.mn { min-height: 100vh; background: $c-mist; }
 
 	/* ---------- 头部 ---------- */
-	.mn__head { position: relative; }
-	.mn__strip { display: block; width: 750rpx; height: 152rpx; }
-	.mn__navzone { position: absolute; top: 6rpx; height: 64rpx; }
-	.mn__navzone--search { left: 176rpx; width: 320rpx; }
-	.mn__navzone--bell { left: 636rpx; width: 72rpx; }
-
-	/* ---------- 个人名片 ---------- */
-	.mn__hero { position: relative; width: 706rpx; margin: 16rpx auto 0; }
+	.mn__hero { position: relative; width: 706rpx; margin: 20rpx auto 0; }
 	.mn__hero-img { display: block; width: 706rpx; height: 322rpx; }
 	.mn__tap { position: absolute; }
 	.mn__tap--edit { left: 76%; top: 37%; width: 23%; height: 13%; }
@@ -238,7 +223,7 @@
 		width: 88rpx; height: 10rpx; border-radius: $r-pill;
 		background: $c-ice; opacity: 0.9;
 	}
-	.mn__cardsub { font-size: 22rpx; color: $t-tertiary; }
+	.mn__cardsub { font-size: 20rpx; color: $t-tertiary; letter-spacing: 2rpx; white-space: nowrap; }
 
 	/* ---------- 我的校园生活 ---------- */
 	.mn__liferow { display: flex; margin-top: 34rpx; }
@@ -254,23 +239,26 @@
 	}
 	.mn__spark--a { left: -20rpx; top: -14rpx; width: 14rpx; height: 14rpx; background: $c-sun; transform: rotate(45deg); }
 	.mn__spark--b { left: -30rpx; top: 4rpx; width: 8rpx; height: 8rpx; background: $c-primary; transform: rotate(45deg); opacity: 0.7; }
-	.mn__sect-t { font-size: 34rpx; font-weight: 800; color: $c-ink; }
-	.mn__sect-sub { margin-left: 16rpx; font-size: 22rpx; color: $t-tertiary; }
+	.mn__sect-t { font-size: 34rpx; font-weight: 800; color: $c-ink; white-space: nowrap; }
+	.mn__sect-sub { margin-left: 14rpx; font-size: 20rpx; color: $t-tertiary; letter-spacing: 1rpx; white-space: nowrap; }
 	.mn__manage {
 		margin-left: auto;
-		padding: 12rpx 26rpx;
+		padding: 12rpx 22rpx;
 		background: $g-cta;
 		border-radius: $r-pill;
 		color: $c-white;
-		font-size: 24rpx;
+		font-size: 22rpx;
 		font-weight: 600;
+		letter-spacing: 1rpx;
+		white-space: nowrap;
 		box-shadow: $sh-float;
 	}
 
 	/* ---------- 小组件网格 ---------- */
 	.mn__grid { display: flex; flex-wrap: wrap; justify-content: space-between; margin: 20rpx $page-x 0; }
 	.mn__widget {
-		width: 343rpx;
+		width: 335rpx;
+		box-sizing: border-box;
 		background: $c-white;
 		border-radius: $r-md;
 		box-shadow: $sh-card;
@@ -305,29 +293,30 @@
 	.mn__streak-big { font-family: $ff-num; font-size: 56rpx; font-weight: 800; color: $c-ink; }
 	.mn__streak-day { font-size: 26rpx; color: $t-main; font-weight: 600; margin-left: 6rpx; }
 	.mn__streak-tip { display: block; margin-top: 14rpx; font-size: 19rpx; color: $c-peach; font-weight: 600; white-space: nowrap; }
-	.mn__wdeco--mascot { width: 104rpx; height: 110rpx; margin-left: 4rpx; flex-shrink: 0; }
+	.mn__wdeco--mascot { width: 100rpx; height: 106rpx; margin-left: 4rpx; flex-shrink: 0; }
 
+	.mn__cal { flex: 1; min-width: 0; }
 	.mn__cal-week { display: flex; justify-content: space-between; }
-	.mn__cal-w { width: 34rpx; text-align: center; font-size: 20rpx; color: $t-tertiary; }
+	.mn__cal-w { width: 26rpx; flex-shrink: 0; text-align: center; font-size: 19rpx; color: $t-tertiary; }
 	.mn__cal-dates { display: flex; justify-content: space-between; margin-top: 10rpx; }
-	.mn__cal-cell { width: 34rpx; height: 44rpx; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-	.mn__cal-cell--on { background: $g-cta; border-radius: 12rpx; }
-	.mn__cal-d { font-size: 22rpx; color: $t-main; font-family: $ff-num; }
+	.mn__cal-cell { width: 26rpx; height: 42rpx; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+	.mn__cal-cell--on { background: $g-cta; border-radius: 10rpx; }
+	.mn__cal-d { font-size: 20rpx; color: $t-main; font-family: $ff-num; }
 	.mn__cal-cell--on .mn__cal-d { color: $c-white; font-weight: 700; }
 	.mn__cal-dots { display: flex; margin-top: 3rpx; }
 	.mn__dot { width: 8rpx; height: 8rpx; border-radius: 50%; margin: 0 2rpx; }
 	.mn__dot--y { background: $c-sun; }
 	.mn__dot--p { background: $c-purple-light; }
-	.mn__wdeco--cal { width: 96rpx; height: 96rpx; margin-left: 8rpx; }
+	.mn__wdeco--cal { width: 84rpx; height: 84rpx; margin-left: 8rpx; }
 
 	.mn__lvrow { display: flex; align-items: baseline; white-space: nowrap; }
-	.mn__lv { font-family: $ff-num; font-size: 44rpx; font-weight: 800; color: $c-ink; }
-	.mn__lv-name { margin-left: 12rpx; font-size: 22rpx; color: $t-main; font-weight: 600; }
+	.mn__lv { font-family: $ff-num; font-size: 38rpx; font-weight: 800; color: $c-ink; }
+	.mn__lv-name { margin-left: 10rpx; font-size: 20rpx; color: $t-main; font-weight: 600; }
 	.mn__growth { display: flex; align-items: baseline; margin-top: 10rpx; }
 	.mn__growth-l { font-size: 20rpx; color: $t-tertiary; }
 	.mn__growth-v { font-family: $ff-num; font-size: 26rpx; font-weight: 700; color: $c-primary; margin-left: 8rpx; }
 	.mn__growth-s { font-family: $ff-num; font-size: 20rpx; color: $t-tertiary; margin-left: 2rpx; }
-	.mn__wdeco--badge { width: 92rpx; height: 100rpx; margin-left: 6rpx; flex-shrink: 0; }
+	.mn__wdeco--badge { width: 82rpx; height: 88rpx; margin-left: 6rpx; flex-shrink: 0; }
 
 	/* ---------- 快捷列表 / 设置 ---------- */
 	.mn__list { padding: 6rpx 28rpx; }

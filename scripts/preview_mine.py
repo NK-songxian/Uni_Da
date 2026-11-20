@@ -63,11 +63,6 @@ TABS = """
 
 BODY = f"""
 <div class="mn">
-  <div class="mn__head">
-    <img class="mn__strip" src="static/unida/mine/header-strip.webp">
-    <div class="mn__navzone mn__navzone--search"></div>
-    <div class="mn__navzone mn__navzone--bell"></div>
-  </div>
   <div class="mn__hero">
     <img class="mn__hero-img" src="static/unida/mine/hero-card.webp">
     <div class="mn__tap mn__tap--edit"></div>
