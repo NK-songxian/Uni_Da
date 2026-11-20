@@ -1,15 +1,18 @@
 <template>
-	<view class="ck">
+	<view class="ck unida-page">
 		<view class="ck__hero">
-			<view class="ck__circle"><text>✓</text></view>
+			<view class="ck__spark ck__spark--a"></view>
+			<view class="ck__spark ck__spark--b"></view>
+			<view class="ck__spark ck__spark--c"></view>
+			<image class="ck__badge" src="/static/unida/bubbles/check-cap.webp" mode="aspectFit" />
 			<text class="ck__title">打卡成功！</text>
-			<text class="ck__sub">已完成签到，玩得开心 🎉</text>
+			<text class="ck__sub">已完成签到，玩得开心</text>
 		</view>
-		<view class="ck__reward unida-card">
-			<view class="ck__reward-icon">🎁</view>
+		<view class="ck__reward">
+			<view class="ck__reward-ico"><image class="ck__reward-img" src="/static/icons-dark/flame.png" mode="aspectFit" /></view>
 			<view class="ck__reward-info">
-				<text class="ck__reward-title">签到奖励</text>
-				<text class="ck__reward-sub">积分 +20 · 已到账</text>
+				<text class="ck__reward-t">签到奖励</text>
+				<text class="ck__reward-s">积分已到账</text>
 			</view>
 			<text class="ck__reward-num">+20</text>
 		</view>
@@ -19,23 +22,60 @@
 
 <script>
 	export default {
+		data() {
+			return { statusBar: 0 };
+		},
+		onLoad() {
+			const sys = uni.getSystemInfoSync();
+			this.statusBar = sys && sys.statusBarHeight || 0;
+		},
 		methods: { goHome() { uni.reLaunch({ url: '/pages/home/home' }); } }
 	};
 </script>
 
 <style lang="scss" scoped>
-	@import '@/common/unida-global.scss';
-	.ck { min-height: 100vh; padding: 0 40rpx 60rpx; background: $unida-bg; }
-	.ck__hero { display: flex; flex-direction: column; align-items: center; padding-top: 160rpx; }
-	.ck__circle { width: 180rpx; height: 180rpx; border-radius: 50%; background: linear-gradient(135deg,#34D399,#86EFAC); display: flex; align-items: center; justify-content: center; box-shadow: 0 20rpx 50rpx rgba(52,211,153,0.4); }
-	.ck__circle text { font-size: 100rpx; color: #fff; font-weight: 700; }
-	.ck__title { margin-top: 44rpx; font-size: 44rpx; font-weight: 800; color: $unida-text; }
-	.ck__sub { margin-top: 14rpx; font-size: 26rpx; color: $unida-text-sub; }
-	.ck__reward { display: flex; align-items: center; margin-top: 70rpx; }
-	.ck__reward-icon { font-size: 64rpx; margin-right: 20rpx; }
-	.ck__reward-info { flex: 1; display: flex; flex-direction: column; }
-	.ck__reward-title { font-size: 28rpx; font-weight: 700; color: $unida-text; }
-	.ck__reward-sub { margin-top: 8rpx; font-size: 24rpx; color: $unida-text-sub; }
-	.ck__reward-num { font-size: 40rpx; font-weight: 800; color: $unida-orange; }
-	.ck__btn { margin-top: 60rpx; height: 92rpx; border-radius: 999rpx; background: linear-gradient(135deg,#7B61FF,#B59BFF); color: #fff; font-size: 30rpx; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+	@import '@/common/unida-tokens.scss';
+
+	.ck { min-height: 100vh; padding: 0 40rpx 60rpx; box-sizing: border-box; }
+	.ck__hero { position: relative; display: flex; flex-direction: column; align-items: center; padding-top: 140rpx; }
+	.ck__spark { position: absolute; border-radius: 4rpx; transform: rotate(45deg); }
+	.ck__spark--a { left: 130rpx; top: 150rpx; width: 20rpx; height: 20rpx; background: $c-sun; }
+	.ck__spark--b { right: 140rpx; top: 210rpx; width: 14rpx; height: 14rpx; background: $c-primary; opacity: 0.7; }
+	.ck__spark--c { right: 120rpx; top: 130rpx; width: 10rpx; height: 10rpx; background: $c-peach; opacity: 0.8; }
+	.ck__badge { width: 260rpx; height: 260rpx; }
+	.ck__title { margin-top: 36rpx; font-size: 44rpx; font-weight: 800; color: $c-ink; letter-spacing: 2rpx; }
+	.ck__sub { margin-top: 14rpx; font-size: 26rpx; color: $t-sub; }
+
+	.ck__reward {
+		display: flex; align-items: center;
+		margin-top: 70rpx;
+		background: $c-white;
+		border-radius: $r-md;
+		box-shadow: $sh-card;
+		padding: 28rpx;
+	}
+	.ck__reward-ico {
+		width: 84rpx; height: 84rpx;
+		border-radius: 26rpx;
+		background: rgba(255, 201, 79, 0.2);
+		display: flex; align-items: center; justify-content: center;
+	}
+	.ck__reward-img { width: 44rpx; height: 44rpx; }
+	.ck__reward-info { flex: 1; margin-left: 20rpx; display: flex; flex-direction: column; }
+	.ck__reward-t { font-size: 28rpx; font-weight: 700; color: $t-main; }
+	.ck__reward-s { margin-top: 8rpx; font-size: 23rpx; color: $t-sub; }
+	.ck__reward-num { font-family: $ff-num; font-size: 44rpx; font-weight: 800; color: $c-peach; }
+
+	.ck__btn {
+		margin-top: 60rpx;
+		height: 96rpx;
+		border-radius: $r-pill;
+		background: $g-cta;
+		color: $c-white;
+		font-size: 30rpx;
+		font-weight: 700;
+		letter-spacing: 2rpx;
+		display: flex; align-items: center; justify-content: center;
+		box-shadow: $sh-float;
+	}
 </style>

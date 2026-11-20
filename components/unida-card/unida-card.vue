@@ -5,7 +5,7 @@
 			<image v-if="item.cover" class="acard__cover-img" :src="item.cover" mode="aspectFill" lazy-load></image>
 			<image v-else class="acard__cover-icon" :src="coverIcon" mode="aspectFit"></image>
 			<view v-if="item.hot" class="acard__hot">
-				<image class="acard__hot-icon" src="/static/icons/flame.png" mode="aspectFit" />
+				<image class="acard__hot-icon" src="/static/icons-dark/flame.png" mode="aspectFit" />
 				<text>热门</text>
 			</view>
 		</view>
@@ -19,11 +19,11 @@
 			</view>
 			<view class="acard__meta">
 				<view class="acard__meta-item">
-					<image class="acard__meta-icon" src="/static/icons/clock.png" mode="aspectFit" />
+					<image class="acard__meta-icon" src="/static/icons-dark/clock.png" mode="aspectFit" />
 					<text>{{ item.time }}</text>
 				</view>
 				<view class="acard__meta-item">
-					<image class="acard__meta-icon" src="/static/icons/pin.png" mode="aspectFit" />
+					<image class="acard__meta-icon" src="/static/icons-dark/pin.png" mode="aspectFit" />
 					<text>{{ item.place }}</text>
 				</view>
 			</view>
@@ -69,7 +69,7 @@
 					'运动': 'racket', '娱乐': 'music', '学习': 'book', '教学': 'bulb',
 					'跑腿': 'box', '找搭子': 'buddy', '校园活动': 'calendar'
 				};
-				return '/static/icons/' + (map[this.item.category] || 'grid') + '.png';
+				return '/static/icons-dark/' + (map[this.item.category] || 'grid') + '.png';
 			},
 			avatarList() {
 				const n = Math.min(Math.max(this.item.joined || 0, 1), 3);

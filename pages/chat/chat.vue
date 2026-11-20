@@ -15,7 +15,7 @@
 					</view>
 				</view>
 			</view>
-			<view class="ch__more" @click="onMore"><image class="ch__more-img" src="/static/icons-dark/compass.png" mode="aspectFit" /></view>
+			<view class="ch__more" @click="onMore"><image class="ch__more-img" src="/static/icons-dark/bell.png" mode="aspectFit" /></view>
 		</view>
 
 		<!-- 消息区 -->

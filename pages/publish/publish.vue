@@ -72,7 +72,7 @@
 					{ label: '发起活动', desc: '组一场多人校园活动', icon: '/static/icons-dark/calendar.png', tone: 'orange' },
 					{ label: '技能教学', desc: '分享你的特长与课程', icon: '/static/icons-dark/bulb.png', tone: 'pink' },
 					{ label: '跑腿需求', desc: '发布互助跑腿任务', icon: '/static/icons-dark/box.png', tone: 'green' },
-					{ label: '校园动态', desc: '分享此刻的校园生活', icon: '/static/icons-dark/book.png', tone: 'sky' },
+					{ label: '校园动态', desc: '分享此刻的校园生活', icon: '/static/icons-dark/heart.png', tone: 'sky' },
 					{ label: '活动招募', desc: '为你的活动招募队友', icon: '/static/icons-dark/flame.png', tone: 'sun' }
 				],
 				labels: [

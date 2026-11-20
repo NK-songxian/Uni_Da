@@ -1,6 +1,6 @@
 <template>
 	<view class="search" @click="onTap">
-		<image class="search__icon" src="/static/icons/search.png" mode="aspectFit" />
+		<image class="search__icon" src="/static/icons-dark/search.png" mode="aspectFit" />
 		<text class="search__ph">{{ placeholder }}</text>
 		<view class="search__btn">搜索</view>
 	</view>
