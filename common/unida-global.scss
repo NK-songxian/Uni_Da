@@ -21,7 +21,20 @@ page,
 .unida-page {
   background: $unida-bg;
   color: $unida-text;
-  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+}
+
+/* ---------- 字体统一：所有原生控件强制继承品牌字体栈 ---------- */
+button,
+input,
+textarea,
+picker,
+navigator,
+checkbox,
+radio,
+label {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+  color: inherit;
 }
 
 .unida-page {

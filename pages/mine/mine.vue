@@ -1,5 +1,5 @@
 <template>
-	<view class="mn">
+	<view class="mn unida-page">
 		<view class="mn__safe" :style="{ paddingTop: statusBar + 'px' }"></view>
 
 		<!-- 个人名片卡（UNIDA 元素整卡，置顶） -->

@@ -1,5 +1,5 @@
 <template>
-	<view class="pb">
+	<view class="pb unida-page">
 		<view class="pb__safe" :style="{ paddingTop: statusBar + 'px' }"></view>
 
 		<!-- 顶栏 -->
