@@ -11,7 +11,7 @@
 				</view>
 				<image class="hd__logo" src="/static/unida/brand/logo-topbar.png" mode="heightFix" />
 				<view class="hd__bell" @click="onNotice">
-					<image class="hd__ico" src="/static/unida/msg/ico-chat.webp" mode="aspectFit" />
+					<image class="hd__ico" src="/static/unida/msg/ico-bell.webp" mode="aspectFit" />
 					<view class="hd__dot"></view>
 				</view>
 			</view>
@@ -145,7 +145,7 @@
 							<view class="now__body">
 								<text class="now__title">{{ n.title }}</text>
 								<view class="now__meta">
-									<image class="now__ico" src="/static/unida/bubbles/time-now.webp" mode="aspectFit" />
+									<image class="now__ico" src="/static/unida/msg/ico-clock.webp" mode="aspectFit" />
 									<text class="now__meta-txt">{{ n.time }}</text>
 									<view class="now__sep"></view>
 									<image class="now__ico" src="/static/unida/msg/ico-pin.webp" mode="aspectFit" />
@@ -227,7 +227,7 @@
 					</view>
 					<view class="feed__acts">
 						<view class="feed__act">
-							<image class="feed__act-ico" src="/static/unida/bubbles/emoji-heart.webp" mode="aspectFit" />
+							<image class="feed__act-ico" src="/static/unida/msg/ico-heart.webp" mode="aspectFit" />
 							<text class="feed__act-n">{{ f.like }}</text>
 						</view>
 						<view class="feed__act">

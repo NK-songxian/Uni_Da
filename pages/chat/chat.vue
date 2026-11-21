@@ -4,9 +4,9 @@
 
 		<!-- 导航 -->
 		<view class="ch__nav">
-			<view class="ch__back" @click="goBack"><image class="ch__back-img" src="/static/icons-dark/back.png" mode="aspectFit" /></view>
+			<view class="ch__back" @click="goBack"><image class="ch__back-img" src="/static/unida/msg/ico-bubble.webp" mode="aspectFit" /></view>
 			<view class="ch__peer">
-				<view class="ch__peer-avatar"><text class="ch__peer-ch">{{ peerName[0] }}</text></view>
+				<view class="ch__peer-avatar"><text class="ch__peer-ch">{{ peerName[0] }}</text><image class="ch__peer-online" src="/static/unida/bubbles/check-green.webp" mode="aspectFit" /></view>
 				<view class="ch__peer-info">
 					<text class="ch__peer-name">{{ peerName }}</text>
 					<view class="ch__peer-status">
@@ -15,7 +15,7 @@
 					</view>
 				</view>
 			</view>
-			<view class="ch__more" @click="onMore"><image class="ch__more-img" src="/static/icons-dark/bell.png" mode="aspectFit" /></view>
+			<view class="ch__more" @click="onMore"><image class="ch__more-img" src="/static/unida/msg/ico-bell.webp" mode="aspectFit" /></view>
 		</view>
 
 		<!-- 消息区 -->
@@ -30,11 +30,14 @@
 			<!-- 订单卡片 -->
 			<view class="ch__ordercard">
 				<view class="ch__ordercard-head">
-					<view class="ch__ordercard-tag"><image class="ch__ordercard-tag-img" src="/static/icons-dark/box.png" mode="aspectFit" /><text class="ch__ordercard-tag-t">跑腿订单</text></view>
+					<view class="ch__ordercard-tag"><image class="ch__ordercard-tag-img" src="/static/unida/msg/ico-bag.webp" mode="aspectFit" /><text class="ch__ordercard-tag-t">跑腿订单</text></view>
 					<text class="ch__ordercard-status">待接单</text>
 				</view>
 				<text class="ch__ordercard-title">帮忙取快递（中通北区）</text>
-				<text class="ch__ordercard-reward">赏金 ¥8.00</text>
+				<view class="ch__ordercard-foot">
+					<text class="ch__ordercard-reward">赏金 ¥8.00</text>
+					<image class="ch__ordercard-stamp" src="/static/unida/msg/tag-order.webp" mode="aspectFit" />
+				</view>
 			</view>
 			<view class="ch__msg ch__msg--out">
 				<view class="ch__bubble">太好了！取件码我私你，送到东园3栋楼下就行～</view>
@@ -50,7 +53,7 @@
 
 		<!-- 输入区 -->
 		<view class="ch__inputbar">
-			<view class="ch__tool" @click="onTool"><image class="ch__tool-img" src="/static/icons-dark/plus.png" mode="aspectFit" /></view>
+			<view class="ch__tool" @click="onTool"><image class="ch__tool-img" src="/static/unida/msg/ico-bubble.webp" mode="aspectFit" /></view>
 			<input class="ch__input" :value="text" @input="onInput" placeholder="发消息…" confirm-type="send" @confirm="send" />
 			<view class="ch__send" @click="send">发送</view>
 		</view>
@@ -66,12 +69,12 @@
 				text: '',
 				scrollTop: 0,
 				emojis: [
-					'/static/unida/bubbles/emoji-heart.webp',
+					'/static/unida/msg/ico-heart.webp',
 					'/static/unida/bubbles/emoji-like.webp',
 					'/static/unida/bubbles/emoji-clap.webp',
 					'/static/unida/bubbles/emoji-party.webp',
 					'/static/unida/bubbles/emoji-fire.webp',
-					'/static/unida/bubbles/emoji-smile.webp'
+					'/static/unida/bubbles/emoji-star.webp'
 				],
 				msgs: [
 					{ type: 'text', text: '你好！看到你发布的跑腿需求，我可以帮你取～' },
@@ -117,9 +120,10 @@
 		display: flex; align-items: center; justify-content: center;
 		flex-shrink: 0;
 	}
-	.ch__back-img { width: 32rpx; height: 32rpx; }
+	.ch__back-img { width: 38rpx; height: 38rpx; }
 	.ch__peer { flex: 1; display: flex; align-items: center; margin-left: 20rpx; min-width: 0; }
 	.ch__peer-avatar {
+		position: relative;
 		width: 84rpx; height: 84rpx;
 		border-radius: 50%;
 		background: $g-brand;
@@ -127,6 +131,7 @@
 		flex-shrink: 0;
 	}
 	.ch__peer-ch { font-size: 34rpx; font-weight: 800; color: $c-white; }
+	.ch__peer-online { position: absolute; right: -4rpx; bottom: -2rpx; width: 26rpx; height: 26rpx; }
 	.ch__peer-info { margin-left: 18rpx; display: flex; flex-direction: column; }
 	.ch__peer-name { font-size: 30rpx; font-weight: 700; color: $t-main; }
 	.ch__peer-status { display: flex; align-items: center; margin-top: 6rpx; }
@@ -139,7 +144,7 @@
 		display: flex; align-items: center; justify-content: center;
 		flex-shrink: 0;
 	}
-	.ch__more-img { width: 34rpx; height: 34rpx; opacity: 0.6; }
+	.ch__more-img { width: 40rpx; height: 40rpx; }
 
 	/* ---------- 消息区 ---------- */
 	.ch__msgs { flex: 1; padding: 0 24rpx; box-sizing: border-box; }
@@ -177,11 +182,13 @@
 	}
 	.ch__ordercard-head { display: flex; align-items: center; justify-content: space-between; }
 	.ch__ordercard-tag { display: flex; align-items: center; }
-	.ch__ordercard-tag-img { width: 30rpx; height: 30rpx; }
+	.ch__ordercard-tag-img { width: 40rpx; height: 40rpx; }
 	.ch__ordercard-tag-t { margin-left: 8rpx; font-size: 23rpx; color: $t-sub; }
 	.ch__ordercard-status { font-size: 22rpx; color: $c-peach; font-weight: 600; }
 	.ch__ordercard-title { display: block; margin-top: 16rpx; font-size: 26rpx; font-weight: 600; color: $t-main; }
-	.ch__ordercard-reward { display: block; margin-top: 10rpx; font-size: 30rpx; font-weight: 800; color: $c-peach; font-family: $ff-num; }
+	.ch__ordercard-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 10rpx; }
+	.ch__ordercard-reward { font-size: 30rpx; font-weight: 800; color: $c-peach; font-family: $ff-num; }
+	.ch__ordercard-stamp { height: 40rpx; width: 116rpx; }
 
 	/* ---------- 表情快捷栏 ---------- */
 	.ch__emojis {
@@ -205,7 +212,7 @@
 		display: flex; align-items: center; justify-content: center;
 		flex-shrink: 0;
 	}
-	.ch__tool-img { width: 32rpx; height: 32rpx; opacity: 0.65; }
+	.ch__tool-img { width: 38rpx; height: 38rpx; }
 	.ch__input {
 		flex: 1;
 		height: 72rpx;

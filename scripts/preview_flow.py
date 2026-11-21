@@ -66,7 +66,7 @@ c_html = "".join(
     f'<span class="ms__preview">{preview}</span></div><img class="ms__chev" src="static/icons-dark/chevron.png"></div>'
     for name, tone, time, preview, unread in CHATS)
 body_ms = (f'<div class="ms unida-page"><div class="ms__top"><span class="ms__title">消息</span>'
-           f'<div class="ms__compose"><img class="ms__compose-img" src="static/icons-dark/plus.png"></div></div>'
+           f'<div class="ms__compose"><img class="ms__compose-img" src="static/unida/msg/ico-bubble.webp"></div></div>'
            f'<div class="ms__notices">{n_html}</div>'
            f'<div class="ms__sect"><span class="ms__sect-t">最近会话</span><span class="ms__sect-s">全部 ›</span></div>{c_html}'
            f'<div class="ms__bottom-space"></div>{tabbar(2)}</div>')
@@ -77,21 +77,21 @@ msgs = ["你好！看到你发布的跑腿需求，我可以帮你取～", "我�
 m_html = "".join(
     f'<div class="ch__msg ch__msg--in"><div class="ch__msg-avatar"><span class="ch__msg-ch">周</span></div>'
     f'<div class="ch__bubble">{t}</div></div>' for t in msgs)
-emojis = ["emoji-heart", "emoji-like", "emoji-clap", "emoji-party", "emoji-fire", "emoji-smile"]
-e_html = "".join(f'<img class="ch__emoji" src="static/unida/bubbles/{e}.webp">' for e in emojis)
+emojis = [("msg","ico-heart"), ("bubbles","emoji-like"), ("bubbles","emoji-clap"), ("bubbles","emoji-party"), ("bubbles","emoji-fire"), ("bubbles","emoji-star")]
+e_html = "".join(f'<img class="ch__emoji" src="static/unida/{d}/{e}.webp">' for d,e in emojis)
 body_ch = (f'<div class="ch"><div class="ch__nav">'
-           f'<div class="ch__back"><img class="ch__back-img" src="static/icons-dark/back.png"></div>'
-           f'<div class="ch__peer"><div class="ch__peer-avatar"><span class="ch__peer-ch">周</span></div>'
+           f'<div class="ch__back"><img class="ch__back-img" src="static/unida/msg/ico-bubble.webp"></div>'
+           f'<div class="ch__peer"><div class="ch__peer-avatar"><span class="ch__peer-ch">周</span><img class="ch__peer-online" src="static/unida/bubbles/check-green.webp"></div>'
            f'<div class="ch__peer-info"><span class="ch__peer-name">周同学</span>'
            f'<div class="ch__peer-status"><img class="ch__peer-shield" src="static/unida/bubbles/shield-check.webp"><span class="ch__peer-status-t">在线 · 已认证</span></div></div></div>'
-           f'<div class="ch__more"><img class="ch__more-img" src="static/icons-dark/compass.png"></div></div>'
+           f'<div class="ch__more"><img class="ch__more-img" src="static/unida/msg/ico-bell.webp"></div></div>'
            f'<div class="ch__msgs"><div class="ch__msgs-pad"></div><div class="ch__time">今天 10:24</div>{m_html}'
-           f'<div class="ch__ordercard"><div class="ch__ordercard-head"><div class="ch__ordercard-tag"><img class="ch__ordercard-tag-img" src="static/icons-dark/box.png"><span class="ch__ordercard-tag-t">跑腿订单</span></div><span class="ch__ordercard-status">待接单</span></div>'
-           f'<span class="ch__ordercard-title">帮忙取快递（中通北区）</span><span class="ch__ordercard-reward">赏金 ¥8.00</span></div>'
+           f'<div class="ch__ordercard"><div class="ch__ordercard-head"><div class="ch__ordercard-tag"><img class="ch__ordercard-tag-img" src="static/unida/msg/ico-bag.webp"><span class="ch__ordercard-tag-t">跑腿订单</span></div><span class="ch__ordercard-status">待接单</span></div>'
+           f'<span class="ch__ordercard-title">帮忙取快递（中通北区）</span><div class="ch__ordercard-foot"><span class="ch__ordercard-reward">赏金 ¥8.00</span><img class="ch__ordercard-stamp" src="static/unida/msg/tag-order.webp"></div></div>'
            f'<div class="ch__msg ch__msg--out"><div class="ch__bubble">太好了！取件码我私你，送到东园3栋楼下就行～</div><div class="ch__msg-avatar ch__msg-avatar--me"><span class="ch__msg-ch">我</span></div></div>'
            f'<div class="ch__msgs-pad"></div></div>'
            f'<div class="ch__emojis">{e_html}</div>'
-           f'<div class="ch__inputbar"><div class="ch__tool"><img class="ch__tool-img" src="static/icons-dark/plus.png"></div>'
+           f'<div class="ch__inputbar"><div class="ch__tool"><img class="ch__tool-img" src="static/unida/msg/ico-bubble.webp"></div>'
            f'<input class="ch__input" placeholder="发消息…"><div class="ch__send">发送</div></div></div>')
 
 # ---------- errand-hall ----------
@@ -135,7 +135,7 @@ s_html = "".join(
 LINES = [("需求描述", "帮忙取个快递，中通北区驿站，取件码已私聊"), ("取件地点", "北区快递驿站"), ("送达地点", "东园3栋宿舍楼下"), ("期望时间", "今天 18:00 前"), ("订单编号", "RT20261118001")]
 l_html = "".join(f'<div class="ed__line"><span class="ed__line-k">{k}</span><span class="ed__line-v{(" ed__line-v--num") if "RT" in v else ""}">{v}</span></div>' for k, v in LINES)
 body_ed = (f'<div class="ed unida-page"><div class="ed__nav">'
-           f'<div class="ed__back"><img class="ed__back-img" src="static/icons-dark/back.png"></div>'
+           f'<div class="ed__back"><img class="ed__back-img" src="static/unida/msg/ico-bubble.webp"></div>'
            f'<span class="ed__title">跑腿订单详情</span><div class="ed__ph"></div></div>'
            f'<div class="ed__status"><img class="ed__status-img" src="static/unida/bubbles/catering-pin.webp">'
            f'<div class="ed__status-info"><span class="ed__status-title">待接单</span><span class="ed__status-sub">快递代取 · 赏金 <span class="ed__status-num">¥8.00</span></span></div>'

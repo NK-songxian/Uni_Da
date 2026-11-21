@@ -25,8 +25,8 @@ const OVERVIEW = {
 
 	// 3D 类目：统一用 unida/msg 立体图标库；tint = squircle 容器底（紫色系统一，绿/黄/蓝点缀）
 	cats: [
-		{ label: '学习组队', icon: U + 'bubbles/join-group.webp',   key: 'study',   tint: 'rgba(128,92,250,.10)' },
-		{ label: '运动搭子', icon: U + 'msg/scene-fitness.webp',  key: 'sport',   tint: 'rgba(41,202,131,.10)' },
+		{ label: '学习组队', icon: U + 'msg/ico-book.webp',   key: 'study',   tint: 'rgba(128,92,250,.10)' },
+		{ label: '运动搭子', icon: U + 'msg/ico-run.webp',  key: 'sport',   tint: 'rgba(41,202,131,.10)' },
 		{ label: '校园活动', icon: U + 'msg/ico-calendar.webp',   key: 'activity',tint: 'rgba(255,201,79,.16)' },
 		{ label: '生活互助', icon: U + 'msg/ico-bag.webp',        key: 'help',    tint: 'rgba(128,92,250,.09)' },
 		{ label: '社团招新', icon: U + 'msg/ico-megaphone.webp',  key: 'club',    tint: 'rgba(105,185,245,.11)' },
