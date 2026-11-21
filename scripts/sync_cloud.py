@@ -14,8 +14,9 @@ DST = os.path.join(DIST, "common", "cloud.js")
 def cloud_to_commonjs(src):
     s = src
     s = s.replace("export const ", "const ")
+    s = s.replace("export async function ", "async function ")
     s = s.replace("export function ", "function ")
-    # uniCloud 只在云端模式启用，产物里加保护避免未关联服务空间时报错
+    # 产物里 uniCloud 可能未定义（未关联服务空间），给出明确提示而非崩溃
     s = s.replace(
         "return uniCloud.callFunction({",
         "if (typeof uniCloud === 'undefined') {\n"

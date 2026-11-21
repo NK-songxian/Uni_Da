@@ -13,37 +13,38 @@
 
 export const CLOUD_MODE = {
 	// 全局总开关：后端部署完成后改为 true
-	enabled: false,
+	enabled: true,
 	// 是否打印云函数返回（调试用，生产建议关）
 	debug: false
 };
 
-/** 调用云函数的统一入口 */
-export function callCloud(name, data = {}) {
+/** 调用云函数的统一入口（async 保证所有错误都变成可 catch 的 Promise rejection） */
+export async function callCloud(name, data = {}) {
 	if (!CLOUD_MODE.enabled) {
-		return Promise.reject(new Error('CLOUD_DISABLED'));
+		throw new Error('CLOUD_DISABLED');
 	}
 	if (CLOUD_MODE.debug) {
 		console.log('[cloud] →', name, data);
 	}
-	// #ifdef MP-WEIXIN
-	// 支付宝云 / 阿里云 / 腾讯云均为 uniCloud 标准 provider，跨端调用一致
-	// #endif
-	return uniCloud.callFunction({
-		name,
-		data
-	}).then((res) => {
+	// 服务空间未关联 / 云函数未上传时给出明确提示，避免卡死
+	if (typeof uniCloud === 'undefined') {
+		throw new Error('云服务未就绪：请在 HBuilderX 关联服务空间并上传云函数');
+	}
+	try {
+		const res = await uniCloud.callFunction({
+			name,
+			data
+		});
 		const out = res && res.result;
 		if (CLOUD_MODE.debug) console.log('[cloud] ←', name, out);
 		if (!out || out.errCode) {
 			throw new Error((out && out.errMsg) || '云函数调用失败');
 		}
 		return out;
-	}).catch((e) => {
-		if (e && e.message === 'CLOUD_DISABLED') throw e;
+	} catch (e) {
 		console.error('[cloud] error', name, e);
 		throw e;
-	});
+	}
 }
 
 /** 本地登录态缓存 */
