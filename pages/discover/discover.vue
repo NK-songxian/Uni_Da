@@ -8,8 +8,9 @@
 					<text class="hd__title-main">发现</text>
 					<text class="hd__title-sub">找到现在就能一起的人</text>
 				</view>
+				<image class="hd__mascot" src="/static/unida/msg/mascot-star.webp" mode="aspectFit" />
 				<view class="hd__search" @click="onSearch">
-					<image class="hd__search-ico" src="/static/icons-dark/search.png" mode="aspectFit" />
+					<image class="hd__search-ico" src="/static/unida/msg/ico-search.webp" mode="aspectFit" />
 					<text class="hd__search-ph">搜索搭子、活动</text>
 				</view>
 			</view>
@@ -27,10 +28,9 @@
 			<!-- ══════════ 三大主类 tab ══════════ -->
 			<view class="maintabs">
 				<view
-					class="maintabs__item"
+					class="maintabs__item {{mainTab === i ? 'maintabs__item--on' : ''}}"
 					v-for="(t, i) in mainTabs"
 					:key="i"
-					:class="{ 'maintabs__item--on': mainTab === i }"
 					@click="onMainTab(i)"
 				>
 					<image class="maintabs__ico" :src="t.icon" mode="aspectFit" />
@@ -42,10 +42,9 @@
 			<scroll-view scroll-x class="chips" :show-scrollbar="false">
 				<view class="chips__inner">
 					<view
-						class="chips__item"
+						class="chips__item {{activeChip === i ? 'chips__item--on' : ''}}"
 						v-for="(c, i) in chips"
 						:key="i"
-						:class="{ 'chips__item--on': activeChip === i }"
 						@click="onChip(i)"
 					>{{ c }}</view>
 				</view>
@@ -55,10 +54,9 @@
 			<view class="sortbar">
 				<view class="sortbar__l">
 					<view
-						class="sortbar__item"
+						class="sortbar__item {{sort === i ? 'sortbar__item--on' : ''}}"
 						v-for="(s, i) in sorts"
 						:key="i"
-						:class="{ 'sortbar__item--on': sort === i }"
 						@click="onSort(i)"
 					>{{ s }}</view>
 				</view>
@@ -70,7 +68,7 @@
 				<view class="card" v-for="(item, i) in feedList" :key="item.id" @click="onCardTap(item)">
 					<view class="card__cover">
 						<image class="card__img" :src="item.cover" mode="aspectFill" />
-						<view class="card__flag" v-if="item.hot">热门</view>
+						<image class="card__flag" v-if="item.hot" src="/static/unida/bubbles/label-hot.webp" mode="aspectFit" />
 						<view class="card__slot">{{ item.time }}</view>
 						<view class="card__ring" :style="{ borderColor: item.bar }">
 							<text class="card__ring-t" :style="{ color: item.bar }">缺{{ item.total - item.joined }}</text>
@@ -80,7 +78,7 @@
 						<view class="card__cate" :style="{ color: item.bar, background: item.barSoft }">{{ item.category }}</view>
 						<text class="card__title">{{ item.title }}</text>
 						<view class="card__meta">
-							<image class="card__meta-ico" src="/static/icons-dark/pin.png" mode="aspectFit" />
+							<image class="card__meta-ico" src="/static/unida/msg/ico-pin.webp" mode="aspectFit" />
 							<text class="card__meta-t">{{ item.place }}</text>
 						</view>
 						<view class="card__foot">
@@ -105,7 +103,7 @@
 					<view class="spin"></view>
 					<text class="foot__t">正在加载更多</text>
 				</view>
-				<view v-else-if="feedError" class="foot__retry" @click="loadFeed(false)">
+				<view v-else-if="feedError" class="foot__retry" @click="onFeedRetry">
 					<text class="foot__retry-t">加载失败，点击重试</text>
 				</view>
 				<view v-else-if="!hasMore && feedList.length" class="foot__end">
@@ -137,9 +135,9 @@
 				page: 1,
 				reqId: 0,
 				mainTabs: [
-					{ label: '找搭子', icon: '/static/unida/illustrations/icon-run.png', key: 'buddy' },
-					{ label: '校园活动', icon: '/static/unida/illustrations/icon-horn-v2.png', key: 'activity' },
-					{ label: '社团招新', icon: '/static/unida/illustrations/icon-team-v2.png', key: 'club' }
+					{ label: '找搭子', icon: '/static/unida/msg/ico-chat.webp', key: 'buddy' },
+					{ label: '校园活动', icon: '/static/unida/msg/ico-calendar.webp', key: 'activity' },
+					{ label: '社团招新', icon: '/static/unida/msg/ico-megaphone.webp', key: 'club' }
 				],
 				mainTab: 0,
 				chips: DISCOVER_FILTERS,
@@ -213,11 +211,15 @@
 				this.sort = i;
 				this.loadFeed(true);
 			},
+			onFeedRetry() {
+				this.loadFeed(false);
+			},
 			onSearch() {
 				uni.showToast({ title: '搜索页待开发', icon: 'none' });
 			},
-			onCardTap(item) {
-				uni.navigateTo({ url: '/pages/activity-detail/activity-detail?id=' + item.id });
+			onCardTap(e) {
+				const id = e.currentTarget.dataset.id;
+				uni.navigateTo({ url: '/pages/activity-detail/activity-detail?id=' + id });
 			}
 		}
 	};
@@ -234,7 +236,15 @@
 		background: $c-mist;
 	}
 	.hd__bar {
+		position: relative;
 		padding: 8rpx $page-x 16rpx;
+	}
+	.hd__mascot {
+		position: absolute;
+		right: 24rpx;
+		top: 0;
+		width: 76rpx;
+		height: 76rpx;
 	}
 	.hd__title-main {
 		display: block;
@@ -261,7 +271,7 @@
 		display: flex;
 		align-items: center;
 	}
-	.hd__search-ico { width: 30rpx; height: 30rpx; opacity: 0.55; }
+	.hd__search-ico { width: 40rpx; height: 40rpx; }
 	.hd__search-ph { margin-left: 14rpx; font-size: $fs-body; color: $t-tertiary; }
 
 	/* ══════════ 三大主类 ══════════ */
@@ -283,10 +293,11 @@
 		border-radius: $r-md;
 	}
 	.maintabs__item--on {
-		background: $g-brand;
-		box-shadow: 0 8rpx 20rpx rgba(128, 92, 250, 0.26);
+		background: rgba(255, 255, 255, 0.96);
+		border: 2rpx solid rgba(128, 92, 250, 0.14);
+		box-shadow: 0 8rpx 20rpx rgba(128, 92, 250, 0.16);
 	}
-	.maintabs__ico { width: 60rpx; height: 60rpx; }
+	.maintabs__ico { width: 66rpx; height: 66rpx; }
 	.maintabs__label {
 		margin-top: 8rpx;
 		font-size: $fs-caption;
@@ -294,7 +305,7 @@
 		letter-spacing: 0.4rpx;
 		color: $t-main;
 	}
-	.maintabs__item--on .maintabs__label { color: #fff; font-weight: $fw-bold; }
+	.maintabs__item--on .maintabs__label { color: $c-primary; font-weight: $fw-bold; }
 
 	/* ══════════ 筛选 chip ══════════ */
 	.chips { width: 100%; white-space: nowrap; margin-top: 24rpx; }
@@ -371,17 +382,10 @@
 	.card__img { width: 100%; height: 100%; display: block; }
 	.card__flag {
 		position: absolute;
-		left: 12rpx;
-		top: 12rpx;
-		height: 34rpx;
-		padding: 0 12rpx;
-		border-radius: $r-pill;
-		background: $g-cta;
-		color: #fff;
-		font-size: 19rpx;
-		font-weight: $fw-semibold;
-		line-height: 34rpx;
-		box-shadow: 0 4rpx 12rpx rgba(128, 92, 250, 0.3);
+		left: 10rpx;
+		top: 10rpx;
+		width: 104rpx;
+		height: 40rpx;
 	}
 	.card__slot {
 		position: absolute;
@@ -439,7 +443,7 @@
 		align-items: center;
 		margin-top: 8rpx;
 	}
-	.card__meta-ico { width: 22rpx; height: 22rpx; opacity: 0.7; }
+	.card__meta-ico { width: 28rpx; height: 28rpx; }
 	.card__meta-t { margin-left: 4rpx; font-size: 20rpx; color: $t-sub; }
 	.card__foot {
 		display: flex;

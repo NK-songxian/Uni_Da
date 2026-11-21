@@ -38,7 +38,7 @@ CARD = """
   <div class="card__body">
     <div class="card__cate" style="color:{bar};background:{soft}">{cate}</div>
     <span class="card__title">{title}</span>
-    <div class="card__meta"><img class="card__meta-ico" src="static/icons-dark/pin.png"><span class="card__meta-t">{place}</span></div>
+    <div class="card__meta"><img class="card__meta-ico" src="static/unida/msg/ico-pin.webp"><span class="card__meta-t">{place}</span></div>
     <div class="card__foot">
       <div class="card__avatars"><div class="card__av" style="background:{bar}">{ch}</div><span class="card__joined">{joined}/{total}</span></div>
       <span class="card__price" style="color:{priceC}">{price}</span>
@@ -46,9 +46,10 @@ CARD = """
   </div>
 </div>"""
 
+HOT = '<img class="card__flag" src="static/unida/bubbles/label-hot.webp">'
 cards = [
-    dict(cover="static/art/art-campus.jpg", hot='<div class="card__flag">热门</div>', time="每天 20:00", bar="#805CFA", soft="rgba(128,92,250,.10)", need="8", cate="学习", title="一起准备英语四级 · 每日打卡互相监督", place="图书馆 4F", ch="星", joined="12", total="20", price="免费", priceC="#29CA83"),
-    dict(cover="static/art/art-cheer.jpg", hot='<div class="card__flag">热门</div>', time="周日 05:30", bar="#29CA83", soft="rgba(41,202,131,.10)", need="4", cate="运动", title="周末爬山 · 登顶看日出，缺 4 人", place="南山公园", ch="陈", joined="6", total="10", price="AA", priceC="#29CA83"),
+    dict(cover="static/art/art-campus.jpg", hot=HOT, time="每天 20:00", bar="#805CFA", soft="rgba(128,92,250,.10)", need="8", cate="学习", title="一起准备英语四级 · 每日打卡互相监督", place="图书馆 4F", ch="星", joined="12", total="20", price="免费", priceC="#29CA83"),
+    dict(cover="static/art/art-cheer.jpg", hot=HOT, time="周日 05:30", bar="#29CA83", soft="rgba(41,202,131,.10)", need="4", cate="运动", title="周末爬山 · 登顶看日出，缺 4 人", place="南山公园", ch="陈", joined="6", total="10", price="AA", priceC="#29CA83"),
     dict(cover="static/art/art-tennis.jpg", hot="", time="今晚 20:00", bar="#69B9F5", soft="rgba(105,185,245,.12)", need="1", cate="运动", title="羽毛球双打 · 缺 1 人，水平不限", place="体育馆 3 号场", ch="林", joined="3", total="4", price="免费", priceC="#29CA83"),
     dict(cover="static/art/art-balls.jpg", hot="", time="即时", bar="#FFB020", soft="rgba(255,176,32,.14)", need="1", cate="跑腿", title="代取外卖到宿舍楼下 · 东门出发", place="东门驿站", ch="快", joined="0", total="1", price="¥4", priceC="#FFB020"),
     dict(cover="static/art/art-guitar.jpg", hot="", time="周六 18:00", bar="#805CFA", soft="rgba(128,92,250,.10)", need="4", cate="娱乐", title="找周末探店搭子 · 新开的烤肉店", place="大学城", ch="安", joined="2", total="6", price="AA", priceC="#29CA83"),
@@ -61,13 +62,14 @@ BODY = f"""
 <div class="hd" style="background:transparent">
   <div class="hd__bar">
     <div class="hd__title"><span class="hd__title-main">发现</span><span class="hd__title-sub">找到现在就能一起的人</span></div>
-    <div class="hd__search"><img class="hd__search-ico" src="static/icons-dark/search.png"><span class="hd__search-ph">搜索搭子、活动</span></div>
+    <img class="hd__mascot" src="static/unida/msg/mascot-star.webp">
+    <div class="hd__search"><img class="hd__search-ico" src="static/unida/msg/ico-search.webp"><span class="hd__search-ph">搜索搭子、活动</span></div>
   </div>
 </div>
 <div class="maintabs">
-  <div class="maintabs__item maintabs__item--on"><img class="maintabs__ico" src="static/unida/illustrations/icon-run.png"><span class="maintabs__label">找搭子</span></div>
-  <div class="maintabs__item"><img class="maintabs__ico" src="static/unida/illustrations/icon-horn-v2.png"><span class="maintabs__label">校园活动</span></div>
-  <div class="maintabs__item"><img class="maintabs__ico" src="static/unida/illustrations/icon-team-v2.png"><span class="maintabs__label">社团招新</span></div>
+  <div class="maintabs__item maintabs__item--on"><img class="maintabs__ico" src="static/unida/msg/ico-chat.webp"><span class="maintabs__label">找搭子</span></div>
+  <div class="maintabs__item"><img class="maintabs__ico" src="static/unida/msg/ico-calendar.webp"><span class="maintabs__label">校园活动</span></div>
+  <div class="maintabs__item"><img class="maintabs__ico" src="static/unida/msg/ico-megaphone.webp"><span class="maintabs__label">社团招新</span></div>
 </div>
 <div class="chips"><div class="chips__inner">
   <div class="chips__item chips__item--on">全部</div><div class="chips__item">学习</div><div class="chips__item">运动</div><div class="chips__item">娱乐</div><div class="chips__item">生活</div><div class="chips__item">社团</div>
@@ -91,3 +93,19 @@ img { display:block; }
 html = f"""<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>{BASE}{CSS}</style></head><body>{BODY}</body></html>"""
 open(OUT, "w", encoding="utf-8").write(html)
 print("已生成", OUT, len(html), "字符")
+
+# 截图自检（375px 宽的手机视图）
+from playwright.sync_api import sync_playwright
+
+CHROME = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
+SHOT = os.path.join(ROOT, "docs", "audit", "discover_v3_preview.png")
+with sync_playwright() as p:
+    b = p.chromium.launch(executable_path=CHROME)
+    pg = b.new_page(viewport={"width": 375, "height": 900})
+    pg.goto("file:///" + OUT.replace("\\", "/"))
+    pg.wait_for_timeout(600)
+    pg.evaluate("document.querySelector('.phone').style.height='auto'")
+    pg.wait_for_timeout(150)
+    pg.screenshot(path=SHOT, full_page=True)
+    b.close()
+print("已截图", SHOT)

@@ -66,6 +66,16 @@ def main():
     # 发现页的 v-for 用 (item, i) in feedList，home 转换器已支持
     # 但 skeletonNums 的 v-for="i in 4" 需要骨架数组
     wxml = H.wxml_from_template(tpl)
+    # home 转换器未覆盖本页 3 处 :style（borderColor / 条件价格色），
+    # 不补会在真机丢色。补成 WXML 静态插值，避免 :style 原样残留。
+    wxml = wxml.replace(':style="{ borderColor: item.bar }"', 'style="border-color:{{item.bar}}"')
+    wxml = wxml.replace(':style="{ color: item.bar }"', 'style="color:{{item.bar}}"')
+    wxml = wxml.replace(
+        ':style="{ color: item.price === \'免费\' ? \'#29CA83\' : item.bar }"',
+        'style="color:{{item.price === \'免费\' ? \'#29CA83\' : item.bar}}"')
+    # 转换器对无属性链的事件参数（onCardTap(item)）会直接丢弃，
+    # 详情页需要 id，这里单独补 data-id；home 页的 onCardTap 不用参数，不受影响。
+    wxml = wxml.replace('bindtap="onCardTap"', 'bindtap="onCardTap" data-id="{{item.id}}"')
     open(os.path.join(OUT_DIR, "discover.wxml"), "w", encoding="utf-8").write(wxml)
 
     # ── wxss
