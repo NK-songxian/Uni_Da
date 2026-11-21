@@ -1,8 +1,10 @@
+import { CLOUD_MODE, callCloud } from '@/common/cloud.js';
+
 /**
  * 发现页数据接口  common/api/discover.js
  * ------------------------------------------------------------------
- * UI 阶段用本地 mock + 延时；接 uniCloud 时只替换本文件内部实现，
- * 页面代码一行都不用改。
+ * 双模式：CLOUD_MODE.enabled=true 走云函数，false 走本地 mock。
+ * 云函数失败自动回退 mock，页面代码无需改动。
  */
 
 const ART = '/static/art/';
@@ -143,6 +145,16 @@ export async function fetchDiscover(opt = {}) {
 	const sort = opt.sort || 0;
 	const page = opt.page || 1;
 	const size = opt.size || 6;
+
+	if (CLOUD_MODE.enabled) {
+		try {
+			const r = await callCloud('getDiscover', { tab, filter, sort, page, size });
+			return { list: r.list, hasMore: r.hasMore, total: r.total };
+		} catch (e) {
+			console.warn('[discover] 云函数失败，回退 mock：', e.message);
+		}
+	}
+
 	await delay(420);
 	if (mockFail) throw new Error('NETWORK');
 

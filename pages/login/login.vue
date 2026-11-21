@@ -39,6 +39,8 @@
 </template>
 
 <script>
+	import { CLOUD_MODE, callCloud, saveSession } from '@/common/cloud.js';
+
 	export default {
 		data() {
 			return {
@@ -52,13 +54,37 @@
 					uni.showToast({ title: '请先同意用户协议和隐私政策', icon: 'none' });
 					return;
 				}
+				const phoneCode = e.detail && e.detail.code;
+				const doLogin = (loginCode) => {
+					if (!CLOUD_MODE.enabled) {
+						// mock 模式：直接进资料设置（保持原有体验）
+						this.loading = false;
+						uni.reLaunch({ url: '/pages/profile-setup/profile-setup' });
+						return;
+					}
+					callCloud('login', { code: loginCode, phoneCode }).then((r) => {
+						this.loading = false;
+						saveSession(r.token, r.user);
+						uni.reLaunch({ url: r.isNew ? '/pages/profile-setup/profile-setup' : '/pages/home/home' });
+					}).catch((err) => {
+						this.loading = false;
+						uni.showToast({ title: err.message || '登录失败，请重试', icon: 'none' });
+					});
+				};
+
 				this.loading = true;
-				console.log('getPhoneNumber code:', e.detail && e.detail.code);
-				// 真实登录：code 发服务端 + wx.login code 换 openid（待后端阶段接入）
-				setTimeout(() => {
-					this.loading = false;
-					uni.reLaunch({ url: '/pages/profile-setup/profile-setup' });
-				}, 800);
+				if (CLOUD_MODE.enabled) {
+					uni.login({
+						provider: 'weixin',
+						success: (res) => doLogin(res.code),
+						fail: () => {
+							this.loading = false;
+							uni.showToast({ title: '获取登录凭证失败', icon: 'none' });
+						}
+					});
+				} else {
+					setTimeout(() => doLogin('mock'), 800);
+				}
 			},
 			onGuest() {
 				uni.reLaunch({ url: '/pages/home/home' });

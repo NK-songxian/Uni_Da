@@ -1,14 +1,18 @@
 <script>
+	import { CLOUD_MODE, getToken, getUser } from '@/common/cloud.js';
+
 	export default {
 		onLaunch: function() {
-			console.log('UNIDA App Launch')
+			// 云端模式下恢复登录态到全局，供各页面读取
+			if (CLOUD_MODE.enabled) {
+				const token = getToken();
+				this.globalData = this.globalData || {};
+				this.globalData.token = token;
+				this.globalData.user = getUser();
+			}
 		},
-		onShow: function() {
-			console.log('UNIDA App Show')
-		},
-		onHide: function() {
-			console.log('UNIDA App Hide')
-		}
+		onShow: function() {},
+		onHide: function() {}
 	}
 </script>
 

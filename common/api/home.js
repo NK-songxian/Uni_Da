@@ -1,9 +1,11 @@
+import { CLOUD_MODE, callCloud } from '@/common/cloud.js';
+
 /**
  * 首页数据接口  common/api/home.js
  * ------------------------------------------------------------------
- * UI 阶段用本地 mock + 延时模拟网络，所有方法都是 Promise。
- * 接入 uniCloud 后，只需把每个方法内部换成 uniCloud.callFunction()，
- * 页面代码一行都不用改。
+ * 双模式：CLOUD_MODE.enabled=true 走云函数，false 走本地 mock。
+ * 云函数失败时自动回退 mock，保证页面始终有数据（不会白屏）。
+ * 页面代码无需任何改动。
  */
 
 const U = '/static/unida/';
@@ -172,6 +174,22 @@ const OVERVIEW = {
 };
 
 export async function fetchOverview() {
+	if (CLOUD_MODE.enabled) {
+		try {
+			const r = await callCloud('getHomeData', { type: 'overview' });
+			return {
+				school: r.school,
+				todayJoin: r.todayJoin,
+				cats: r.cats,
+				promos: r.promos,
+				nowList: r.nowList,
+				acts: r.acts,
+				mates: r.mates
+			};
+		} catch (e) {
+			console.warn('[home] 云函数失败，回退 mock：', e.message);
+		}
+	}
 	await delay(520);
 	if (mockFail) throw new Error('NETWORK');
 	return JSON.parse(JSON.stringify(OVERVIEW));
@@ -270,6 +288,16 @@ export async function fetchFeed(opt = {}) {
 	const tab = opt.tab || 0;
 	const page = opt.page || 1;
 	const size = opt.size || 3;
+
+	if (CLOUD_MODE.enabled) {
+		try {
+			const r = await callCloud('getHomeData', { type: 'feed', tab, page, size });
+			return { list: r.list, hasMore: r.hasMore, total: r.total };
+		} catch (e) {
+			console.warn('[home] feed 云函数失败，回退 mock：', e.message);
+		}
+	}
+
 	await delay(420);
 	if (mockFail) throw new Error('NETWORK');
 

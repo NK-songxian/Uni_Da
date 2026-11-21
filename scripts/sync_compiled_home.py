@@ -127,7 +127,8 @@ def wxml_from_template(tpl):
 
 
 def api_commonjs(src):
-    s = src
+    import sync_cloud
+    s = sync_cloud.patch_api_imports(src)
     s = s.replace("export async function ", "async function ")
     s = s.replace("export function ", "function ")
     s += "\nmodule.exports = { fetchOverview, fetchFeed, setMockFail };\n"
