@@ -41,9 +41,9 @@ BODY = """
 <!-- 顶栏 -->
 <div class="hd">
   <div class="hd__bar">
-    <div class="hd__school"><img class="hd__ico" src="static/icons-dark/pin.png"><span class="hd__name">江南大学</span><img class="hd__chev" src="static/icons-dark/chevron.png"></div>
+    <div class="hd__school"><img class="hd__ico" src="static/unida/msg/ico-pin.webp"><span class="hd__name">江南大学</span><img class="hd__chev" src="static/icons-dark/chevron.png"></div>
     <img class="hd__logo" src="static/unida/brand/logo-topbar.png" style="height:22px">
-    <div class="hd__bell"><img class="hd__ico" src="static/icons-dark/bell.png"><div class="hd__dot"></div></div>
+    <div class="hd__bell"><img class="hd__ico" src="static/unida/msg/ico-chat.webp"><div class="hd__dot"></div></div>
   </div>
 </div>
 
@@ -59,7 +59,7 @@ BODY = """
       <div class="hero__pill"><div class="hero__live"></div><span class="hero__pill-txt">今天 <span class="hero__num">1,284</span> 位同学找到了搭子</span></div>
       <span class="hero__title">在校园，</span>
       <span class="hero__title hero__title--2">找到和你同频的人</span>
-      <div class="hero__search"><img class="hero__search-ico" src="static/icons-dark/search.png"><span class="hero__search-ph">搜活动、搭子、社团</span></div>
+      <div class="hero__search"><img class="hero__search-ico" src="static/unida/msg/ico-search.webp"><span class="hero__search-ph">搜活动、搭子、社团</span></div>
     </div>
     <img class="hero__trio" src="static/unida/characters/trio-back.webp">
     <img class="hero__planet" src="static/unida/mascot/u-planet.png">
@@ -87,12 +87,12 @@ BODY = """
 
 <!-- 类目 -->
 <div class="cats">
-  <div class="cats__item"><div class="cats__fig" style="background:rgba(128,92,250,.10)"><img class="cats__img" src="static/unida/illustrations/icon-study.png"></div><span class="cats__label">学习组队</span></div>
-  <div class="cats__item"><div class="cats__fig" style="background:rgba(41,202,131,.10)"><img class="cats__img" src="static/unida/illustrations/icon-run.png"></div><span class="cats__label">运动搭子</span></div>
-  <div class="cats__item"><div class="cats__fig" style="background:rgba(255,201,79,.16)"><img class="cats__img" src="static/unida/illustrations/icon-horn-v2.png"></div><span class="cats__label">校园活动</span></div>
-  <div class="cats__item"><div class="cats__fig" style="background:rgba(128,92,250,.09)"><img class="cats__img" src="static/unida/illustrations/icon-gift-v2.png"></div><span class="cats__label">生活互助</span></div>
-  <div class="cats__item"><div class="cats__fig" style="background:rgba(105,185,245,.11)"><img class="cats__img" src="static/unida/illustrations/icon-team-v2.png"></div><span class="cats__label">社团招新</span></div>
-  <div class="cats__item"><div class="cats__fig" style="background:rgba(169,139,255,.14)"><img class="cats__img" src="static/unida/illustrations/icon-planet.png"></div><span class="cats__label">同校广场</span></div>
+  <div class="cats__item"><div class="cats__fig" style="background:rgba(128,92,250,.10)"><img class="cats__img" src="static/unida/bubbles/join-group.webp"></div><span class="cats__label">学习组队</span></div>
+  <div class="cats__item"><div class="cats__fig" style="background:rgba(41,202,131,.10)"><img class="cats__img" src="static/unida/msg/scene-fitness.webp"></div><span class="cats__label">运动搭子</span></div>
+  <div class="cats__item"><div class="cats__fig" style="background:rgba(255,201,79,.16)"><img class="cats__img" src="static/unida/msg/ico-calendar.webp"></div><span class="cats__label">校园活动</span></div>
+  <div class="cats__item"><div class="cats__fig" style="background:rgba(128,92,250,.09)"><img class="cats__img" src="static/unida/msg/ico-bag.webp"></div><span class="cats__label">生活互助</span></div>
+  <div class="cats__item"><div class="cats__fig" style="background:rgba(105,185,245,.11)"><img class="cats__img" src="static/unida/msg/ico-megaphone.webp"></div><span class="cats__label">社团招新</span></div>
+  <div class="cats__item"><div class="cats__fig" style="background:rgba(169,139,255,.14)"><img class="cats__img" src="static/unida/msg/ico-bubble.webp"></div><span class="cats__label">同校广场</span></div>
 </div>
 
 <!-- 现在可以搭 -->
@@ -103,7 +103,7 @@ BODY = """
       <div class="now__cover"><img class="now__img" src="static/art/art-cheer.jpg"><div class="now__rank">1</div><div class="now__clock">40 分钟后</div></div>
       <div class="now__body">
         <span class="now__title">周五夜跑 · 环湖 5 公里</span>
-        <div class="now__meta"><img class="now__ico" src="static/icons-dark/clock.png"><span class="now__meta-txt">19:30</span><div class="now__sep"></div><img class="now__ico" src="static/icons-dark/pin.png"><span class="now__meta-txt">中心湖广场</span></div>
+        <div class="now__meta"><img class="now__ico" src="static/unida/bubbles/time-now.webp"><span class="now__meta-txt">19:30</span><div class="now__sep"></div><img class="now__ico" src="static/unida/msg/ico-pin.webp"><span class="now__meta-txt">中心湖广场</span></div>
         <div class="now__foot">
           <div class="now__people">
             <div class="now__av" style="background:linear-gradient(135deg,#805CFA,#A98BFF)">星</div>
@@ -119,7 +119,7 @@ BODY = """
       <div class="now__cover"><img class="now__img" src="static/art/art-tennis.jpg"><div class="now__rank">2</div><div class="now__clock">1 小时后</div></div>
       <div class="now__body">
         <span class="now__title">羽毛球双打，缺 1 人</span>
-        <div class="now__meta"><img class="now__ico" src="static/icons-dark/clock.png"><span class="now__meta-txt">20:00</span><div class="now__sep"></div><img class="now__ico" src="static/icons-dark/pin.png"><span class="now__meta-txt">体育馆 3 号场</span></div>
+        <div class="now__meta"><img class="now__ico" src="static/unida/bubbles/time-now.webp"><span class="now__meta-txt">20:00</span><div class="now__sep"></div><img class="now__ico" src="static/unida/msg/ico-pin.webp"><span class="now__meta-txt">体育馆 3 号场</span></div>
         <div class="now__foot">
           <div class="now__people">
             <div class="now__av" style="background:linear-gradient(135deg,#69B9F5,#B9E2FB)">陈</div>
@@ -156,8 +156,8 @@ BODY = """
       <img class="feed__thumb" src="static/art/art-cheer.jpg">
     </div>
     <div class="feed__acts">
-      <div class="feed__act"><img class="feed__act-ico" src="static/icons-dark/heart.png"><span class="feed__act-n">42</span></div>
-      <div class="feed__act"><img class="feed__act-ico" src="static/icons-dark/message.png"><span class="feed__act-n">12</span></div>
+      <div class="feed__act"><img class="feed__act-ico" src="static/unida/bubbles/emoji-heart.webp"><span class="feed__act-n">42</span></div>
+      <div class="feed__act"><img class="feed__act-ico" src="static/unida/msg/ico-chat.webp"><span class="feed__act-n">12</span></div>
       <div class="feed__join" style="color:#805CFA;border-color:#805CFA">加入搭子 ›</div>
     </div>
   </div>
@@ -236,5 +236,20 @@ html = f"""<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport
 
 open(OUT, "w", encoding="utf-8").write(html)
 print("已生成", OUT, len(html), "字符")
+
+# 截图自检
+from playwright.sync_api import sync_playwright
+CHROME = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
+SHOT = os.path.join(ROOT, "docs", "audit", "home_v13_preview.png")
+with sync_playwright() as p:
+    b = p.chromium.launch(executable_path=CHROME)
+    pg = b.new_page(viewport={"width": 375, "height": 900})
+    pg.goto("file:///" + OUT.replace("\\", "/"))
+    pg.wait_for_timeout(700)
+    pg.evaluate("document.querySelector('.phone').style.height='auto'")
+    pg.wait_for_timeout(150)
+    pg.screenshot(path=SHOT, full_page=True)
+    b.close()
+print("已截图", SHOT)
 for k in ("--c-primary", "--t-main", "--page-x", "--r-md"):
     print("  token", k, "=", tokens.get(k.strip("-"), "缺失"))

@@ -5,13 +5,13 @@
 		<view class="hd" :class="{ 'hd--solid': scrolled }" :style="{ paddingTop: statusBar + 'px' }">
 			<view class="hd__bar">
 				<view class="hd__school" @click="onSwitchSchool">
-					<image class="hd__ico" src="/static/icons-dark/pin.png" mode="aspectFit" />
+					<image class="hd__ico" src="/static/unida/msg/ico-pin.webp" mode="aspectFit" />
 					<text class="hd__name">{{ school }}</text>
 					<image class="hd__chev" src="/static/icons-dark/chevron.png" mode="aspectFit" />
 				</view>
 				<image class="hd__logo" src="/static/unida/brand/logo-topbar.png" mode="heightFix" />
 				<view class="hd__bell" @click="onNotice">
-					<image class="hd__ico" src="/static/icons-dark/bell.png" mode="aspectFit" />
+					<image class="hd__ico" src="/static/unida/msg/ico-chat.webp" mode="aspectFit" />
 					<view class="hd__dot"></view>
 				</view>
 			</view>
@@ -69,7 +69,7 @@
 								<text class="hero__title">在校园，</text>
 								<text class="hero__title hero__title--2">找到和你同频的人</text>
 								<view class="hero__search" @click="onSearch">
-									<image class="hero__search-ico" src="/static/icons-dark/search.png" mode="aspectFit" />
+									<image class="hero__search-ico" src="/static/unida/msg/ico-search.webp" mode="aspectFit" />
 									<text class="hero__search-ph">搜活动、搭子、社团</text>
 								</view>
 							</view>
@@ -145,10 +145,10 @@
 							<view class="now__body">
 								<text class="now__title">{{ n.title }}</text>
 								<view class="now__meta">
-									<image class="now__ico" src="/static/icons-dark/clock.png" mode="aspectFit" />
+									<image class="now__ico" src="/static/unida/bubbles/time-now.webp" mode="aspectFit" />
 									<text class="now__meta-txt">{{ n.time }}</text>
 									<view class="now__sep"></view>
-									<image class="now__ico" src="/static/icons-dark/pin.png" mode="aspectFit" />
+									<image class="now__ico" src="/static/unida/msg/ico-pin.webp" mode="aspectFit" />
 									<text class="now__meta-txt">{{ n.place }}</text>
 								</view>
 								<view class="now__foot">
@@ -227,11 +227,11 @@
 					</view>
 					<view class="feed__acts">
 						<view class="feed__act">
-							<image class="feed__act-ico" src="/static/icons-dark/heart.png" mode="aspectFit" />
+							<image class="feed__act-ico" src="/static/unida/bubbles/emoji-heart.webp" mode="aspectFit" />
 							<text class="feed__act-n">{{ f.like }}</text>
 						</view>
 						<view class="feed__act">
-							<image class="feed__act-ico" src="/static/icons-dark/message.png" mode="aspectFit" />
+							<image class="feed__act-ico" src="/static/unida/msg/ico-chat.webp" mode="aspectFit" />
 							<text class="feed__act-n">{{ f.cmt }}</text>
 						</view>
 						<view class="feed__join" :style="{ color: f.bar, borderColor: f.bar }" @click.stop="onJoin(f)">加入搭子 ›</view>
