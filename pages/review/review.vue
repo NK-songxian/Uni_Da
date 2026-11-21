@@ -1,29 +1,57 @@
 <template>
 	<view class="rv unida-page">
-		<view class="rv__nav"><text class="rv__back" @click="goBack">‹</text><text class="rv__title">活动评价</text><text class="rv__ph"></text></view>
-		<view class="rv__event unida-card">
-			<view class="rv__event-icon">🎪</view>
-			<view><text class="rv__event-title">校园草地音乐会</text><text class="rv__event-sub">本周六 · 中心草坪广场</text></view>
+		<view class="rv-safe" :style="{ paddingTop: statusBar + 'px' }"></view>
+
+		<!-- 顶栏 -->
+		<view class="rv__nav">
+			<view class="rv__back" @click="goBack"><image class="rv__back-img" src="/static/icons-dark/back.png" mode="aspectFit" /></view>
+			<text class="rv__title">活动评价</text>
+			<view class="rv__ph"></view>
 		</view>
-		<view class="rv__rate unida-card">
-			<text class="rv__rate-label">整体体验</text>
+
+		<!-- 活动卡 -->
+		<view class="rv__event">
+			<view class="rv__event-cover">
+				<image class="rv__event-img" src="/static/unida/bubbles/pennant-star.webp" mode="aspectFit" />
+			</view>
+			<view class="rv__event-info">
+				<text class="rv__event-title">校园草地音乐会</text>
+				<view class="rv__event-meta">
+					<image class="rv__event-ico" src="/static/icons-dark/calendar.png" mode="aspectFit" />
+					<text class="rv__event-meta-t">本周六 · 中心草坪</text>
+				</view>
+			</view>
+			<image class="rv__event-badge" src="/static/unida/bubbles/label-hot.webp" mode="heightFix" />
+		</view>
+
+		<!-- 星级 -->
+		<view class="rv__card">
+			<text class="rv__label">整体体验</text>
 			<view class="rv__stars">
-				<text v-for="n in 5" :key="n" class="rv__star" :class="{ 'rv__star--on': n <= rating }" @click="rating = n">⭐</text>
+				<view class="rv__star" v-for="(s, i) in stars" :key="i" :class="{ 'rv__star--on': s.on }" @click="onRate(i)"></view>
 			</view>
-			<text class="rv__rate-hint">{{ ratingText }}</text>
+			<text class="rv__hint">{{ ratingTexts[rating] }}</text>
 		</view>
-		<view class="rv__tags unida-card">
-			<text class="rv__rate-label">快速评价（可多选）</text>
-			<view class="rv__tag-list">
-				<text v-for="(t, i) in tags" :key="i" class="rv__tag" :class="{ 'rv__tag--on': chosen.includes(t) }" @click="toggleTag(t)">{{ t }}</text>
+
+		<!-- 快速评价 -->
+		<view class="rv__card">
+			<text class="rv__label">快速评价 <text class="rv__label-sub">（可多选）</text></text>
+			<view class="rv__tags">
+				<view class="rv__tag" v-for="(t, i) in tags" :key="i" :class="{ 'rv__tag--on': t.on }" @click="onTag(i)">
+					<text class="rv__tag-t">{{ t.name }}</text>
+				</view>
 			</view>
 		</view>
-		<view class="rv__content unida-card">
-			<text class="rv__rate-label">说说你的感受</text>
-			<textarea class="rv__textarea" v-model="content" placeholder="活动怎么样？有什么想说的～" maxlength="200"></textarea>
+
+		<!-- 文字评价 -->
+		<view class="rv__card">
+			<text class="rv__label">说说你的感受</text>
+			<textarea class="rv__textarea" :value="content" placeholder="活动怎么样？有什么想说的～" maxlength="200" @input="onContent" />
 			<text class="rv__count">{{ content.length }}/200</text>
 		</view>
-		<view class="rv__submit" @click="onSubmit">提交评价</view>
+
+		<!-- 提交 -->
+		<view class="rv__submit" @click="onSubmit"><text class="rv__submit-t">提交评价</text></view>
 	</view>
 </template>
 
@@ -31,23 +59,36 @@
 	export default {
 		data() {
 			return {
+				statusBar: 0,
 				rating: 5,
-				tags: ['组织有序', '氛围超好', '认识新朋友', '场地不错', '值得一来', '下次还来'],
-				chosen: [],
+				stars: [
+					{ n: 1, on: true }, { n: 2, on: true }, { n: 3, on: true }, { n: 4, on: true }, { n: 5, on: true }
+				],
+				ratingTexts: ['', '很差', '一般', '还行', '不错', '超棒！'],
+				tags: [
+					{ name: '组织有序', on: false }, { name: '氛围超好', on: false },
+					{ name: '认识新朋友', on: false }, { name: '场地不错', on: false },
+					{ name: '值得一来', on: false }, { name: '下次还来', on: false }
+				],
 				content: ''
 			};
 		},
-		computed: {
-			ratingText() { return ['', '很差', '一般', '还行', '不错', '超棒！'][this.rating]; }
+		onLoad() {
+			const sys = uni.getSystemInfoSync();
+			this.statusBar = sys && sys.statusBarHeight || 0;
 		},
 		methods: {
 			goBack() { uni.navigateBack(); },
-			toggleTag(t) {
-				const i = this.chosen.indexOf(t);
-				if (i >= 0) this.chosen.splice(i, 1); else this.chosen.push(t);
+			onRate(i) {
+				this.rating = i + 1;
+				this.stars = this.stars.map((x, j) => j <= i ? { n: x.n, on: true } : { n: x.n, on: false });
 			},
+			onTag(i) {
+				this.tags = this.tags.map((x, j) => j === i ? { name: x.name, on: !x.on } : x);
+			},
+			onContent(e) { this.content = e.detail.value; },
 			onSubmit() {
-				if (!this.rating) { uni.showToast({ title: '请给活动评分', icon: 'none' }); return; }
+				if (!this.content.trim()) { uni.showToast({ title: '写点评价再提交吧', icon: 'none' }); return; }
 				uni.showToast({ title: '评价已提交（演示）', icon: 'success' });
 				setTimeout(() => uni.navigateBack(), 1200);
 			}
@@ -56,28 +97,94 @@
 </script>
 
 <style lang="scss" scoped>
-	@import '@/common/unida-global.scss';
-	.rv { padding: 0 24rpx 60rpx; }
-	.rv__nav { height: 120rpx; padding-top: 60rpx; display: flex; align-items: center; justify-content: space-between; }
-	.rv__back { font-size: 48rpx; width: 60rpx; }
-	.rv__title { font-size: 32rpx; font-weight: 700; }
-	.rv__ph { width: 60rpx; }
-	.rv__event { display: flex; align-items: center; }
-	.rv__event-icon { width: 90rpx; height: 90rpx; border-radius: 20rpx; background: linear-gradient(135deg,#7B61FF,#FFD76A); display: flex; align-items: center; justify-content: center; font-size: 48rpx; margin-right: 20rpx; }
-	.rv__event view { display: flex; flex-direction: column; }
-	.rv__event-title { font-size: 28rpx; font-weight: 700; color: $unida-text; }
-	.rv__event-sub { margin-top: 8rpx; font-size: 22rpx; color: $unida-text-sub; }
-	.rv__rate, .rv__tags, .rv__content { margin-top: 20rpx; }
-	.rv__rate { display: flex; flex-direction: column; align-items: center; }
-	.rv__rate-label { display: block; font-size: 28rpx; font-weight: 700; color: $unida-text; align-self: flex-start; }
-	.rv__stars { display: flex; gap: 16rpx; margin-top: 24rpx; }
-	.rv__star { font-size: 56rpx; filter: grayscale(1) opacity(0.3); }
-	.rv__star--on { filter: none; }
-	.rv__rate-hint { margin-top: 16rpx; font-size: 26rpx; color: $unida-orange; font-weight: 700; }
-	.rv__tag-list { display: flex; flex-wrap: wrap; gap: 16rpx; margin-top: 20rpx; }
-	.rv__tag { font-size: 24rpx; color: $unida-text-sub; background: $unida-bg; padding: 14rpx 24rpx; border-radius: 999rpx; border: 2rpx solid transparent; }
-	.rv__tag--on { color: $unida-primary; background: rgba(123,97,255,0.08); border-color: $unida-primary; }
-	.rv__textarea { width: 100%; height: 180rpx; margin-top: 20rpx; font-size: 26rpx; line-height: 1.6; }
-	.rv__count { display: block; text-align: right; font-size: 22rpx; color: $unida-text-sub; }
-	.rv__submit { margin-top: 40rpx; height: 92rpx; border-radius: 999rpx; background: linear-gradient(135deg,#7B61FF,#B59BFF); color: #fff; font-size: 30rpx; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+	@import '@/common/unida-tokens.scss';
+
+	.rv { padding: 0 $page-x 60rpx; box-sizing: border-box; }
+
+	.rv__nav { height: 110rpx; display: flex; align-items: center; justify-content: space-between; }
+	.rv__back {
+		width: 68rpx; height: 68rpx;
+		background: $c-white;
+		border-radius: 50%;
+		box-shadow: $sh-card;
+		display: flex; align-items: center; justify-content: center;
+	}
+	.rv__back-img { width: 32rpx; height: 32rpx; }
+	.rv__title { font-size: 34rpx; font-weight: 800; color: $c-ink; letter-spacing: 1rpx; }
+	.rv__ph { width: 68rpx; }
+
+	.rv__event {
+		display: flex; align-items: center;
+		background: $c-white;
+		border-radius: $r-md;
+		box-shadow: $sh-card;
+		padding: 24rpx;
+	}
+	.rv__event-cover {
+		width: 96rpx; height: 96rpx;
+		border-radius: $r-sm;
+		background: rgba(128, 92, 250, 0.1);
+		display: flex; align-items: center; justify-content: center;
+		flex-shrink: 0;
+	}
+	.rv__event-img { width: 64rpx; height: 64rpx; }
+	.rv__event-info { flex: 1; margin: 0 16rpx; display: flex; flex-direction: column; min-width: 0; }
+	.rv__event-title { font-size: 28rpx; font-weight: 700; color: $t-main; }
+	.rv__event-meta { display: flex; align-items: center; margin-top: 10rpx; }
+	.rv__event-ico { width: 24rpx; height: 24rpx; opacity: 0.55; }
+	.rv__event-meta-t { margin-left: 8rpx; font-size: 21rpx; color: $t-sub; }
+	.rv__event-badge { height: 48rpx; width: 88rpx; flex-shrink: 0; }
+
+	.rv__card {
+		background: $c-white;
+		border-radius: $r-md;
+		box-shadow: $sh-card;
+		padding: 28rpx;
+		margin-top: 20rpx;
+	}
+	.rv__label { display: block; font-size: 30rpx; font-weight: 800; color: $c-ink; }
+	.rv__label-sub { font-size: 22rpx; color: $t-tertiary; font-weight: 400; }
+
+	.rv__stars { display: flex; justify-content: center; margin-top: 28rpx; }
+	.rv__star {
+		width: 68rpx; height: 68rpx;
+		margin: 0 16rpx;
+		background: $c-ice;
+		clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+	}
+	.rv__star--on { background: $c-sun; }
+	.rv__hint { display: block; text-align: center; margin-top: 18rpx; font-size: 26rpx; color: $c-peach; font-weight: 700; }
+
+	.rv__tags { display: flex; flex-wrap: wrap; margin-top: 20rpx; }
+	.rv__tag {
+		background: $c-mist;
+		border-radius: $r-pill;
+		padding: 14rpx 26rpx;
+		margin: 0 16rpx 16rpx 0;
+		border: 2rpx solid transparent;
+		box-sizing: border-box;
+	}
+	.rv__tag--on { background: rgba(128, 92, 250, 0.1); border-color: $c-primary; }
+	.rv__tag-t { font-size: 24rpx; color: $t-sub; }
+	.rv__tag--on .rv__tag-t { color: $c-primary; font-weight: 600; }
+
+	.rv__textarea {
+		width: 100%; height: 180rpx;
+		margin-top: 20rpx;
+		font-size: 26rpx;
+		line-height: 1.6;
+		color: $t-main;
+		box-sizing: border-box;
+	}
+	.rv__count { display: block; text-align: right; font-size: 22rpx; color: $t-tertiary; font-family: $ff-num; }
+
+	.rv__submit {
+		margin-top: 40rpx;
+		height: 92rpx;
+		border-radius: $r-pill;
+		background: $g-cta;
+		box-shadow: $sh-float;
+		display: flex; align-items: center; justify-content: center;
+	}
+	.rv__submit-t { font-size: 30rpx; color: $c-white; font-weight: 700; letter-spacing: 2rpx; }
 </style>
