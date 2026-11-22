@@ -39,15 +39,34 @@ common/
 
 ---
 
-## 第 2 步：配置微信登录凭证（可选，先跑通可跳过）
+## 第 2 步：配置微信登录凭证（本次已填好 ✅）
 
-1. 打开 `uniCloud-alipay/cloudfunctions/common/uni-config-center/index.js`
-2. 把 `appsecret` 换成你的微信 AppSecret（微信公众平台 → 开发管理 → 开发设置）
-3. 把 `useRealLogin` 改为 `true`
+已把 AppSecret 填入 `uniCloud-alipay/cloudfunctions/common/uni-config-center/index.js`，`useRealLogin: true`。
 
-**如果暂时没有 AppSecret**：保持默认 `useRealLogin: false`，登录会用「演示模式」跑通全链路（能登录、能写 users 表，只是 openid 是临时值）。这一步不阻塞其他功能。
+- 🔒 该文件已加入 `.gitignore` 并从 git 仓库移除，**密钥只在本机和云端，不会进 GitHub**
+- 📋 仓库里留了 `index.example.js` 模板，换测试号时复制成 `index.js` 再填
 
-> 🔒 安全提醒：AppSecret 只在云端，切勿提交到公开 GitHub 仓库。
+> ⚠️ **必须重新上传才生效**（代码改过了）：见下方「重新上传」提示。
+
+> 🔑 **凭证匹配**：AppSecret 必须和 AppID `wx7bb5cba400820f1b` 属于**同一个小程序**。如果登录报 `invalid appsecret`，说明这串 secret 是另一个测试号的，需要去对应小程序后台取配套的（或把项目 AppID 改成那个测试号）。
+
+### 换测试号/换电脑的操作
+
+1. 复制 `index.example.js` 为 `index.js`
+2. 填新测试号的 AppSecret，`useRealLogin: true`
+3. HBuilderX 重新上传公共模块 + login 云函数
+
+---
+
+## ⚠️ 代码改动后必须重新上传（重要）
+
+只要改了 `cloudfunctions/` 下的任何文件（云函数或公共模块），云端不会自动更新，必须：
+
+1. 右键 `uniCloud-alipay/cloudfunctions/common` → 「上传公共模块」
+2. 右键 `uniCloud-alipay/cloudfunctions/login` → 「上传部署」
+3. 等控制台显示上传成功，再测试登录
+
+本次修复了公共模块读取 bug + 填入凭证，**这两步一定要重做**。
 
 ---
 

@@ -1,3 +1,6 @@
+# 微信 AppSecret 等云函数敏感配置（只在本地与云端，绝不进仓库）
+uniCloud-alipay/cloudfunctions/common/uni-config-center/index.js
+
 # 编译产物（由 HBuilderX / sync 脚本生成）
 unpackage/
 dist/

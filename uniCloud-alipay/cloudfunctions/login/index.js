@@ -19,14 +19,21 @@
 const crypto = require('crypto');
 
 // 公共模块：uni-config-center（需在 HBuilderX 里上传此公共模块）
+// 注意：本项目用的是自写简单公共模块（module.exports = {...}），
+// 不是官方 uni-config-center 的 .config() 用法，直接解构即可。
 let cfg = {
 	weixin: { appid: 'wx7bb5cba400820f1b', appsecret: '', useRealLogin: false }
 };
 try {
 	const uc = require('uni-config-center');
-	cfg = uc({ configId: '' }).config();
+	// 兼容两种形态：官方 .config() 与自写对象
+	if (uc && typeof uc.config === 'function') {
+		cfg = uc.config();
+	} else if (uc && uc.weixin) {
+		cfg = uc;
+	}
 } catch (e) {
-	console.warn('uni-config-center 未上传，使用内置默认配置');
+	console.warn('uni-config-center 未上传，使用内置默认配置:', e.message);
 }
 
 const WX = cfg.weixin || {};
