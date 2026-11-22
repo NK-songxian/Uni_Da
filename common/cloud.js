@@ -14,8 +14,8 @@
 export const CLOUD_MODE = {
 	// 全局总开关：后端部署完成后改为 true
 	enabled: true,
-	// 是否打印云函数返回（调试用，生产建议关）
-	debug: false
+	// 调试期打开，能在控制台看到每次 callCloud 的请求和返回；上线前改回 false
+	debug: true
 };
 
 /** 调用云函数的统一入口（async 保证所有错误都变成可 catch 的 Promise rejection） */
@@ -42,6 +42,11 @@ export async function callCloud(name, data = {}) {
 		}
 		return out;
 	} catch (e) {
+		const msg = String((e && e.message) || e);
+		// 支付宝云本地调试读数据库会报 request has expired（官方已知问题，云函数线上不受影响）
+		if (msg.indexOf('request has expired') >= 0) {
+			throw new Error('本地调试数据库鉴权过期：请在 HBuilderX 前端控制台右上角切到「连接云端云函数」后重试');
+		}
 		console.error('[cloud] error', name, e);
 		throw e;
 	}

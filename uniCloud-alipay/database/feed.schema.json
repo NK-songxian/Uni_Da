@@ -1,0 +1,8 @@
+{
+  "bsonType": "object",
+  "properties": {},
+  "permission": {
+    "read": false,
+    "write": false
+  }
+}

@@ -2,7 +2,7 @@
 	<view class="ad unida-page">
 		<!-- ══════════ 沉浸式封面（统一插画，满幅铺底） ══════════ -->
 		<view class="ad__cover">
-			<image class="ad__cover-img" src="/static/art/art-guitar.jpg" mode="aspectFill" />
+			<image class="ad__cover-img" :src="cover" mode="aspectFill" />
 			<view class="ad__cover-shade"></view>
 
 			<!-- 透明浮层导航（无框无投影，白字+深描边保证可读） -->
@@ -26,15 +26,15 @@
 		<!-- ══════════ 主体信息卡（叠压封面） ══════════ -->
 		<view class="ad__main">
 			<view class="ad__title-row">
-				<text class="ad__title">校园草地音乐会 · 一起嗨翻周末</text>
-				<view class="ad__fav" @click="faved = !faved">
+				<text class="ad__title">{{ title || '加载中…' }}</text>
+				<view class="ad__fav" @click="onFav">
 					<image class="ad__fav-ico" :class="{ 'ad__fav-ico--on': faved }" src="/static/icons-dark/heart.png" mode="aspectFit" />
 				</view>
 			</view>
 			<view class="ad__tags">
-				<text class="ad__tag ad__tag--purple">校园活动</text>
+				<text class="ad__tag ad__tag--purple">{{ category }}</text>
 				<text class="ad__tag ad__tag--orange">热门</text>
-				<text class="ad__tag ad__tag--green">免费</text>
+				<text class="ad__tag ad__tag--green">{{ price === '免费' ? '免费' : price }}</text>
 			</view>
 
 			<!-- 时间 / 地点：线性图标 + 墨紫数值 -->
@@ -43,14 +43,14 @@
 					<view class="ad__meta-ico"><image src="/static/icons-dark/clock.png" mode="aspectFit" /></view>
 					<view class="ad__meta-col">
 						<text class="ad__meta-label">活动时间</text>
-						<text class="ad__meta-value">本周六 19:00 - 21:00</text>
+						<text class="ad__meta-value">{{ time || '待定' }}</text>
 					</view>
 				</view>
 				<view class="ad__meta-item">
 					<view class="ad__meta-ico"><image src="/static/icons-dark/pin.png" mode="aspectFit" /></view>
 					<view class="ad__meta-col">
 						<text class="ad__meta-label">活动地点</text>
-						<text class="ad__meta-value">中心草坪广场</text>
+						<text class="ad__meta-value">{{ place || '待定' }}</text>
 					</view>
 				</view>
 			</view>
@@ -102,7 +102,7 @@
 		<view class="ad__card">
 			<view class="ad__subhead"><text class="ad__subhead-title">费用说明</text></view>
 			<view class="ad__cost">
-				<text class="ad__cost-free">免费参与</text>
+				<text class="ad__cost-free">{{ price === '免费' ? '免费参与' : price }}</text>
 				<text class="ad__cost-dot">·</text>
 				<text class="ad__cost-text">零食饮料 AA（预计 ¥15/人）</text>
 			</view>
@@ -120,12 +120,22 @@
 </template>
 
 <script>
+	import { callCloud, getToken } from '@/common/cloud.js';
+
 	export default {
 		data() {
 			return {
 				statusBar: 0,
+				itemId: '',
+				title: '',
+				cover: '/static/art/art-guitar.jpg',
+				time: '',
+				place: '',
+				price: '免费',
+				category: '校园活动',
 				faved: false,
-				joined: 36,
+				favBusy: false,
+				joined: 0,
 				total: 50,
 				members: [
 					{ ch: '陈', bg: 'linear-gradient(135deg,#A98BFF,#805CFA)' },
@@ -137,18 +147,74 @@
 			};
 		},
 		computed: {
-			pct() { return Math.round(this.joined / this.total * 100); }
+			pct() {
+				const t = Math.max(1, Number(this.total) || 50);
+				return Math.min(100, Math.round((Number(this.joined) || 0) / t * 100));
+			}
 		},
-		onLoad() {
+		onLoad(options) {
 			const sys = uni.getSystemInfoSync();
 			this.statusBar = (sys && (sys.statusBarHeight || 0)) || 0;
+			this.itemId = (options && options.id) || '';
+			this.loadDetail();
+			this.checkFav();
 		},
 		methods: {
 			goBack() { uni.navigateBack(); },
 			onShare() { uni.showToast({ title: '分享功能待接入', icon: 'none' }); },
 			goUser() { uni.navigateTo({ url: '/pages/user-home/user-home' }); },
-			onContact() { uni.navigateTo({ url: '/pages/chat/chat' }); },
-			onBooking() { uni.navigateTo({ url: '/pages/booking-confirm/booking-confirm' }); }
+			onContact() { uni.navigateTo({ url: '/pages/chat/chat?peer=official&name=' + encodeURIComponent('UNIDA 小助手') }); },
+			onBooking() { uni.navigateTo({ url: '/pages/booking-confirm/booking-confirm?id=' + this.itemId }); },
+			async loadDetail() {
+				if (!this.itemId) return;
+				try {
+					const r = await callCloud('itemDetail', { id: this.itemId });
+					const it = r.item || {};
+					this.title = it.title || '';
+					this.cover = it.cover || this.cover;
+					this.time = it.time || '';
+					this.place = it.place || '';
+					this.price = it.price || '免费';
+					this.category = it.category || '校园活动';
+					this.joined = Number(it.joined) || 0;
+					this.total = Number(it.total) || 50;
+				} catch (e) {
+					uni.showToast({ title: (e && e.message) || '获取详情失败', icon: 'none' });
+				}
+			},
+			async checkFav() {
+				if (!this.itemId) return;
+				try {
+					const r = await callCloud('favorite', {
+						action: 'check',
+						token: getToken(),
+						type: 'item',
+						targetId: this.itemId
+					});
+					this.faved = !!r.faved;
+				} catch (e) {}
+			},
+			async onFav() {
+				if (this.favBusy || !this.itemId) return;
+				this.favBusy = true;
+				try {
+					const r = await callCloud('favorite', {
+						action: 'toggle',
+						token: getToken(),
+						type: 'item',
+						targetId: this.itemId,
+						title: this.title,
+						cover: this.cover,
+						desc: (this.time + (this.place ? ' · ' + this.place : '')).slice(0, 80)
+					});
+					this.faved = !!r.faved;
+					uni.showToast({ title: r.faved ? '已收藏' : '已取消收藏', icon: 'none' });
+				} catch (e) {
+					uni.showToast({ title: (e && e.message) || '操作失败', icon: 'none' });
+				} finally {
+					this.favBusy = false;
+				}
+			}
 		}
 	};
 </script>

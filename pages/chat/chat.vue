@@ -6,12 +6,12 @@
 		<view class="ch__nav">
 			<view class="ch__back" @click="goBack"><image class="ch__back-img" src="/static/unida/msg/ico-bubble.webp" mode="aspectFit" /></view>
 			<view class="ch__peer">
-				<view class="ch__peer-avatar"><text class="ch__peer-ch">{{ peerName[0] }}</text><image class="ch__peer-online" src="/static/unida/bubbles/check-green.webp" mode="aspectFit" /></view>
+				<view class="ch__peer-avatar"><text class="ch__peer-ch">{{ peerName[0] }}</text></view>
 				<view class="ch__peer-info">
 					<text class="ch__peer-name">{{ peerName }}</text>
 					<view class="ch__peer-status">
 						<image class="ch__peer-shield" src="/static/unida/bubbles/shield-check.webp" mode="aspectFit" />
-						<text class="ch__peer-status-t">在线 · 已认证</text>
+						<text class="ch__peer-status-t">{{ isOfficial ? '官方助手 · 随时在线' : '已认证搭友' }}</text>
 					</view>
 				</view>
 			</view>
@@ -21,27 +21,14 @@
 		<!-- 消息区 -->
 		<scroll-view class="ch__msgs" scroll-y="true" :scroll-top="scrollTop">
 			<view class="ch__msgs-pad"></view>
-			<view class="ch__time">今天 10:24</view>
-			<view class="ch__msg ch__msg--in" v-for="(m, i) in msgs" :key="i">
-				<view class="ch__msg-avatar"><text class="ch__msg-ch">{{ peerName[0] }}</text></view>
+			<view class="ch__empty" v-if="!loading && msgs.length === 0">
+				<text class="ch__empty-t">打个招呼吧～</text>
+			</view>
+			<view class="ch__msg" :class="m.mine ? 'ch__msg--out' : 'ch__msg--in'" v-for="(m, i) in msgs" :key="m.id || i">
+				<view class="ch__msg-avatar" v-if="!m.mine"><text class="ch__msg-ch">{{ peerName[0] }}</text></view>
 				<view v-if="m.type === 'emoji'" class="ch__bubble ch__bubble--emoji"><image class="ch__emoji-img" :src="m.src" mode="aspectFit" /></view>
 				<view v-else class="ch__bubble">{{ m.text }}</view>
-			</view>
-			<!-- 订单卡片 -->
-			<view class="ch__ordercard">
-				<view class="ch__ordercard-head">
-					<view class="ch__ordercard-tag"><image class="ch__ordercard-tag-img" src="/static/unida/msg/ico-bag.webp" mode="aspectFit" /><text class="ch__ordercard-tag-t">跑腿订单</text></view>
-					<text class="ch__ordercard-status">待接单</text>
-				</view>
-				<text class="ch__ordercard-title">帮忙取快递（中通北区）</text>
-				<view class="ch__ordercard-foot">
-					<text class="ch__ordercard-reward">赏金 ¥8.00</text>
-					<image class="ch__ordercard-stamp" src="/static/unida/msg/tag-order.webp" mode="aspectFit" />
-				</view>
-			</view>
-			<view class="ch__msg ch__msg--out">
-				<view class="ch__bubble">太好了！取件码我私你，送到东园3栋楼下就行～</view>
-				<view class="ch__msg-avatar ch__msg-avatar--me"><text class="ch__msg-ch">我</text></view>
+				<view class="ch__msg-avatar ch__msg-avatar--me" v-if="m.mine"><text class="ch__msg-ch">我</text></view>
 			</view>
 			<view class="ch__msgs-pad"></view>
 		</scroll-view>
@@ -61,13 +48,19 @@
 </template>
 
 <script>
+	import { callCloud, getToken } from '@/common/cloud.js';
+
 	export default {
 		data() {
 			return {
 				statusBar: 0,
-				peerName: '周同学',
+				peer: '',
+				peerName: '同学',
 				text: '',
 				scrollTop: 0,
+				loading: false,
+				sendBusy: false,
+				pollTimer: null,
 				emojis: [
 					'/static/unida/msg/ico-heart.webp',
 					'/static/unida/bubbles/emoji-like.webp',
@@ -76,31 +69,88 @@
 					'/static/unida/bubbles/emoji-fire.webp',
 					'/static/unida/bubbles/emoji-star.webp'
 				],
-				msgs: [
-					{ type: 'text', text: '你好！看到你发布的跑腿需求，我可以帮你取～' },
-					{ type: 'text', text: '我在东区，离北区驿站挺近的' }
-				]
+				msgs: []
 			};
+		},
+		computed: {
+			isOfficial() { return this.peer === 'official'; }
 		},
 		onLoad(q) {
 			const sys = uni.getSystemInfoSync();
 			this.statusBar = sys && sys.statusBarHeight || 0;
-			if (q && q.name) this.peerName = q.name;
+			if (q && q.peer) this.peer = q.peer;
+			if (q && q.name) this.peerName = decodeURIComponent(q.name);
+			if (!this.peer) this.peer = 'official';
+			this.loadMsgs();
+			// 5 秒轮询新消息（小程序无长连接，轮询足够轻量）
+			this.pollTimer = setInterval(() => this.loadMsgs(true), 5000);
+		},
+		onUnload() {
+			if (this.pollTimer) clearInterval(this.pollTimer);
+			this.pollTimer = null;
 		},
 		methods: {
 			goBack() { uni.navigateBack(); },
 			onMore() { uni.showToast({ title: '会话设置待开发', icon: 'none' }); },
 			onTool() { uni.showToast({ title: '更多工具待接入', icon: 'none' }); },
 			onInput(e) { this.text = e.detail.value; },
-			onEmoji(i) {
-				this.msgs = this.msgs.concat([{ type: 'emoji', src: this.emojis[i] }]);
-				this.scrollTop = this.scrollTop + 1;
+			async loadMsgs(silent) {
+				if (this.loading && !silent) return;
+				this.loading = true;
+				try {
+					const r = await callCloud('chat', { action: 'list', token: getToken(), peer: this.peer });
+					this.msgs = r.list || [];
+					this.scrollTop = this.scrollTop + 1;
+				} catch (e) {
+					if (!silent) uni.showToast({ title: (e && e.message) || '加载消息失败', icon: 'none' });
+				} finally {
+					this.loading = false;
+				}
 			},
-			send() {
-				if (!this.text.trim()) return;
-				this.msgs = this.msgs.concat([{ type: 'text', text: this.text }]);
-				this.text = '';
-				this.scrollTop = this.scrollTop + 1;
+			async onEmoji(i) {
+				if (this.sendBusy) return;
+				this.sendBusy = true;
+				try {
+					const r = await callCloud('chat', {
+						action: 'send',
+						token: getToken(),
+						peer: this.peer,
+						peerName: this.peerName,
+						type: 'emoji',
+						content: this.emojis[i]
+					});
+					if (r.msg) this.msgs = this.msgs.concat([r.msg]);
+					this.scrollTop = this.scrollTop + 1;
+					// 官方助手自动回复稍后到达，立即拉一次
+					if (this.isOfficial) setTimeout(() => this.loadMsgs(true), 600);
+				} catch (e) {
+					uni.showToast({ title: (e && e.message) || '发送失败', icon: 'none' });
+				} finally {
+					this.sendBusy = false;
+				}
+			},
+			async send() {
+				const t = this.text.trim();
+				if (!t || this.sendBusy) return;
+				this.sendBusy = true;
+				try {
+					const r = await callCloud('chat', {
+						action: 'send',
+						token: getToken(),
+						peer: this.peer,
+						peerName: this.peerName,
+						type: 'text',
+						content: t
+					});
+					if (r.msg) this.msgs = this.msgs.concat([r.msg]);
+					this.text = '';
+					this.scrollTop = this.scrollTop + 1;
+					if (this.isOfficial) setTimeout(() => this.loadMsgs(true), 600);
+				} catch (e) {
+					uni.showToast({ title: (e && e.message) || '发送失败', icon: 'none' });
+				} finally {
+					this.sendBusy = false;
+				}
 			}
 		}
 	};
@@ -131,7 +181,6 @@
 		flex-shrink: 0;
 	}
 	.ch__peer-ch { font-size: 34rpx; font-weight: 800; color: $c-white; }
-	.ch__peer-online { position: absolute; right: -4rpx; bottom: -2rpx; width: 26rpx; height: 26rpx; }
 	.ch__peer-info { margin-left: 18rpx; display: flex; flex-direction: column; }
 	.ch__peer-name { font-size: 30rpx; font-weight: 700; color: $t-main; }
 	.ch__peer-status { display: flex; align-items: center; margin-top: 6rpx; }
@@ -149,55 +198,55 @@
 	/* ---------- 消息区 ---------- */
 	.ch__msgs { flex: 1; padding: 0 24rpx; box-sizing: border-box; }
 	.ch__msgs-pad { height: 24rpx; }
-	.ch__time { text-align: center; font-size: 21rpx; color: $t-tertiary; margin: 12rpx 0 28rpx; font-family: $ff-num; }
-	.ch__msg { display: flex; align-items: flex-start; margin-bottom: 28rpx; }
+	.ch__empty { display: flex; justify-content: center; padding: 80rpx 0; }
+	.ch__empty-t { font-size: 25rpx; color: $t-tertiary; }
+
+	.ch__msg { display: flex; align-items: flex-start; margin-top: 24rpx; }
+	.ch__msg--out { flex-direction: row-reverse; }
 	.ch__msg-avatar {
-		width: 72rpx; height: 72rpx;
+		width: 64rpx; height: 64rpx;
 		border-radius: 50%;
 		background: $g-brand;
 		display: flex; align-items: center; justify-content: center;
 		flex-shrink: 0;
 	}
-	.ch__msg-avatar--me { background: linear-gradient(160deg, #FF9B77, #FFC94F); }
-	.ch__msg-ch { font-size: 30rpx; font-weight: 800; color: $c-white; }
-	.ch__bubble {
-		max-width: 70%;
-		padding: 22rpx 26rpx;
-		font-size: 26rpx;
-		line-height: 1.6;
-		color: $t-main;
-	}
-	.ch__msg--in .ch__bubble { background: $c-white; border-radius: 6rpx 24rpx 24rpx 24rpx; margin-left: 16rpx; }
-	.ch__msg--out { justify-content: flex-end; }
-	.ch__msg--out .ch__bubble { background: $g-cta; border-radius: 24rpx 6rpx 24rpx 24rpx; margin-right: 16rpx; color: $c-white; }
-	.ch__bubble--emoji { padding: 10rpx; }
-	.ch__emoji-img { width: 96rpx; height: 96rpx; }
+	.ch__msg-avatar--me { background: $g-cta; margin-left: 0; }
+	.ch__msg--in .ch__msg-avatar { margin-right: 16rpx; }
+	.ch__msg--out .ch__msg-avatar { margin-left: 16rpx; }
+	.ch__msg-ch { font-size: 26rpx; color: $c-white; font-weight: 700; }
 
-	.ch__ordercard {
+	.ch__bubble {
+		max-width: 460rpx;
 		background: $c-white;
-		border-radius: $r-md;
-		padding: 24rpx;
-		margin: 0 88rpx 28rpx;
+		border-radius: 8rpx 28rpx 28rpx 28rpx;
+		padding: 22rpx 28rpx;
+		font-size: 27rpx;
+		color: $t-main;
+		line-height: 1.6;
 		box-shadow: $sh-card;
+		box-sizing: border-box;
 	}
-	.ch__ordercard-head { display: flex; align-items: center; justify-content: space-between; }
-	.ch__ordercard-tag { display: flex; align-items: center; }
-	.ch__ordercard-tag-img { width: 40rpx; height: 40rpx; }
-	.ch__ordercard-tag-t { margin-left: 8rpx; font-size: 23rpx; color: $t-sub; }
-	.ch__ordercard-status { font-size: 22rpx; color: $c-peach; font-weight: 600; }
-	.ch__ordercard-title { display: block; margin-top: 16rpx; font-size: 26rpx; font-weight: 600; color: $t-main; }
-	.ch__ordercard-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 10rpx; }
-	.ch__ordercard-reward { font-size: 30rpx; font-weight: 800; color: $c-peach; font-family: $ff-num; }
-	.ch__ordercard-stamp { height: 40rpx; width: 116rpx; }
+	.ch__msg--out .ch__bubble {
+		background: $g-brand;
+		color: $c-white;
+		border-radius: 28rpx 8rpx 28rpx 28rpx;
+		box-shadow: 0 8rpx 16rpx rgba(128, 92, 250, 0.28);
+	}
+	.ch__bubble--emoji {
+		background: $c-white;
+		padding: 12rpx;
+	}
+	.ch__emoji-img { width: 88rpx; height: 88rpx; display: block; }
 
 	/* ---------- 表情快捷栏 ---------- */
 	.ch__emojis {
-		display: flex; align-items: center; justify-content: space-between;
-		padding: 14rpx $page-x;
+		display: flex; align-items: center; justify-content: space-around;
 		background: $c-white;
+		padding: 18rpx 24rpx;
+		box-shadow: 0 -4rpx 16rpx rgba(57, 0, 126, 0.05);
 	}
-	.ch__emoji { height: 72rpx; width: 72rpx; flex-shrink: 0; }
-	.ch__emoji:active { transform: scale(0.85); }
+	.ch__emoji { width: 64rpx; height: 64rpx; }
+	.ch__emoji:active { opacity: 0.7; }
 
 	/* ---------- 输入区 ---------- */
 	.ch__inputbar {
@@ -212,23 +261,25 @@
 		display: flex; align-items: center; justify-content: center;
 		flex-shrink: 0;
 	}
-	.ch__tool-img { width: 38rpx; height: 38rpx; }
+	.ch__tool-img { width: 36rpx; height: 36rpx; }
 	.ch__input {
-		flex: 1;
-		height: 72rpx;
+		flex: 1; height: 76rpx;
 		background: $c-mist;
 		border-radius: $r-pill;
-		padding: 0 28rpx;
-		font-size: 26rpx;
+		padding: 0 30rpx;
 		margin: 0 16rpx;
+		font-size: 27rpx;
+		color: $t-main;
+		box-sizing: border-box;
 	}
 	.ch__send {
+		background: $g-cta;
+		border-radius: $r-pill;
+		padding: 18rpx 34rpx;
+		flex-shrink: 0;
 		font-size: 26rpx;
 		color: $c-white;
-		background: $g-cta;
-		padding: 18rpx 34rpx;
-		border-radius: $r-pill;
-		font-weight: 600;
-		flex-shrink: 0;
+		font-weight: 700;
+		box-shadow: 0 8rpx 16rpx rgba(255, 122, 82, 0.3);
 	}
 </style>

@@ -11,36 +11,42 @@
 
 		<scroll-view scroll-y class="pd__scroll">
 			<!-- 帖子卡 -->
-			<view class="pd__post">
+			<view class="pd__post" v-if="post.id">
 				<view class="pd__head">
-					<view class="pd__avatar" @click="goUser"><text class="pd__avatar-ch">阿</text></view>
+					<view class="pd__avatar" @click="goUser"><text class="pd__avatar-ch">{{ post.user[0] }}</text></view>
 					<view class="pd__user">
-						<text class="pd__name" @click="goUser">阿星</text>
-						<text class="pd__time">10分钟前 · 阳光大学</text>
+						<text class="pd__name" @click="goUser">{{ post.user }}</text>
+						<text class="pd__time">{{ post.time }} · {{ post.campus }}</text>
 					</view>
 					<view class="pd__follow" :class="{ 'pd__follow--on': following }" @click="onFollow">
 						<text class="pd__follow-t">{{ following ? '已关注' : '+ 关注' }}</text>
 					</view>
 				</view>
-				<text class="pd__text">今天的晚霞也太美了吧！中心湖边随手一拍就是大片，分享给同样热爱生活的小伙伴们～</text>
-				<view class="pd__images">
-					<view class="pd__img" v-for="(g, i) in grads" :key="i" :style="{ background: g }"></view>
+				<text class="pd__text">{{ post.text }}</text>
+				<view class="pd__images" v-if="post.images.length">
+					<block v-for="(g, i) in post.images" :key="i">
+						<image v-if="isHttpImg(g)" class="pd__img pd__img--pic" :src="g" mode="aspectFill" @click="previewImg(i)" />
+						<view v-else class="pd__img" :style="{ background: g }"></view>
+					</block>
 				</view>
 				<view class="pd__tags">
-					<view class="pd__tag pd__tag--purple"><text class="pd__tag-t"># 校园生活</text></view>
-					<view class="pd__tag pd__tag--orange"><text class="pd__tag-t"># 摄影</text></view>
+					<view class="pd__tag pd__tag--purple"><text class="pd__tag-t"># {{ post.tag }}</text></view>
 				</view>
 				<view class="pd__stats">
-					<view class="pd__stat"><image class="pd__stat-ico" src="/static/icons-dark/heart.png" mode="aspectFit" /><text class="pd__stat-n">{{ likes }} 赞</text></view>
+					<view class="pd__stat" :class="{ 'pd__stat--on': post.liked }" @click="onLike">
+						<image class="pd__stat-ico" src="/static/icons-dark/heart.png" mode="aspectFit" /><text class="pd__stat-n">{{ post.likes }} 赞</text>
+					</view>
 					<view class="pd__stat"><image class="pd__stat-ico" src="/static/icons-dark/message.png" mode="aspectFit" /><text class="pd__stat-n">{{ comments.length }} 评论</text></view>
-					<view class="pd__stat"><image class="pd__stat-ico" src="/static/icons-dark/box.png" mode="aspectFit" /><text class="pd__stat-n">{{ favs }} 收藏</text></view>
+					<view class="pd__stat" :class="{ 'pd__stat--on': post.faved }" @click="onFav">
+						<image class="pd__stat-ico" src="/static/icons-dark/box.png" mode="aspectFit" /><text class="pd__stat-n">{{ post.favs }} 收藏</text>
+					</view>
 				</view>
 			</view>
 
 			<!-- 评论区 -->
 			<view class="pd__comments">
 				<text class="pd__ctitle">评论 ({{ comments.length }})</text>
-				<view class="pd__comment" v-for="(c, i) in comments" :key="i">
+				<view class="pd__comment" v-for="(c, i) in comments" :key="c.id || i">
 					<view class="pd__cavatar" :class="'pd__cavatar--' + c.tone"><text class="pd__cavatar-ch">{{ c.name[0] }}</text></view>
 					<view class="pd__cbody">
 						<text class="pd__cname">{{ c.name }}</text>
@@ -48,6 +54,7 @@
 						<text class="pd__ctime">{{ c.time }}</text>
 					</view>
 				</view>
+				<text class="pd__cempty" v-if="comments.length === 0">还没有评论，来说点什么吧～</text>
 			</view>
 			<view class="pd__scroll-end"></view>
 		</scroll-view>
@@ -61,32 +68,105 @@
 </template>
 
 <script>
+	import { callCloud, getToken } from '@/common/cloud.js';
+	import { timeAgo } from '@/common/fmt.js';
+
 	export default {
 		data() {
 			return {
 				statusBar: 0,
-				following: false, likes: 128, favs: 36, comment: '',
-				grads: ['linear-gradient(135deg,#FF8A3D,#FFD76A)', 'linear-gradient(135deg,#805CFA,#B59BFF)'],
-				comments: [
-					{ name: '小林', tone: 'green', text: '太好看了！哪个机位拍的？', time: '5分钟前' },
-					{ name: 'Leo', tone: 'orange', text: '校园的晚霞真的绝了，改天一起去拍！', time: '2分钟前' }
-				]
+				postId: '',
+				loading: false,
+				following: false,
+				comment: '',
+				sendBusy: false,
+				post: { id: '', user: '', tone: 'purple', campus: '', time: '', tag: '', text: '', images: [], likes: 0, comments: 0, favs: 0, liked: false, faved: false },
+				comments: []
 			};
 		},
-		onLoad() {
+		onLoad(options) {
 			const sys = uni.getSystemInfoSync();
 			this.statusBar = sys && sys.statusBarHeight || 0;
+			this.postId = (options && options.id) || '';
+			this.loadDetail();
 		},
 		methods: {
 			goBack() { uni.navigateBack(); },
 			goUser() { uni.navigateTo({ url: '/pages/user-home/user-home' }); },
-			onMore() { uni.showToast({ title: '举报 / 分享', icon: 'none' }); },
+			isHttpImg(g) { return String(g || '').indexOf('http') === 0; },
+			previewImg(i) {
+				const urls = (this.post.images || []).filter((g) => this.isHttpImg(g));
+				if (!urls.length) return;
+				uni.previewImage({ urls, current: Math.max(0, urls.indexOf(this.post.images[i])) });
+			},
+			onMore() { uni.showActionSheet({ itemList: ['举报该帖子'], success: () => uni.navigateTo({ url: '/pages/report/report' }) }); },
 			onFollow() { this.following = !this.following; },
 			onCommentInput(e) { this.comment = e.detail.value; },
-			sendComment() {
-				if (!this.comment.trim()) return;
-				this.comments = this.comments.concat([{ name: '我', tone: 'purple', text: this.comment, time: '刚刚' }]);
-				this.comment = '';
+			async loadDetail() {
+				if (!this.postId || this.loading) return;
+				this.loading = true;
+				try {
+					const r = await callCloud('posts', { action: 'detail', postId: this.postId, token: getToken() });
+					const p = r.post || {};
+					this.post = { ...p, time: p.time || timeAgo(p.ts) };
+					this.comments = (r.comments || []).map((c) => ({ ...c, time: timeAgo(c.ts) }));
+				} catch (e) {
+					uni.showToast({ title: (e && e.message) || '加载失败', icon: 'none' });
+				} finally {
+					this.loading = false;
+				}
+			},
+			async onLike() {
+				const p = this.post;
+				if (!p.id) return;
+				try {
+					const r = await callCloud('like', { action: 'toggle', token: getToken(), postId: p.id });
+					this.post = { ...p, liked: !!r.liked, likes: typeof r.likes === 'number' ? r.likes : p.likes };
+				} catch (e) {
+					uni.showToast({ title: (e && e.message) || '点赞失败', icon: 'none' });
+				}
+			},
+			async onFav() {
+				const p = this.post;
+				if (!p.id) return;
+				try {
+					const r = await callCloud('favorite', {
+						action: 'toggle',
+						token: getToken(),
+						type: 'post',
+						targetId: p.id,
+						title: p.tag + ' · ' + p.user,
+						cover: '',
+						desc: String(p.text || '').slice(0, 80)
+					});
+					const faved = !!r.faved;
+					this.post = { ...p, faved, favs: Math.max(0, p.favs + (faved ? 1 : -1)) };
+					uni.showToast({ title: faved ? '已收藏' : '已取消收藏', icon: 'none' });
+				} catch (e) {
+					uni.showToast({ title: (e && e.message) || '收藏失败', icon: 'none' });
+				}
+			},
+			async sendComment() {
+				const text = this.comment.trim();
+				if (!text || this.sendBusy || !this.postId) return;
+				this.sendBusy = true;
+				try {
+					const r = await callCloud('posts', {
+						action: 'comment',
+						token: getToken(),
+						postId: this.postId,
+						text
+					});
+					if (r.comment) {
+						this.comments = this.comments.concat([{ ...r.comment, time: '刚刚' }]);
+					}
+					this.post = { ...this.post, comments: this.post.comments + 1 };
+					this.comment = '';
+				} catch (e) {
+					uni.showToast({ title: (e && e.message) || '评论失败', icon: 'none' });
+				} finally {
+					this.sendBusy = false;
+				}
 			}
 		}
 	};
@@ -146,6 +226,7 @@
 	.pd__images { display: flex; margin-top: 20rpx; }
 	.pd__img { flex: 1; height: 300rpx; border-radius: 20rpx; margin-right: 12rpx; }
 	.pd__img:last-child { margin-right: 0; }
+	.pd__img--pic { width: 100%; }
 	.pd__tags { display: flex; margin-top: 20rpx; }
 	.pd__tag { border-radius: $r-pill; padding: 8rpx 20rpx; margin-right: 12rpx; }
 	.pd__tag--purple { background: rgba(128, 92, 250, 0.12); }
@@ -161,6 +242,8 @@
 	.pd__stat { display: flex; align-items: center; margin-right: 36rpx; }
 	.pd__stat-ico { width: 32rpx; height: 32rpx; opacity: 0.55; }
 	.pd__stat-n { margin-left: 10rpx; font-size: 23rpx; color: $t-sub; }
+	.pd__stat--on .pd__stat-ico { opacity: 1; }
+	.pd__stat--on .pd__stat-n { color: $c-primary; font-weight: 700; }
 
 	.pd__comments {
 		background: $c-white;
@@ -180,6 +263,7 @@
 	.pd__cname { font-size: 25rpx; font-weight: 600; color: $t-main; }
 	.pd__ctext { margin-top: 8rpx; font-size: 26rpx; color: $t-main; line-height: 1.6; }
 	.pd__ctime { margin-top: 8rpx; font-size: 20rpx; color: $t-tertiary; }
+	.pd__cempty { display: block; margin-top: 24rpx; font-size: 24rpx; color: $t-tertiary; }
 	.pd__scroll-end { height: 40rpx; }
 
 	.pd__inputbar {

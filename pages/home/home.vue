@@ -510,13 +510,29 @@
 				uni.showToast({ title: '搜索页待开发', icon: 'none' });
 			},
 			onCategory(c) {
-				uni.showToast({ title: c.label, icon: 'none' });
+				// 全站唯一分类落点：学习/运动/娱乐→发现页找搭子对应筛选；活动→校园活动 tab；
+				// 互助→跑腿大厅；广场→社区
+				const routes = {
+					study: '/pages/discover/discover?tab=0&chip=' + encodeURIComponent('学习'),
+					sport: '/pages/discover/discover?tab=0&chip=' + encodeURIComponent('运动'),
+					fun: '/pages/discover/discover?tab=0&chip=' + encodeURIComponent('娱乐'),
+					act: '/pages/discover/discover?tab=1',
+					help: '/pages/errand-hall/errand-hall',
+					square: '/pages/community/community'
+				};
+				const url = routes[c && c.key];
+				if (url) { uni.navigateTo({ url }); return; }
+				uni.showToast({ title: (c && c.label) || '分类', icon: 'none' });
 			},
 			onCardTap(item) {
-				uni.navigateTo({ url: '/pages/activity-detail/activity-detail' });
+				let id = item && item.id;
+				if (item && item.currentTarget) id = item.currentTarget.dataset.id;
+				uni.navigateTo({ url: '/pages/activity-detail/activity-detail?id=' + id });
 			},
 			onJoin(item) {
-				uni.showToast({ title: '已提交加入申请', icon: 'none' });
+				let id = item && item.id;
+				if (item && item.currentTarget) id = item.currentTarget.dataset.id;
+				uni.navigateTo({ url: '/pages/booking-confirm/booking-confirm?id=' + id });
 			},
 			goDiscover() {
 				uni.reLaunch({ url: '/pages/discover/discover' });

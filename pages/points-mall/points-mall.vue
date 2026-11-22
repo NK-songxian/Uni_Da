@@ -12,7 +12,7 @@
 		<view class="pm__bar" @click="goPoints">
 			<view class="pm__coin"><text class="pm__coin-t">P</text></view>
 			<text class="pm__bar-label">我的积分</text>
-			<text class="pm__bar-num">1,280</text>
+			<text class="pm__bar-num">{{ pointsText }}</text>
 			<image class="pm__chev" src="/static/icons-dark/chevron.png" mode="aspectFit" />
 		</view>
 
@@ -49,35 +49,76 @@
 </template>
 
 <script>
+	import { callCloud, getToken } from '@/common/cloud.js';
+
 	export default {
 		data() {
 			return {
 				statusBar: 0,
+				points: 0,
+				exBusy: false,
 				cats: ['全部', '实物礼品', '生活用品', '专属特权'],
 				active: 0,
 				goods: [
-					{ name: '定制帆布袋', icon: '/static/icons-dark/box.png', tone: 'purple', point: 500 },
-					{ name: '咖啡兑换券', icon: '/static/icons-dark/clock.png', tone: 'orange', point: 800 },
-					{ name: '校园纪念徽章', icon: '/static/unida/bubbles/brand-badge-u.webp', tone: 'green', point: 400 },
-					{ name: '电影票抵扣券', icon: '/static/icons-dark/music.png', tone: 'pink', point: 1500 },
 					{ name: '专属头像框', icon: '/static/icons-dark/bulb.png', tone: 'sky', point: 200 },
-					{ name: '免跑腿券', icon: '/static/icons-dark/heart.png', tone: 'purple', point: 600 }
+					{ name: '校园纪念徽章', icon: '/static/unida/bubbles/brand-badge-u.webp', tone: 'green', point: 400 },
+					{ name: '定制帆布袋', icon: '/static/icons-dark/box.png', tone: 'purple', point: 500 },
+					{ name: '免跑腿券', icon: '/static/icons-dark/heart.png', tone: 'purple', point: 600 },
+					{ name: '咖啡兑换券', icon: '/static/icons-dark/clock.png', tone: 'orange', point: 800 },
+					{ name: '电影票抵扣券', icon: '/static/icons-dark/music.png', tone: 'pink', point: 1500 }
 				]
 			};
+		},
+		computed: {
+			pointsText() {
+				return String(this.points).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+			}
 		},
 		onLoad() {
 			const sys = uni.getSystemInfoSync();
 			this.statusBar = sys && sys.statusBarHeight || 0;
 		},
+		onShow() {
+			this.loadPoints();
+		},
 		methods: {
 			goBack() { uni.navigateBack(); },
 			goPoints() { uni.navigateTo({ url: '/pages/points/points' }); },
 			onCat(i) { this.active = i; },
+			async loadPoints() {
+				try {
+					const r = await callCloud('points', { action: 'home', token: getToken() });
+					this.points = Number(r.points) || 0;
+				} catch (e) {}
+			},
 			onExchange(i) {
+				const g = this.goods[i];
+				if (!g || this.exBusy) return;
+				if (this.points < g.point) {
+					uni.showToast({ title: '积分不够，还差 ' + (g.point - this.points) + ' 分', icon: 'none' });
+					return;
+				}
 				uni.showModal({
 					title: '确认兑换',
-					content: '用 ' + this.goods[i].point + ' 积分兑换「' + this.goods[i].name + '」？',
-					success: (res) => { if (res.confirm) uni.showToast({ title: '兑换成功（演示）', icon: 'success' }); }
+					content: '用 ' + g.point + ' 积分兑换「' + g.name + '」？',
+					success: async (res) => {
+						if (!res.confirm) return;
+						this.exBusy = true;
+						try {
+							const r = await callCloud('points', {
+								action: 'redeem',
+								token: getToken(),
+								name: g.name,
+								cost: g.point
+							});
+							this.points = Number(r.points);
+							uni.showToast({ title: '兑换成功，请到服务点领取', icon: 'success' });
+						} catch (e) {
+							uni.showToast({ title: (e && e.message) || '兑换失败', icon: 'none' });
+						} finally {
+							this.exBusy = false;
+						}
+					}
 				});
 			}
 		}

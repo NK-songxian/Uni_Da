@@ -25,14 +25,16 @@ const OVERVIEW = {
 	school: '江南大学',
 	todayJoin: '1,284',
 
-	// 3D 类目：统一用 unida/msg 立体图标库；tint = squircle 容器底（紫色系统一，绿/黄/蓝点缀）
+	// 3D 类目：统一用 unida/msg 立体图标库；tint = squircle 容器底
+	// 全站唯一分类体系：学习/运动/娱乐 → 发现页找搭子对应筛选；活动 → 校园活动 tab；
+	// 互助 → 跑腿大厅（即时单）；广场 → 社区。每个入口都有真实落点。
 	cats: [
-		{ label: '学习组队', icon: U + 'msg/ico-book.webp',   key: 'study',   tint: 'rgba(128,92,250,.10)' },
-		{ label: '运动搭子', icon: U + 'msg/ico-run.webp',  key: 'sport',   tint: 'rgba(41,202,131,.10)' },
-		{ label: '校园活动', icon: U + 'msg/ico-calendar.webp',   key: 'activity',tint: 'rgba(255,201,79,.16)' },
-		{ label: '生活互助', icon: U + 'msg/ico-bag.webp',        key: 'help',    tint: 'rgba(128,92,250,.09)' },
-		{ label: '社团招新', icon: U + 'msg/ico-megaphone.webp',  key: 'club',    tint: 'rgba(105,185,245,.11)' },
-		{ label: '同校广场', icon: U + 'msg/ico-bubble.webp',     key: 'square',  tint: 'rgba(169,139,255,.14)' }
+		{ label: '学习搭子', icon: U + 'msg/ico-book.webp',    key: 'study',  tint: 'rgba(128,92,250,.10)' },
+		{ label: '运动搭子', icon: U + 'msg/ico-run.webp',     key: 'sport',  tint: 'rgba(41,202,131,.10)' },
+		{ label: '娱乐聚会', icon: U + 'msg/ico-heart.webp',   key: 'fun',    tint: 'rgba(244,114,182,.14)' },
+		{ label: '校园活动', icon: U + 'msg/ico-calendar.webp', key: 'act',    tint: 'rgba(255,201,79,.16)' },
+		{ label: '互帮互助', icon: U + 'msg/ico-bag.webp',     key: 'help',   tint: 'rgba(105,185,245,.16)' },
+		{ label: '同校广场', icon: U + 'msg/ico-bubble.webp',  key: 'square', tint: 'rgba(169,139,255,.14)' }
 	],
 
 	// 校园任务轮播：优质发布 / 高积分推广任务（运营位）

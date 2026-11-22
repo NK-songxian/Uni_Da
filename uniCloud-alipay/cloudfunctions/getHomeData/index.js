@@ -14,11 +14,11 @@ const SEED = {
 	school: '江南大学',
 	todayJoin: '1,284',
 	cats: [
-		{ label: '学习组队', icon: '/static/unida/msg/ico-book.webp', key: 'study', tint: 'rgba(128,92,250,.10)', order: 1 },
+		{ label: '学习搭子', icon: '/static/unida/msg/ico-book.webp', key: 'study', tint: 'rgba(128,92,250,.10)', order: 1 },
 		{ label: '运动搭子', icon: '/static/unida/msg/ico-run.webp', key: 'sport', tint: 'rgba(41,202,131,.10)', order: 2 },
-		{ label: '校园活动', icon: '/static/unida/msg/ico-calendar.webp', key: 'activity', tint: 'rgba(255,201,79,.16)', order: 3 },
-		{ label: '生活互助', icon: '/static/unida/msg/ico-bag.webp', key: 'help', tint: 'rgba(128,92,250,.09)', order: 4 },
-		{ label: '社团招新', icon: '/static/unida/msg/ico-megaphone.webp', key: 'club', tint: 'rgba(105,185,245,.11)', order: 5 },
+		{ label: '娱乐聚会', icon: '/static/unida/msg/ico-heart.webp', key: 'fun', tint: 'rgba(244,114,182,.14)', order: 3 },
+		{ label: '校园活动', icon: '/static/unida/msg/ico-calendar.webp', key: 'act', tint: 'rgba(255,201,79,.16)', order: 4 },
+		{ label: '互帮互助', icon: '/static/unida/msg/ico-bag.webp', key: 'help', tint: 'rgba(105,185,245,.16)', order: 5 },
 		{ label: '同校广场', icon: '/static/unida/msg/ico-bubble.webp', key: 'square', tint: 'rgba(169,139,255,.14)', order: 6 }
 	],
 	promos: [

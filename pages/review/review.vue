@@ -15,10 +15,10 @@
 				<image class="rv__event-img" src="/static/unida/bubbles/pennant-star.webp" mode="aspectFit" />
 			</view>
 			<view class="rv__event-info">
-				<text class="rv__event-title">校园草地音乐会</text>
+				<text class="rv__event-title">{{ actTitle || '校园草地音乐会' }}</text>
 				<view class="rv__event-meta">
 					<image class="rv__event-ico" src="/static/icons-dark/calendar.png" mode="aspectFit" />
-					<text class="rv__event-meta-t">本周六 · 中心草坪</text>
+					<text class="rv__event-meta-t">评价成功 +15 积分</text>
 				</view>
 			</view>
 			<image class="rv__event-badge" src="/static/unida/bubbles/label-hot.webp" mode="heightFix" />
@@ -56,10 +56,14 @@
 </template>
 
 <script>
+	import { callCloud, getToken } from '@/common/cloud.js';
+
 	export default {
 		data() {
 			return {
 				statusBar: 0,
+				itemId: '',
+				actTitle: '',
 				rating: 5,
 				stars: [
 					{ n: 1, on: true }, { n: 2, on: true }, { n: 3, on: true }, { n: 4, on: true }, { n: 5, on: true }
@@ -70,12 +74,15 @@
 					{ name: '认识新朋友', on: false }, { name: '场地不错', on: false },
 					{ name: '值得一来', on: false }, { name: '下次还来', on: false }
 				],
-				content: ''
+				content: '',
+				busy: false
 			};
 		},
-		onLoad() {
+		onLoad(q) {
 			const sys = uni.getSystemInfoSync();
 			this.statusBar = sys && sys.statusBarHeight || 0;
+			if (q && q.itemId) this.itemId = q.itemId;
+			if (q && q.title) this.actTitle = decodeURIComponent(q.title);
 		},
 		methods: {
 			goBack() { uni.navigateBack(); },
@@ -87,10 +94,30 @@
 				this.tags = this.tags.map((x, j) => j === i ? { name: x.name, on: !x.on } : x);
 			},
 			onContent(e) { this.content = e.detail.value; },
-			onSubmit() {
-				if (!this.content.trim()) { uni.showToast({ title: '写点评价再提交吧', icon: 'none' }); return; }
-				uni.showToast({ title: '评价已提交（演示）', icon: 'success' });
-				setTimeout(() => uni.navigateBack(), 1200);
+			async onSubmit() {
+				if (this.busy) return;
+				const picked = this.tags.filter((t) => t.on).map((t) => t.name);
+				if (!this.content.trim() && !picked.length) {
+					uni.showToast({ title: '写点评价或选个标签再提交吧', icon: 'none' });
+					return;
+				}
+				this.busy = true;
+				try {
+					const r = await callCloud('review', {
+						action: 'submit',
+						token: getToken(),
+						itemId: this.itemId || 'unknown',
+						title: this.actTitle,
+						rating: this.rating,
+						tags: picked,
+						content: this.content.trim()
+					});
+					uni.showToast({ title: '评价成功 +' + (r.gained || 15) + ' 积分', icon: 'success' });
+					setTimeout(() => uni.navigateBack(), 1200);
+				} catch (e) {
+					uni.showToast({ title: (e && e.message) || '提交失败', icon: 'none' });
+					this.busy = false;
+				}
 			}
 		}
 	};

@@ -1,0 +1,23 @@
+{
+  "bsonType": "object",
+  "required": ["openid", "itemId", "code"],
+  "properties": {
+    "openid": { "bsonType": "string" },
+    "itemId": { "bsonType": "string" },
+    "title": { "bsonType": "string" },
+    "cover": { "bsonType": "string" },
+    "time": { "bsonType": "string" },
+    "place": { "bsonType": "string" },
+    "price": { "bsonType": "string" },
+    "count": { "bsonType": "int" },
+    "remark": { "bsonType": "string" },
+    "code": { "bsonType": "string" },
+    "status": { "bsonType": "string" },
+    "createdAt": { "bsonType": "int" },
+    "updatedAt": { "bsonType": "int" }
+  },
+  "permission": {
+    "read": false,
+    "write": false
+  }
+}

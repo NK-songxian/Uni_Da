@@ -64,8 +64,8 @@
 				</view>
 				<view class="mn__wbody">
 					<view class="mn__wmain">
-						<view class="mn__streak"><text class="mn__streak-big">7</text><text class="mn__streak-day">天</text></view>
-						<text class="mn__streak-tip">再签 3 天得成长徽章！</text>
+						<view class="mn__streak"><text class="mn__streak-big">{{ streak }}</text><text class="mn__streak-day">天</text></view>
+						<text class="mn__streak-tip">去签到领积分，连续更划算！</text>
 					</view>
 					<image class="mn__wdeco mn__wdeco--mascot" src="/static/unida/mine/w-mascot.png" mode="aspectFit" />
 				</view>
@@ -100,9 +100,9 @@
 				</view>
 				<view class="mn__wbody">
 					<view class="mn__wmain">
-						<view class="mn__lvrow"><text class="mn__lv">Lv.4</text><text class="mn__lv-name">活跃成长者</text></view>
+						<view class="mn__lvrow"><text class="mn__lv">Lv.{{ level }}</text><text class="mn__lv-name">{{ levelName }}</text></view>
 						<view class="mn__bar"><view class="mn__bar-fill mn__bar-fill--68"></view></view>
-						<view class="mn__growth"><text class="mn__growth-l">成长值</text><text class="mn__growth-v">680</text><text class="mn__growth-s">/ 1,000</text></view>
+						<view class="mn__growth"><text class="mn__growth-l">积分</text><text class="mn__growth-v">{{ points }}</text><text class="mn__growth-s">去签到赚更多</text></view>
 					</view>
 					<image class="mn__wdeco mn__wdeco--badge" src="/static/unida/mine/w-badge.png" mode="aspectFit" />
 				</view>
@@ -135,12 +135,17 @@
 
 <script>
 	import unidaTabbar from '@/components/unida-tabbar/unida-tabbar.vue';
+	import { callCloud, getToken } from '@/common/cloud.js';
 
 	export default {
 		components: { unidaTabbar },
 		data() {
 			return {
 				statusBar: 0,
+				streak: 0,
+				points: 0,
+				level: 2,
+				levelName: '初来乍到',
 				lifeItems: [
 					{ icon: '/static/unida/mine/life-act.png', label: '我的活动' },
 					{ icon: '/static/unida/mine/life-team.png', label: '我的组队' },
@@ -151,10 +156,10 @@
 				weekHead: ['一', '二', '三', '四', '五', '六', '日'],
 				dateArr: [20, 21, 22, 23, 24, 25, 26],
 				listRows: [
-					{ icon: '/static/unida/mine/row-pub.png', label: '我的发布', count: 36 },
-					{ icon: '/static/unida/mine/row-buddy.png', label: '我的搭子', count: 128 },
-					{ icon: '/static/unida/mine/row-fav.png', label: '我的收藏', count: 42 },
-					{ icon: '/static/unida/mine/row-order.png', label: '我的报名', count: 12 }
+					{ icon: '/static/unida/mine/row-pub.png', label: '我的发布', count: 0 },
+					{ icon: '/static/unida/mine/row-buddy.png', label: '我的搭子', count: '-' },
+					{ icon: '/static/unida/mine/row-fav.png', label: '我的收藏', count: 0 },
+					{ icon: '/static/unida/mine/row-order.png', label: '我的报名', count: 0 }
 				],
 				setRows: [
 					{ icon: '/static/unida/mine/row-set.png', label: '设置' },
@@ -166,27 +171,51 @@
 			const sys = uni.getSystemInfoSync();
 			this.statusBar = sys && sys.statusBarHeight || 0;
 		},
+		onShow() {
+			this.loadStats();
+		},
 		methods: {
+			async loadStats() {
+				try {
+					const r = await callCloud('points', { action: 'stats', token: getToken() });
+					this.streak = Number(r.streak) || 0;
+					this.points = Number(r.points) || 0;
+					this.level = Number(r.level) || 2;
+					this.levelName = r.levelName || '初来乍到';
+					this.listRows = [
+						{ icon: '/static/unida/mine/row-pub.png', label: '我的发布', count: Number(r.pubCount) || 0 },
+						{ icon: '/static/unida/mine/row-buddy.png', label: '我的搭子', count: '-' },
+						{ icon: '/static/unida/mine/row-fav.png', label: '我的收藏', count: Number(r.favCount) || 0 },
+						{ icon: '/static/unida/mine/row-order.png', label: '我的报名', count: Number(r.orderCount) || 0 }
+					];
+				} catch (e) {
+					// 未登录或网络异常时不打断页面，保持默认展示
+				}
+			},
 			onToast(name) { uni.showToast({ title: name + '待开发', icon: 'none' }); },
-			onEdit() { uni.showToast({ title: '编辑资料待开发', icon: 'none' }); },
+			onEdit() { uni.navigateTo({ url: '/pages/profile-setup/profile-setup' }); },
 			onStatTap(e) {
 				const i = Number(e.currentTarget.dataset.stat);
 				const map = ['我的发布', '我的搭子', '关注', '粉丝'];
 				uni.showToast({ title: map[i] + '待开发', icon: 'none' });
 			},
 			onLife(i) {
+				if (i === 2) { uni.navigateTo({ url: '/pages/favorites/favorites' }); return; }
+				if (i === 3) { uni.navigateTo({ url: '/pages/mypub/mypub' }); return; }
 				if (i === 0 || i === 4) { uni.navigateTo({ url: '/pages/my-orders/my-orders' }); return; }
 				this.onToast(this.lifeItems[i].label);
 			},
 			onListRow(i) {
+				if (i === 0) { uni.navigateTo({ url: '/pages/mypub/mypub' }); return; }
+				if (i === 2) { uni.navigateTo({ url: '/pages/favorites/favorites' }); return; }
 				if (i === 3) { uni.navigateTo({ url: '/pages/my-orders/my-orders' }); return; }
 				this.onToast(this.listRows[i].label);
 			},
 			onSetRow(i) { this.onToast(this.setRows[i].label); },
-			onCheckin() { uni.showToast({ title: '签到日历待开发', icon: 'none' }); },
+			onCheckin() { uni.navigateTo({ url: '/pages/points/points' }); },
 			onGoal() { this.onToast('本周目标'); },
 			onCal() { this.onToast('活动日历'); },
-			onBadge() { this.onToast('成长徽章'); },
+			onBadge() { uni.navigateTo({ url: '/pages/points/points' }); },
 			onManage() { this.onToast('组件管理'); }
 		}
 	};

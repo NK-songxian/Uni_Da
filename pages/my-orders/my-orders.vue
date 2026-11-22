@@ -71,9 +71,8 @@
 						{{ o.price === '0' ? '免费' : '¥' + o.price }}
 					</text>
 					<view class="mo__order-actions">
-						<text v-if="o.statusKey === 'ongoing'" class="mo__order-btn mo__order-btn--ghost" @click="onTrack(o)">查看进度</text>
+						<text v-if="o.statusKey === 'wait'" class="mo__order-btn mo__order-btn--ghost" @click="onCancelBooking(o)">取消预约</text>
 						<text v-if="o.statusKey === 'done'" class="mo__order-btn" @click="onReview(o)">去评价</text>
-						<text v-if="o.statusKey === 'wait'" class="mo__order-btn" @click="onConfirm(o)">确认完成</text>
 					</view>
 				</view>
 			</view>
@@ -89,10 +88,13 @@
 </template>
 
 <script>
+	import { callCloud, getToken } from '@/common/cloud.js';
+
 	export default {
 		data() {
 			return {
 				statusBar: 0,
+				loading: false,
 				active: 0,
 				ordersShow: [],
 				tabs: [
@@ -101,28 +103,76 @@
 					{ label: '进行中', key: 'ongoing' },
 					{ label: '已完成', key: 'done' }
 				],
-				orders: [
-					{ id: 1, typeIcon: '/static/icons-dark/box.png', type: '跑腿服务', title: '帮忙取快递（中通北区驿站）', time: '今天 18:00 前', place: '北区驿站', price: '8', status: '待接单', statusKey: 'wait' },
-					{ id: 2, typeIcon: '/static/icons-dark/music.png', type: '校园活动', title: '校园草地音乐会', time: '本周六 19:00', place: '中心草坪广场', price: '0', status: '进行中', statusKey: 'ongoing' },
-					{ id: 3, typeIcon: '/static/icons-dark/box.png', type: '跑腿服务', title: '代拿外卖到宿舍楼下', time: '昨天', place: '东门', price: '5', status: '已完成', statusKey: 'done' }
-				]
+				orders: []
 			};
 		},
 		onLoad() {
 			const sys = uni.getSystemInfoSync();
 			this.statusBar = (sys && sys.statusBarHeight) || 0;
-			this.ordersShow = this.orders.slice();
+			this.loadOrders();
+		},
+		onPullDownRefresh() {
+			this.loadOrders();
 		},
 		methods: {
 			goBack() { uni.navigateBack(); },
+			async loadOrders() {
+				if (this.loading) return;
+				this.loading = true;
+				try {
+					const r = await callCloud('getMyOrders', { token: getToken() });
+					this.orders = (r.list || []).map((x) => ({
+						id: x.id,
+						itemId: x.itemId || x.id,
+						typeIcon: '/static/icons-dark/music.png',
+						type: '校园活动',
+						title: x.title,
+						time: x.time,
+						place: x.place,
+						price: x.price === '免费' ? '0' : String(x.price),
+						status: x.status,
+						statusKey: x.status === '已取消' ? 'cancel' : x.status === '已完成' ? 'done' : x.status === '进行中' ? 'ongoing' : 'wait'
+					}));
+					this.ordersShow = this.orders.slice();
+				} catch (e) {
+					uni.showToast({ title: (e && e.message) || '获取报名失败', icon: 'none' });
+				} finally {
+					this.loading = false;
+					uni.stopPullDownRefresh();
+				}
+			},
 			onTab(i) {
 				this.active = i;
 				const key = this.tabs[i].key;
 				this.ordersShow = key === 'all' ? this.orders.slice() : this.orders.filter(o => o.statusKey === key);
 			},
 			onTrack() { uni.navigateTo({ url: '/pages/errand-detail/errand-detail' }); },
-			onReview() { uni.navigateTo({ url: '/pages/review/review' }); },
-			onConfirm() { uni.showToast({ title: '已确认完成（演示）', icon: 'success' }); }
+			onReview(o) {
+				uni.navigateTo({
+					url: '/pages/review/review?itemId=' + (o.itemId || '') + '&title=' + encodeURIComponent(o.title || '')
+				});
+			},
+			onCancelBooking(o) {
+				uni.showModal({
+					title: '取消预约',
+					content: '确定取消「' + o.title + '」的报名吗？',
+					confirmColor: '#FF5A4E',
+					success: async (res) => {
+						if (!res.confirm) return;
+						try {
+							await callCloud('joinActivity', {
+								action: 'cancel',
+								token: getToken(),
+								itemId: o.itemId
+							});
+							uni.showToast({ title: '已取消预约', icon: 'none' });
+							this.loadOrders();
+						} catch (e) {
+							uni.showToast({ title: (e && e.message) || '操作失败', icon: 'none' });
+						}
+					}
+				});
+			}
 		}
 	};
 </script>
@@ -195,6 +245,9 @@
 	.mo__status--done { background: rgba(41,202,131,0.12); }
 	.mo__status--done .mo__status-dot { background: $c-mint; }
 	.mo__status--done .mo__status-t { color: $c-mint; }
+	.mo__status--cancel { background: rgba(232,97,84,0.10); }
+	.mo__status--cancel .mo__status-dot { background: #E86154; }
+	.mo__status--cancel .mo__status-t { color: #E86154; }
 	.mo__order-title {
 		display: block; margin-top: 18rpx;
 		font-size: $fs-h3; font-weight: $fw-bold; color: $c-ink;

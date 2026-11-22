@@ -121,7 +121,7 @@
 
 <script>
 	import unidaTabbar from '@/components/unida-tabbar/unida-tabbar.vue';
-	import { fetchDiscover, DISCOVER_FILTERS, DISCOVER_SORTS } from '@/common/api/discover.js';
+	import { fetchDiscover, DISCOVER_TABS, DISCOVER_SORTS } from '@/common/api/discover.js';
 
 	export default {
 		components: { unidaTabbar },
@@ -134,26 +134,36 @@
 				hasMore: true,
 				page: 1,
 				reqId: 0,
-				mainTabs: [
-					{ label: '找搭子', icon: '/static/unida/msg/ico-chat.webp', key: 'buddy' },
-					{ label: '校园活动', icon: '/static/unida/msg/ico-calendar.webp', key: 'activity' },
-					{ label: '社团招新', icon: '/static/unida/msg/ico-megaphone.webp', key: 'club' }
-				],
+				mainTabs: DISCOVER_TABS,
 				mainTab: 0,
-				chips: DISCOVER_FILTERS,
 				activeChip: 0,
-				sorts: DISCOVER_SORTS,
 				sort: 0,
 				feedList: [],
 				total: 0
 			};
 		},
-		onLoad() {
+		computed: {
+			chips() {
+				const t = this.mainTabs[this.mainTab];
+				return (t && t.filters) || ['全部'];
+			}
+		},
+		onLoad(q) {
 			try {
 				const info = uni.getSystemInfoSync();
 				this.statusBar = info.statusBarHeight || 0;
 			} catch (e) {
 				this.statusBar = 20;
+			}
+			// 支持首页分类入口带参跳入：tab + chip（分类文案）
+			if (q && q.tab !== undefined && q.tab !== '') {
+				const t = Number(q.tab);
+				if (t >= 0 && t < this.mainTabs.length) this.mainTab = t;
+			}
+			if (q && q.chip) {
+				const label = decodeURIComponent(q.chip);
+				const idx = this.chips.indexOf(label);
+				if (idx >= 0) this.activeChip = idx;
 			}
 			this.loadFeed(true);
 		},
@@ -176,7 +186,7 @@
 				try {
 					const res = await fetchDiscover({
 						tab: this.mainTab,
-						filter: this.activeChip,
+						chip: this.chips[this.activeChip] || '全部',
 						sort: this.sort,
 						page: reset ? 1 : this.page + 1,
 						size: 6
@@ -199,6 +209,7 @@
 			onMainTab(i) {
 				if (i === this.mainTab) return;
 				this.mainTab = i;
+				this.activeChip = 0; // 切 tab 后筛选归位到「全部」
 				this.loadFeed(true);
 			},
 			onChip(i) {
@@ -217,8 +228,8 @@
 			onSearch() {
 				uni.showToast({ title: '搜索页待开发', icon: 'none' });
 			},
-			onCardTap(e) {
-				const id = e.currentTarget.dataset.id;
+			onCardTap(item) {
+				const id = item && item.id;
 				uni.navigateTo({ url: '/pages/activity-detail/activity-detail?id=' + id });
 			}
 		}
@@ -366,7 +377,9 @@
 		padding: 20rpx $page-x 0;
 	}
 	.card {
-		width: calc(50% - 11rpx);
+		/* 微信真机对 calc(50% - 11rpx) 解析会溢出导致两列折成单列，改用设计基准固定宽度 */
+		width: 332rpx;
+		flex-shrink: 0;
 		margin-bottom: 22rpx;
 		border-radius: $r-md;
 		background: #fff;
@@ -510,7 +523,7 @@
 	}
 	.sk__grid { display: flex; flex-wrap: wrap; margin-top: 24rpx; }
 	.sk__card {
-		width: calc(50% - 11rpx); height: 440rpx; margin-bottom: 22rpx;
+		width: 332rpx; flex-shrink: 0; height: 440rpx; margin-bottom: 22rpx;
 		border-radius: $r-md; background: #ECE5FA;
 		animation: skBreath 1.4s ease-in-out infinite;
 	}

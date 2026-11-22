@@ -1,0 +1,27 @@
+{
+  "bsonType": "object",
+  "required": ["id", "title", "tab"],
+  "properties": {
+    "id": { "bsonType": "string" },
+    "tab": { "bsonType": "int" },
+    "category": { "bsonType": "string" },
+    "hot": { "bsonType": "bool" },
+    "title": { "bsonType": "string" },
+    "cover": { "bsonType": "string" },
+    "time": { "bsonType": "string" },
+    "place": { "bsonType": "string" },
+    "joined": { "bsonType": "int" },
+    "total": { "bsonType": "int" },
+    "price": { "bsonType": "string" },
+    "members": { "bsonType": "array" },
+    "bar": { "bsonType": "string" },
+    "barSoft": { "bsonType": "string" },
+    "type": { "bsonType": "string" },
+    "createdBy": { "bsonType": "string" },
+    "createdAt": { "bsonType": "int" }
+  },
+  "permission": {
+    "read": false,
+    "write": false
+  }
+}

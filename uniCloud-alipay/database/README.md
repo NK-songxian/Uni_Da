@@ -4,7 +4,7 @@
 
 | 集合名 | 用途 | 对应云函数 | 是否必须 |
 |--------|------|-----------|---------|
-| `users` | 用户（openid/昵称/积分/登录态） | login | ✅ 登录自动写入 |
+| `users` | 用户（openid/昵称/积分/登录态/学校/兴趣） | login / saveProfile | ✅ 登录自动写入 |
 | `app_config` | 全局配置（学校名/今日匹配数） | getHomeData | 可选 |
 | `home_categories` | 首页六大入口 | getHomeData | 可选 |
 | `home_promos` | 首页任务轮播 | getHomeData | 可选 |
@@ -12,13 +12,24 @@
 | `home_acts` | 首页校园活动横滑卡 | getHomeData | 可选 |
 | `mates` | 首页同频推荐 | getHomeData | 可选 |
 | `feed` | 同校动态（分页） | getHomeData | 可选 |
-| `discover_items` | 发现页列表（分页/筛选/排序） | getDiscover | 可选 |
+| `discover_items` | 发现页列表（分页/筛选/排序） | getDiscover / publishItem | 发布时必须 |
+| `activity_members` | 报名 / 加入记录（openid+itemId 唯一） | joinActivity / getMyOrders | 报名时必须 |
+| `favorites` | 收藏（type=item 活动 / post 帖子） | favorite | 收藏时必须 |
+| `likes` | 帖子点赞记录（openid+postId 唯一） | like | 点赞时必须 |
+| `posts` | 社区帖子（空集合自动写种子帖） | posts | 社区时必须 |
+| `post_comments` | 帖子评论 | posts(detail/comment) | 评论时必须 |
+| `messages` | 私信消息（pairKey=双方 openid 排序拼接） | chat | 聊天时必须 |
+| `checkins` | 每日签到（openid+date 唯一，streak 连签） | points | 签到时必须 |
+| `orders` | 跑腿订单（状态机：待接单→进行中→已完成/已取消） | errand | 跑腿时必须 |
+| `notifications` | 业务通知（system/activity/order/booking/interact） | notify / 各业务云函数 | 通知时必须 |
 
 ## 核心原则：不导入也能跑
 
 所有云函数都做了**双保险**：集合存在且有数据 → 用数据库；集合为空或不存在 → 用云函数内嵌的种子数据。
 
 所以你可以**先上传云函数跑通全链路**，之后再慢慢导入集合、把种子数据替换成真实数据。
+
+例外：使用 `publishItem` 真正发布时，必须先创建 `discover_items` 集合，否则写入会失败（读取展示仍可用种子数据）。
 
 ## 导入方法
 
@@ -38,6 +49,7 @@ avatar      string   头像
 phone       string   手机号
 points      number   积分
 school      string   学校
+interests   array    兴趣标签（saveProfile 写入）
 createdAt   number   创建时间戳
 lastLoginAt number   最后登录时间戳
 ```

@@ -13,10 +13,10 @@
 		<view class="ed__status">
 			<image class="ed__status-img" src="/static/unida/bubbles/catering-pin.webp" mode="aspectFit" />
 			<view class="ed__status-info">
-				<text class="ed__status-title">待接单</text>
-				<text class="ed__status-sub">快递代取 · 赏金 <text class="ed__status-num">¥8.00</text></text>
+				<text class="ed__status-title">{{ order.title || '加载中…' }}</text>
+				<text class="ed__status-sub">{{ order.type }} · 赏金 <text class="ed__status-num">¥{{ rewardText }}</text></text>
 			</view>
-			<view class="ed__status-badge"><text class="ed__status-badge-t">进行中</text></view>
+			<view class="ed__status-badge"><text class="ed__status-badge-t">{{ order.status }}</text></view>
 		</view>
 
 		<!-- 进度 -->
@@ -33,56 +33,145 @@
 		<!-- 需求详情 -->
 		<view class="ed__card">
 			<text class="ed__card-title">需求详情</text>
-			<view class="ed__line"><text class="ed__line-k">需求描述</text><text class="ed__line-v">帮忙取个快递，中通北区驿站，取件码已私聊</text></view>
-			<view class="ed__line"><text class="ed__line-k">取件地点</text><text class="ed__line-v">北区快递驿站</text></view>
-			<view class="ed__line"><text class="ed__line-k">送达地点</text><text class="ed__line-v">东园3栋宿舍楼下</text></view>
-			<view class="ed__line"><text class="ed__line-k">期望时间</text><text class="ed__line-v">今天 18:00 前</text></view>
-			<view class="ed__line"><text class="ed__line-k">订单编号</text><text class="ed__line-v ed__line-v--num">RT20261118001</text></view>
+			<view class="ed__line"><text class="ed__line-k">需求描述</text><text class="ed__line-v">{{ order.desc || '无' }}</text></view>
+			<view class="ed__line"><text class="ed__line-k">取件地点</text><text class="ed__line-v">{{ order.pickup || '待沟通' }}</text></view>
+			<view class="ed__line"><text class="ed__line-k">送达地点</text><text class="ed__line-v">{{ order.delivery || '待沟通' }}</text></view>
+			<view class="ed__line"><text class="ed__line-k">期望时间</text><text class="ed__line-v">{{ order.deadline || '时间灵活' }}</text></view>
+			<view class="ed__line"><text class="ed__line-k">订单编号</text><text class="ed__line-v ed__line-v--num">{{ order.id }}</text></view>
+			<view class="ed__line" v-if="order.acceptorName"><text class="ed__line-k">接单同学</text><text class="ed__line-v">{{ order.acceptorName }}</text></view>
 		</view>
 
 		<!-- 发布者 -->
-		<view class="ed__card ed__user" @click="goUser">
-			<view class="ed__user-avatar"><text class="ed__user-ch">阿</text></view>
+		<view class="ed__card ed__user" @click="onContact">
+			<view class="ed__user-avatar"><text class="ed__user-ch">{{ (order.publisherName || '同')[0] }}</text></view>
 			<view class="ed__user-info">
-				<text class="ed__user-name">阿星</text>
+				<text class="ed__user-name">{{ order.publisherName }}</text>
 				<view class="ed__user-sub">
 					<image class="ed__user-shield" src="/static/unida/bubbles/shield-check.webp" mode="aspectFit" />
-					<text class="ed__user-sub-t">已认证 · 好评率 4.9</text>
+					<text class="ed__user-sub-t">已认证 · 点击联系</text>
 				</view>
 			</view>
 			<image class="ed__chev" src="/static/icons-dark/chevron.png" mode="aspectFit" />
 		</view>
 
+		<view class="ed__tip" v-if="order.status === '进行中'">
+			<text class="ed__tip-t">接单后请及时联系发布者确认细节，完成后由发布者确认交付</text>
+		</view>
+
 		<!-- 底部操作 -->
 		<view class="ed__bottom">
-			<view class="ed__btn ed__btn--ghost" @click="onChat">
+			<view class="ed__btn ed__btn--ghost" @click="onContact">
 				<image class="ed__btn-img" src="/static/unida/bubbles/chat-purple.webp" mode="aspectFit" />
 				<text class="ed__btn-ghost-t">联系TA</text>
 			</view>
-			<view class="ed__btn ed__btn--primary" @click="onAccept"><text class="ed__btn-t">立即接单</text></view>
+			<!-- 待接单：非发布者 → 接单；发布者 → 取消 -->
+			<view v-if="order.status === '待接单' && !isPublisher" class="ed__btn ed__btn--primary" @click="onAccept"><text class="ed__btn-t">立即接单</text></view>
+			<view v-else-if="order.status === '待接单' && isPublisher" class="ed__btn ed__btn--cancel" @click="onCancel"><text class="ed__btn-t">取消订单</text></view>
+			<!-- 进行中：发布者 → 确认完成；接单者 → 等待确认 -->
+			<view v-else-if="order.status === '进行中' && isPublisher" class="ed__btn ed__btn--primary" @click="onConfirm"><text class="ed__btn-t">确认完成</text></view>
+			<view v-else-if="order.status === '进行中'" class="ed__btn ed__btn--wait"><text class="ed__btn-t">已接单 · 待发布者确认</text></view>
+			<!-- 已完成 -->
+			<view v-else-if="order.status === '已完成'" class="ed__btn ed__btn--wait"><text class="ed__btn-t">订单已完成</text></view>
+			<view v-else class="ed__btn ed__btn--wait"><text class="ed__btn-t">订单已取消</text></view>
 		</view>
 		<view class="ed__bottom-space"></view>
 	</view>
 </template>
 
 <script>
+	import { callCloud, getToken } from '@/common/cloud.js';
+
 	export default {
 		data() {
 			return {
 				statusBar: 0,
+				orderId: '',
+				order: {},
 				steps: ['发布需求', '接单', '执行中', '已交付', '评价'],
-				activeStep: 1
+				busy: false
 			};
 		},
-		onLoad() {
+		computed: {
+			rewardText() {
+				const r = Number(this.order.reward) || 0;
+				return r % 1 === 0 ? String(r) : r.toFixed(2);
+			},
+			activeStep() {
+				const s = this.order.status;
+				if (s === '进行中') return 2;
+				if (s === '已完成') return 3;
+				return 0;
+			},
+			isPublisher() {
+				return this.order.myRole === 'publisher';
+			}
+		},
+		onLoad(q) {
 			const sys = uni.getSystemInfoSync();
 			this.statusBar = sys && sys.statusBarHeight || 0;
+			this.orderId = (q && q.id) || '';
+			this.loadDetail();
 		},
 		methods: {
 			goBack() { uni.navigateBack(); },
-			goUser() { uni.navigateTo({ url: '/pages/user-home/user-home' }); },
-			onChat() { uni.navigateTo({ url: '/pages/chat/chat?name=阿星' }); },
-			onAccept() { uni.showToast({ title: '接单成功（演示）', icon: 'success' }); }
+			async loadDetail() {
+				if (!this.orderId) return;
+				try {
+					const r = await callCloud('errand', { action: 'detail', token: getToken(), id: this.orderId });
+					this.order = r.order || {};
+				} catch (e) {
+					uni.showToast({ title: (e && e.message) || '加载订单失败', icon: 'none' });
+				}
+			},
+			onContact() {
+				const o = this.order;
+				const peer = o.peerOpenid || 'official';
+				const name = o.peerName || '同学';
+				uni.navigateTo({ url: '/pages/chat/chat?peer=' + peer + '&name=' + encodeURIComponent(name) });
+			},
+			async onAccept() {
+				if (this.busy) return;
+				this.busy = true;
+				try {
+					await callCloud('errand', { action: 'accept', token: getToken(), id: this.orderId });
+					uni.showToast({ title: '接单成功', icon: 'success' });
+					this.loadDetail();
+				} catch (e) {
+					uni.showToast({ title: (e && e.message) || '接单失败', icon: 'none' });
+				} finally {
+					this.busy = false;
+				}
+			},
+			async onConfirm() {
+				if (this.busy) return;
+				this.busy = true;
+				try {
+					await callCloud('errand', { action: 'confirm', token: getToken(), id: this.orderId });
+					uni.showToast({ title: '已确认完成', icon: 'success' });
+					this.loadDetail();
+				} catch (e) {
+					uni.showToast({ title: (e && e.message) || '操作失败', icon: 'none' });
+				} finally {
+					this.busy = false;
+				}
+			},
+			onCancel() {
+				uni.showModal({
+					title: '取消订单',
+					content: '确定取消这个跑腿需求吗？',
+					confirmColor: '#FF5A4E',
+					success: async (res) => {
+						if (!res.confirm) return;
+						try {
+							await callCloud('errand', { action: 'cancel', token: getToken(), id: this.orderId });
+							uni.showToast({ title: '已取消', icon: 'none' });
+							this.loadDetail();
+						} catch (e) {
+							uni.showToast({ title: (e && e.message) || '操作失败', icon: 'none' });
+						}
+					}
+				});
+			}
 		}
 	};
 </script>
@@ -114,8 +203,8 @@
 		box-shadow: $sh-float;
 	}
 	.ed__status-img { width: 100rpx; height: 100rpx; flex-shrink: 0; }
-	.ed__status-info { flex: 1; margin-left: 22rpx; display: flex; flex-direction: column; }
-	.ed__status-title { font-size: 34rpx; font-weight: 800; color: $c-white; }
+	.ed__status-info { flex: 1; margin-left: 22rpx; display: flex; flex-direction: column; min-width: 0; }
+	.ed__status-title { font-size: 30rpx; font-weight: 800; color: $c-white; }
 	.ed__status-sub { margin-top: 10rpx; font-size: 23rpx; color: rgba(255, 255, 255, 0.85); }
 	.ed__status-num { font-family: $ff-num; font-weight: 800; font-size: 26rpx; color: $c-white; }
 	.ed__status-badge {
@@ -188,6 +277,15 @@
 	.ed__user-sub-t { margin-left: 8rpx; font-size: 22rpx; color: $t-sub; }
 	.ed__chev { width: 26rpx; height: 26rpx; opacity: 0.35; }
 
+	/* ---------- 温馨提示 ---------- */
+	.ed__tip {
+		margin-top: 20rpx;
+		background: rgba(255, 201, 79, 0.16);
+		border-radius: $r-md;
+		padding: 20rpx 26rpx;
+	}
+	.ed__tip-t { font-size: 22rpx; color: #B8860B; line-height: 1.6; }
+
 	/* ---------- 底部操作 ---------- */
 	.ed__bottom {
 		position: fixed;
@@ -210,6 +308,10 @@
 	.ed__btn-img { width: 40rpx; height: 40rpx; }
 	.ed__btn-ghost-t { margin-left: 12rpx; font-size: 27rpx; color: $c-primary; font-weight: 600; }
 	.ed__btn--primary { background: $g-cta; box-shadow: $sh-float; }
+	.ed__btn--cancel { background: #FFF0EE; box-shadow: none; }
+	.ed__btn--cancel .ed__btn-t { color: #E86154; }
+	.ed__btn--wait { background: $c-ice; box-shadow: none; }
+	.ed__btn--wait .ed__btn-t { color: $t-sub; font-size: 24rpx; }
 	.ed__btn-t { font-size: 28rpx; color: $c-white; font-weight: 700; letter-spacing: 1rpx; }
 
 	.ed__bottom-space { height: 180rpx; }

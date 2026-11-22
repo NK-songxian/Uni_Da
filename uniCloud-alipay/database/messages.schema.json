@@ -1,0 +1,19 @@
+{
+  "bsonType": "object",
+  "required": ["pairKey", "from", "to", "content"],
+  "properties": {
+    "pairKey": { "bsonType": "string" },
+    "from": { "bsonType": "string" },
+    "to": { "bsonType": "string" },
+    "fromName": { "bsonType": "string" },
+    "toName": { "bsonType": "string" },
+    "type": { "bsonType": "string" },
+    "content": { "bsonType": "string" },
+    "read": { "bsonType": "bool" },
+    "createdAt": { "bsonType": "int" }
+  },
+  "permission": {
+    "read": false,
+    "write": false
+  }
+}

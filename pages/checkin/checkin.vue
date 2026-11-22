@@ -5,31 +5,33 @@
 			<view class="ck__spark ck__spark--b"></view>
 			<view class="ck__spark ck__spark--c"></view>
 			<image class="ck__badge" src="/static/unida/bubbles/check-cap.webp" mode="aspectFit" />
-			<text class="ck__title">打卡成功！</text>
-			<text class="ck__sub">已完成签到，玩得开心</text>
+		<text class="ck__title">打卡成功！</text>
+		<text class="ck__sub">已连续签到 {{ streak }} 天，玩得开心</text>
+	</view>
+	<view class="ck__reward">
+		<view class="ck__reward-ico"><image class="ck__reward-img" src="/static/icons-dark/flame.png" mode="aspectFit" /></view>
+		<view class="ck__reward-info">
+			<text class="ck__reward-t">签到奖励</text>
+			<text class="ck__reward-s">积分已到账</text>
 		</view>
-		<view class="ck__reward">
-			<view class="ck__reward-ico"><image class="ck__reward-img" src="/static/icons-dark/flame.png" mode="aspectFit" /></view>
-			<view class="ck__reward-info">
-				<text class="ck__reward-t">签到奖励</text>
-				<text class="ck__reward-s">积分已到账</text>
-			</view>
-			<text class="ck__reward-num">+20</text>
-		</view>
-		<view class="ck__btn" @click="goHome">完成</view>
+		<text class="ck__reward-num">+{{ gained }}</text>
+	</view>
+	<view class="ck__btn" @click="goBack">完成</view>
 	</view>
 </template>
 
 <script>
 	export default {
 		data() {
-			return { statusBar: 0 };
+			return { statusBar: 0, gained: 5, streak: 1 };
 		},
-		onLoad() {
+		onLoad(q) {
 			const sys = uni.getSystemInfoSync();
 			this.statusBar = sys && sys.statusBarHeight || 0;
+			this.gained = Number(q && q.gained) || 5;
+			this.streak = Number(q && q.streak) || 1;
 		},
-		methods: { goHome() { uni.reLaunch({ url: '/pages/home/home' }); } }
+		methods: { goBack() { uni.navigateBack(); } }
 	};
 </script>
 

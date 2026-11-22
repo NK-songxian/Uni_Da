@@ -39,7 +39,7 @@
 </template>
 
 <script>
-	import { CLOUD_MODE, callCloud, saveSession } from '@/common/cloud.js';
+	import { CLOUD_MODE, callCloud, getToken, getUser, saveSession } from '@/common/cloud.js';
 
 	export default {
 		data() {
@@ -47,6 +47,16 @@
 				agreed: false,
 				loading: false
 			};
+		},
+		onLoad() {
+			// 有登录态时不再强制重新登录：token + user 齐全进首页，只有 token 进资料页
+			const token = getToken();
+			const user = getUser();
+			if (token && user && user.id) {
+				uni.reLaunch({ url: '/pages/home/home' });
+			} else if (token) {
+				uni.reLaunch({ url: '/pages/profile-setup/profile-setup' });
+			}
 		},
 		methods: {
 			onGetPhone(e) {

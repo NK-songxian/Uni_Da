@@ -1,0 +1,13 @@
+{
+  "bsonType": "object",
+  "required": ["openid", "postId"],
+  "properties": {
+    "openid": { "bsonType": "string" },
+    "postId": { "bsonType": "string" },
+    "createdAt": { "bsonType": "int" }
+  },
+  "permission": {
+    "read": false,
+    "write": false
+  }
+}

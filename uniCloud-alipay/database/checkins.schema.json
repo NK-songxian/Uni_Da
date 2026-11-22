@@ -1,0 +1,15 @@
+{
+  "bsonType": "object",
+  "required": ["openid", "date"],
+  "properties": {
+    "openid": { "bsonType": "string" },
+    "date": { "bsonType": "string" },
+    "streak": { "bsonType": "int" },
+    "points": { "bsonType": "int" },
+    "createdAt": { "bsonType": "int" }
+  },
+  "permission": {
+    "read": false,
+    "write": false
+  }
+}

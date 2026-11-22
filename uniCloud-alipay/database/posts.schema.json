@@ -1,0 +1,23 @@
+{
+  "bsonType": "object",
+  "required": ["id", "authorOpenid", "text"],
+  "properties": {
+    "id": { "bsonType": "string" },
+    "authorOpenid": { "bsonType": "string" },
+    "authorName": { "bsonType": "string" },
+    "tone": { "bsonType": "string" },
+    "campus": { "bsonType": "string" },
+    "tag": { "bsonType": "string" },
+    "text": { "bsonType": "string" },
+    "images": { "bsonType": "array" },
+    "likes": { "bsonType": "int" },
+    "comments": { "bsonType": "int" },
+    "favs": { "bsonType": "int" },
+    "timeText": { "bsonType": "string" },
+    "createdAt": { "bsonType": "int" }
+  },
+  "permission": {
+    "read": false,
+    "write": false
+  }
+}

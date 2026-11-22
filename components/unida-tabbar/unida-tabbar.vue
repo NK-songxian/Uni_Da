@@ -1,5 +1,5 @@
 <template>
-	<!-- UNIDA 专属底部导航 V6：图片镂空 U 型凹槽白栏（真机必渲染） + U 星球发布球嵌谷 -->
+	<!-- UNIDA 专属底部导航 V8：V7 镂空 U 型凹槽白栏 + 昨天全套深紫 3D 图标 + 发布球叠加安全区下沉坐进谷 -->
 	<view class="unida-tabbar">
 		<!-- 白栏顶部真挖 U 型谷（PNG 透明区），发布球坐进谷里；图片方案规避 mask 真机失效 -->
 		<image class="tabbar-sheet" src="/static/unida/tabbar/tabbar-sheet.png" mode="widthFix" />
@@ -214,7 +214,9 @@
 	.publish-center {
 		position: absolute;
 		left: 50%;
-		top: 22rpx;
+		/* 必须叠加安全区：容器高度含 safe-area，若只写 22rpx，全面屏会把球顶飞到白栏上方 */
+		top: calc(22rpx + constant(safe-area-inset-bottom));
+		top: calc(22rpx + env(safe-area-inset-bottom));
 		transform: translateX(-50%);
 		width: 160rpx;
 		display: flex;

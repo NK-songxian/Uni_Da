@@ -1,0 +1,7 @@
+{
+  "name": "joinActivity",
+  "version": "1.0.0",
+  "description": "UNIDA 报名 / 加入活动云函数",
+  "main": "index.js",
+  "dependencies": {}
+}

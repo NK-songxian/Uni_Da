@@ -87,24 +87,36 @@ common/
 
 ---
 
-## 第 3 步：上传公共模块和云函数
+## 第 3 步：上传公共模块、云函数、数据库集合（已脚本化）
 
-1. HBuilderX 左侧右键 **`uniCloud-alipay/cloudfunctions/common`** → 「上传公共模块」
-2. 再右键 **`uniCloud-alipay/cloudfunctions`** → 「上传所有云函数」（或逐个右键每个云函数 → 上传）
-3. 等待控制台显示上传成功
+不用再逐个右键上传。项目里已加一键部署脚本：
+
+```bash
+E:/anaco/envs/sam_gpu/python.exe H:/UniDA/unida/scripts/deploy_cloud.py
+```
+
+它会自动：
+1. 逐个上传 `cloudfunctions/common/` 下**非空**公共模块（跳过空模块，避免 `all` 模式中断）
+2. 逐个上传全部云函数（`login` / `getHomeData` / `getDiscover` / `publishItem`）
+3. 上传 `database/*.schema.json`，自动创建全部集合（含 `discover_items`、`users` 等）
+
+核对云端现状：
+
+```bash
+E:/anaco/envs/sam_gpu/python.exe H:/UniDA/unida/scripts/deploy_cloud.py --check
+```
+
+> 脚本使用 HBuilderX CLI，需要 HBuilderX 已登录 DCloud 且已关联服务空间。本机 CLI 路径 `H:/HBuilderX/cli.exe`，服务空间 `env-00jy72vf1i57`。
+
+手动右键上传仍可用作兜底，但改完代码后建议直接跑脚本，不用再记哪些没传。
 
 ---
 
-## 第 4 步：创建数据库集合（可选，不建也能跑）
+## 第 4 步：数据库集合（已由脚本自动创建 ✅）
 
-云函数已内置种子数据，**不建集合也能显示内容**。想用真实数据库管理时：
+本地 `uniCloud-alipay/database/*.schema.json` 已覆盖全部集合，跑一次 `deploy_cloud.py` 就会自动建好 `users` / `app_config` / `discover_items` / `feed` 等 9 个集合，权限均为「仅云函数可读写」。
 
-1. 打开 `uniCloud-alipay/database/README.md` 看集合清单
-2. HBuilderX 里右键 `database` → 新建集合，按清单创建（如 `users`、`feed`、`discover_items` 等）
-3. 需要初始数据时，把 `database/seed/` 下的 JSON 导入对应集合
-4. 建议把集合权限设为「仅云函数可读写」
-
-`users` 集合**无需手动创建**——登录时云函数会自动写入（首次登录自动生成）。
+需要初始数据时，再把 `database/seed/` 下的 JSON 导入对应集合即可（不导入也能跑，云函数有种子兜底）。
 
 ---
 
@@ -113,14 +125,16 @@ common/
 支付宝云调用需要在微信小程序后台加白名单：
 
 1. 登录 https://mp.weixin.qq.com → 开发管理 → 开发设置 → 服务器域名
-2. 在 **request 合法域名** 中添加：
+2. 在 **request 合法域名** 中添加（本项目实际值）：
    ```
-   https://你的空间ID.api-hz.cloudbasefunction.cn
+   https://env-00jy72vf1i57.api-hz.cloudbasefunction.cn
    ```
-   （空间 ID 在 HBuilderX 关联后的云服务空间详情里能看到）
-3. 保存
+3. 保存后，微信开发者工具里点「详情 → 域名信息 → 刷新项目配置」，或直接重新编译项目
 
-> 开发阶段可在微信开发者工具勾选「不校验合法域名」先跳过。
+开发阶段可临时跳过校验：
+
+- 微信开发者工具 → 详情 → 本地设置 → 勾选「不校验合法域名…」
+- 本项目产物 `project.config.json` 已补 `"urlCheck": false`，但部分版本仍会在页面顶部提示，勾选一次最稳
 
 ---
 
@@ -141,14 +155,120 @@ export const CLOUD_MODE = {
 
 ---
 
-## 第 7 步：验证
+## 第 7 步：5 分钟真实验证（按这个顺序做）
 
-1. 微信开发者工具打开 `unpackage/dist/dev/mp-weixin/`
-2. 打开登录页 → 点微信登录 → 观察：
-   - 控制台 `[cloud] → login` / `[cloud] ← login` 日志（debug=true 时）
-   - uniCloud 控制台 `users` 集合出现新用户记录
-3. 进入首页 → 数据正常显示（若集合为空，显示的是种子数据）
-4. 进入发现页 → 列表/筛选/排序正常
+> 我已把 `common/cloud.js` 的 `enabled: true`、`debug: true` 同步到源码和产物。
+> `debug: true` 会在微信开发者工具控制台打印 `[cloud] → 云函数名` 和 `[cloud] ← 返回结果`，验证完成后再改回 `false`。
+
+### 7.1 先确认三件事（错了后面全白测）
+
+1. **云函数已上传**：HBuilderX 控制台显示 `common` 公共模块 + `login` / `getHomeData` / `getDiscover` 上传成功。改过配置后必须**重新上传**，不是只保存本地文件。
+2. **切到云端云函数**：HBuilderX 底部「前端控制台」右上角有一个连接切换，默认是 **`连接本地云函数`**。真实验证必须切成 **`连接云端云函数`**，否则跑的是本机模拟环境，数据库不会出现记录。
+3. **打开正确项目目录**：微信开发者工具打开 `unpackage/dist/dev/mp-weixin/`；`urlCheck:false` 已配好，开发阶段不用管合法域名。
+
+### 7.2 验证登录 + users 集合
+
+1. 微信开发者工具 → 清掉本地缓存里的 `unida_token` / `unida_user`（或直接清 Storage），重新进登录页走一次微信登录。
+2. 控制台应看到：
+   ```text
+   [cloud] → login {code: "..."}
+   [cloud] ← login {errCode: 0, mode: "real", isNew: true, ...}
+   ```
+   - `mode: "real"` 说明微信 code2Session 成功；
+   - 若 `mode: "demo"`，说明公共模块没上传或配置没读到。
+3. HBuilderX 右键 `uniCloud-alipay` → 「打开 uniCloud Web 控制台」→ 数据库 → `users` 集合，应多出一条记录，带 `openid`、`token`、`createdAt`。
+   > 集合不存在时，第一次登录会自动创建并写入。
+
+### 7.3 验证首页 / 发现页真实数据
+
+1. 进首页，控制台应看到 `[cloud] → getHomeData` / `[cloud] ← getHomeData`。
+2. 进发现页，控制台应看到 `[cloud] → getDiscover` / `[cloud] ← getDiscover`。
+3. **最硬的证据：改数据库，看界面变。**
+   - 首页：在 Web 控制台把 `app_config` 里那条记录的 `school` 改成 `云端已连通测试大学`，下拉刷新首页，顶部学校名应跟着变。
+   - 发现页：在 `discover_items` 集合新增一条记录（tab=0 才会出现在默认「找搭子」）：
+     ```json
+     {
+       "id": "d999",
+       "tab": 0,
+       "category": "学习",
+       "hot": true,
+       "title": "【云端真实数据】验证成功",
+       "cover": "/static/art/art-campus.jpg",
+       "time": "现在",
+       "place": "云端数据库",
+       "joined": 1,
+       "total": 2,
+       "price": "免费",
+       "members": [],
+       "bar": "#805CFA",
+       "barSoft": "rgba(128,92,250,.10)"
+     }
+     ```
+     回到发现页下拉刷新，列表应出现这条标题。
+4. 云函数返回里有 `_source.fromDB: true`（在 `[cloud] ←` 的日志里能看到），表示数据确实来自数据库而不是内置种子。
+
+### 7.4 如果还是老数据
+
+| 现象 | 先查这里 |
+|------|----------|
+| 控制台没有 `[cloud]` 日志 | `CLOUD_MODE.enabled` 被编译回 false；重跑 `scripts/sync_cloud.py` 或重新编译 |
+| 有 `[cloud] error` | 看 errMsg：服务空间未关联 / 云函数未上传 / 未切到云端云函数 |
+| `mode: "demo"` | 公共模块没重新上传，`uni-config-center` 没读到 AppSecret |
+| 页面数据没变但日志正常 | 云函数读集合失败会回退种子数据；去数据库确认集合名拼写（`discover_items`、`app_config`） |
+| `request has expired`（登录/读集合都报） | 支付宝云 **HBuilderX 本地调试读数据库的已知问题**，DCloud 已确认不影响线上 | 前端控制台右上角切到「连接云端云函数」后重试；`common/cloud.js` 已把这句翻译成明确提示 |
+| `socket 合法域名校验出错 ws://10.68...:8090` / `Cannot send network request to localhost` | 这是 HBuilderX 开发模式日志通道，不是业务云请求 | 微信开发者工具「详情 → 本地设置」勾选「不校验合法域名…」，然后关闭项目重新打开；不用把 ws 域名加进后台 |
+| 真机正常、模拟器不正常 | 微信开发者工具勾选「不校验合法域名」后重试 |
+
+验证通过后，把 `common/cloud.js` 的 `debug` 改回 `false` 并重跑 `scripts/sync_cloud.py`，避免生产环境打印用户数据。
+
+---
+
+## 第 8 步：发布功能真实入库（已接入 publishItem）
+
+前端 `publish-form` 已不再“演示成功”，改为调 `publishItem` 云函数写入 `discover_items`。
+
+1. `discover_items` 集合已由 `deploy_cloud.py` 自动创建，不用手动建。
+2. 云函数也已由脚本上传，确认过 `[cloud] → publishItem` 能调用即可。
+3. 确认已登录（本地 Storage 有 `unida_token`），进入发布页填标题/时间/地点，点「发布活动」。
+4. 控制台应看到：
+   ```text
+   [cloud] → publishItem {...}
+   [cloud] ← publishItem { errCode:0, id:"d..." }
+   ```
+5. 自动跳回发现页，列表第一条应出现你刚发的标题；Web 控制台 `discover_items` 集合同步多一条记录。
+
+> 云函数会校验 `unida_token` 签名，未登录或登录态伪造会返回 401，不会写入数据库。
+
+---
+
+## 第 9 步：资料完善真实入库（已接入 saveProfile）
+
+`profile-setup` 页面现在会把「学校 / 昵称 / 兴趣」写入 `users` 集合，并把云端返回的 `user` 覆盖本地缓存。
+
+1. 清掉本地 `unida_user` 后重新登录，或直接进 `profile-setup`
+2. 填学校 + 昵称 + 选兴趣 → 点「完成」
+3. 控制台应看到：
+   ```text
+   [cloud] → saveProfile {...}
+   [cloud] ← saveProfile { errCode:0, user:{...} }
+   ```
+4. Web 控制台 `users` 集合中，对应 openid 那条记录应新增 `school` / `nickname` / `interests` 字段
+5. 再次进入 `profile-setup`，已保存的学校/昵称/兴趣会自动回显
+
+---
+
+## 第 10 步：报名 / 加入活动真实入库（已接入 joinActivity + getMyOrders）
+
+1. 首页 / 发现页点进活动详情 → 立即报名 → 报名确认页
+2. 填人数 / 备注 → 提交报名
+3. 控制台应看到：
+   ```text
+   [cloud] → joinActivity {...}
+   [cloud] ← joinActivity { errCode:0, orderId:"UNI..." }
+   ```
+4. 自动跳到报名成功页；Web 控制台 `activity_members` 集合应多一条记录
+5. 如果活动在 `discover_items` / `activities` 里有对应 `id`，对应条目的 `joined` 人数会同步 +人数
+6. 进入「我的报名」，控制台应看到 `[cloud] ← getMyOrders`，列表显示刚才那条报名
 
 ---
 

@@ -67,8 +67,9 @@
 			<text class="st__title">完善个人资料</text>
 			<text class="st__sub">让大家更快认识你</text>
 			<view class="st__avatar-wrap" @click="onAvatar">
-				<view class="st__avatar"><text class="st__avatar-ch">{{ nickFirst }}</text></view>
-				<view class="st__avatar-tip"><image class="st__avatar-pen" src="/static/icons-dark/bulb.png" mode="aspectFit" /><text class="st__avatar-tip-t">点击更换头像</text></view>
+				<image v-if="avatar" class="st__avatar st__avatar--pic" :src="avatar" mode="aspectFill" />
+				<view v-else class="st__avatar"><text class="st__avatar-ch">{{ nickFirst }}</text></view>
+				<view class="st__avatar-tip"><image class="st__avatar-pen" src="/static/icons-dark/bulb.png" mode="aspectFit" /><text class="st__avatar-tip-t">{{ avatar ? '点击更换头像' : '点击上传头像' }}</text></view>
 			</view>
 			<view class="st__field">
 				<text class="st__label">昵称</text>
@@ -91,14 +92,19 @@
 </template>
 
 <script>
+	import { callCloud, getToken, getUser, saveSession } from '@/common/cloud.js';
+	import { uploadImage } from '@/common/upload.js';
+
 	export default {
 		data() {
 			return {
 				statusBar: 0,
+				submitting: false,
 				step: 1,
 				school: '',
 				nickname: '',
 				nickFirst: '我',
+				avatar: '',
 				interests: [
 					{ label: '学习', icon: '/static/icons-dark/heart.png', tone: 'purple', on: false },
 					{ label: '运动', icon: '/static/icons-dark/flame.png', tone: 'orange', on: false },
@@ -112,6 +118,23 @@
 		onLoad() {
 			const sys = uni.getSystemInfoSync();
 			this.statusBar = sys && sys.statusBarHeight || 0;
+			const cached = getUser();
+			if (cached) {
+				if (cached.school) this.school = cached.school;
+				if (cached.nickname) {
+					this.nickname = cached.nickname;
+					this.nickFirst = cached.nickname.slice(0, 1);
+				}
+				if (cached.avatar) this.avatar = cached.avatar;
+				if (Array.isArray(cached.interests)) {
+					this.interests = this.interests.map((x) => ({
+						label: x.label,
+						icon: x.icon,
+						tone: x.tone,
+						on: cached.interests.indexOf(x.label) >= 0
+					}));
+				}
+			}
 		},
 		methods: {
 			goBack() { uni.navigateBack(); },
@@ -132,10 +155,46 @@
 				this.nickname = e.detail.value;
 				this.nickFirst = e.detail.value ? e.detail.value.slice(0, 1) : '我';
 			},
-			onAvatar() { uni.showToast({ title: '头像上传待接入', icon: 'none' }); },
-			onFinish() {
+			onAvatar() {
+				uni.chooseImage({
+					count: 1,
+					sizeType: ['compressed'],
+					success: (res) => {
+						const p = res.tempFilePaths && res.tempFilePaths[0];
+						if (p) this.avatar = p;
+					}
+				});
+			},
+			async onFinish() {
+				if (this.submitting) return;
 				if (!this.nickname.trim()) { uni.showToast({ title: '给自己起个昵称吧', icon: 'none' }); return; }
-				this.step = 3;
+				if (!this.school) { uni.showToast({ title: '请先选择学校', icon: 'none' }); return; }
+				this.submitting = true;
+				try {
+					// 选了本地头像（http 开头说明是云端旧头像，无需重传）
+					let avatarUrl = this.avatar;
+					if (avatarUrl && avatarUrl.indexOf('http') !== 0) {
+						uni.showLoading({ title: '上传头像中', mask: true });
+						avatarUrl = await uploadImage(avatarUrl, 'avatars');
+					}
+					uni.showLoading({ title: '正在保存到云端' });
+					const r = await callCloud('saveProfile', {
+						token: getToken(),
+						school: this.school,
+						nickname: this.nickname.trim(),
+						avatar: avatarUrl,
+						interests: this.interests.filter((x) => x.on).map((x) => x.label)
+					});
+					// 把云端返回的 user 覆盖本地缓存，后面个人中心/首页都能直接用
+					saveSession(getToken(), r.user);
+					uni.hideLoading();
+					this.step = 3;
+				} catch (e) {
+					uni.hideLoading();
+					uni.showToast({ title: (e && e.message) || '保存失败', icon: 'none' });
+				} finally {
+					this.submitting = false;
+				}
 			},
 			onSkip() { this.enterApp(); },
 			enterApp() { uni.reLaunch({ url: '/pages/home/home' }); }
@@ -243,6 +302,7 @@
 		box-shadow: 0 10rpx 30rpx rgba(128, 92, 250, 0.24);
 	}
 	.st__avatar-ch { font-size: 72rpx; color: $c-white; font-weight: 800; }
+	.st__avatar--pic { box-sizing: border-box; }
 	.st__avatar-tip { display: flex; align-items: center; margin-top: 16rpx; }
 	.st__avatar-pen { width: 28rpx; height: 28rpx; margin-right: 8rpx; }
 	.st__avatar-tip-t { font-size: 24rpx; color: $c-primary; }

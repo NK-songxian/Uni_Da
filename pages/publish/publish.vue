@@ -68,12 +68,12 @@
 			return {
 				statusBar: 0,
 				types: [
-					{ label: '找搭子', desc: '自习·吃饭·运动，找同频伙伴', icon: '/static/icons-dark/buddy.png', tone: 'purple' },
-					{ label: '发起活动', desc: '组一场多人校园活动', icon: '/static/icons-dark/calendar.png', tone: 'orange' },
-					{ label: '技能教学', desc: '分享你的特长与课程', icon: '/static/icons-dark/bulb.png', tone: 'pink' },
-					{ label: '跑腿需求', desc: '发布互助跑腿任务', icon: '/static/icons-dark/box.png', tone: 'green' },
-					{ label: '校园动态', desc: '分享此刻的校园生活', icon: '/static/icons-dark/heart.png', tone: 'sky' },
-					{ label: '活动招募', desc: '为你的活动招募队友', icon: '/static/icons-dark/flame.png', tone: 'sun' }
+					{ label: '学习搭子', desc: '自习·图书馆·技能教学', icon: '/static/icons-dark/buddy.png', tone: 'purple', route: 'form' },
+					{ label: '运动搭子', desc: '健身·球类·跑步爬山', icon: '/static/icons-dark/flame.png', tone: 'orange', route: 'form' },
+					{ label: '娱乐聚会', desc: '探店·桌游·唱歌摄影', icon: '/static/icons-dark/heart.png', tone: 'pink', route: 'form' },
+					{ label: '发起活动', desc: '赛事·招新·讲座展览', icon: '/static/icons-dark/calendar.png', tone: 'sun', route: 'form' },
+					{ label: '跑腿需求', desc: '快递·外卖·代取帮办', icon: '/static/icons-dark/box.png', tone: 'green', route: 'errand' },
+					{ label: '校园动态', desc: '分享此刻的校园生活', icon: '/static/icons-dark/bulb.png', tone: 'sky', route: 'community' }
 				],
 				labels: [
 					{ icon: '/static/unida/bubbles/label-hot.webp', name: '热门' },
@@ -95,10 +95,14 @@
 		},
 		methods: {
 			onType(i) {
-				uni.showToast({ title: '「' + this.types[i].label + '」表单待开发', icon: 'none' });
+				const t = this.types[i];
+				if (!t) return;
+				if (t.route === 'errand') { uni.navigateTo({ url: '/pages/errand-publish/errand-publish' }); return; }
+				if (t.route === 'community') { uni.navigateTo({ url: '/pages/community/community' }); return; }
+				uni.navigateTo({ url: '/pages/publish-form/publish-form?type=' + encodeURIComponent(t.label) });
 			},
 			onLabel(i) {
-				uni.showToast({ title: '标签「' + this.labelNames[i] + '」已带上（示例）', icon: 'none' });
+				uni.showToast({ title: '标签「' + this.labels[i].name + '」已带上（示例）', icon: 'none' });
 			}
 		}
 	};

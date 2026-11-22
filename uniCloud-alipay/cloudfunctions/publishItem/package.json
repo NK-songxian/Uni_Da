@@ -1,0 +1,7 @@
+{
+  "name": "publishItem",
+  "version": "1.0.0",
+  "description": "UNIDA 发布活动/搭子云函数",
+  "main": "index.js",
+  "dependencies": {}
+}

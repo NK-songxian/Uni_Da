@@ -1,0 +1,27 @@
+{
+  "bsonType": "object",
+  "required": ["id", "publisherOpenid", "title", "status"],
+  "properties": {
+    "id": { "bsonType": "string" },
+    "type": { "bsonType": "string" },
+    "title": { "bsonType": "string" },
+    "desc": { "bsonType": "string" },
+    "reward": { "bsonType": "double" },
+    "pickup": { "bsonType": "string" },
+    "delivery": { "bsonType": "string" },
+    "deadline": { "bsonType": "string" },
+    "status": { "bsonType": "string" },
+    "publisherOpenid": { "bsonType": "string" },
+    "publisherName": { "bsonType": "string" },
+    "acceptorOpenid": { "bsonType": "string" },
+    "acceptorName": { "bsonType": "string" },
+    "acceptAt": { "bsonType": "int" },
+    "doneAt": { "bsonType": "int" },
+    "createdAt": { "bsonType": "int" },
+    "updatedAt": { "bsonType": "int" }
+  },
+  "permission": {
+    "read": false,
+    "write": false
+  }
+}

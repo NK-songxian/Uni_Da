@@ -9,6 +9,7 @@
 				<text class="eh__title">跑腿大厅</text>
 				<text class="eh__sub">同学互助，小事不用愁</text>
 			</view>
+			<view class="eh__mine" @click="goMine"><text class="eh__mine-t">我的订单</text></view>
 			<image class="eh__hero-mascot" src="/static/unida/msg/mascot-wave.webp" mode="widthFix" />
 		</view>
 
@@ -40,26 +41,34 @@
 
 		<!-- 需求列表 -->
 		<view class="eh__sect">
-			<text class="eh__sect-t">附近需求</text>
-			<text class="eh__sect-s">{{ orders.length }} 个待接单</text>
+			<text class="eh__sect-t">{{ activeCat > 0 ? cats[activeCat - 1].label : '附近需求' }}</text>
+			<view class="eh__sect-r">
+				<text class="eh__sort" :class="{ 'eh__sort--on': sort === 'new' }" @click="onSort('new')">最新</text>
+				<text class="eh__sort" :class="{ 'eh__sort--on': sort === 'reward' }" @click="onSort('reward')">赏金最高</text>
+			</view>
 		</view>
-		<view class="eh__item" v-for="(o, i) in orders" :key="i" @click="onOrder(i)">
+		<view class="eh__item" v-for="(o, i) in orders" :key="o.id" @click="onOrder(i)">
 			<view class="eh__item-head">
-				<image class="eh__item-tag" :src="o.tagIcon" mode="heightFix" />
-				<view class="eh__reward"><text class="eh__reward-s">¥</text><text class="eh__reward-n">{{ o.reward }}</text></view>
+				<view class="eh__cat-chip"><text class="eh__cat-chip-t">{{ o.type }}</text></view>
+				<view class="eh__reward"><text class="eh__reward-s">¥</text><text class="eh__reward-n">{{ o.rewardText }}</text></view>
 			</view>
 			<text class="eh__item-title">{{ o.title }}</text>
 			<view class="eh__item-meta">
-				<view class="eh__meta-row"><image class="eh__meta-ico" src="/static/icons-dark/pin.png" mode="aspectFit" /><text class="eh__meta-t">{{ o.from }} → {{ o.to }}</text></view>
-				<view class="eh__meta-row"><image class="eh__meta-ico" src="/static/icons-dark/clock.png" mode="aspectFit" /><text class="eh__meta-t">{{ o.time }}</text></view>
+				<view class="eh__meta-row"><image class="eh__meta-ico" src="/static/icons-dark/pin.png" mode="aspectFit" /><text class="eh__meta-t">{{ o.pickup }} → {{ o.delivery }}</text></view>
+				<view class="eh__meta-row"><image class="eh__meta-ico" src="/static/icons-dark/clock.png" mode="aspectFit" /><text class="eh__meta-t">{{ o.deadline || '时间灵活' }}</text></view>
 			</view>
 			<view class="eh__item-foot">
 				<view class="eh__user">
-					<view class="eh__avatar" :class="'eh__avatar--' + o.tone"><text class="eh__avatar-ch">{{ o.user[0] }}</text></view>
-					<text class="eh__user-t">{{ o.user }} · {{ o.dorm }}</text>
+					<view class="eh__avatar"><text class="eh__avatar-ch">{{ o.publisherName[0] }}</text></view>
+					<text class="eh__user-t">{{ o.publisherName }} · {{ o.time }}发布</text>
 				</view>
 				<view class="eh__status"><text class="eh__status-t">立即接单</text></view>
 			</view>
+		</view>
+
+		<!-- 空态 -->
+		<view class="eh__empty" v-if="!loading && orders.length === 0">
+			<text class="eh__empty-t">{{ activeCat > 0 ? '该分类暂时没有待接单需求' : '这个时段还没人发单，你来发第一个？' }}</text>
 		</view>
 
 		<view class="eh__bottom-space"></view>
@@ -69,34 +78,74 @@
 
 <script>
 	import unidaTabbar from '@/components/unida-tabbar/unida-tabbar.vue';
+	import { callCloud } from '@/common/cloud.js';
+	import { timeAgo } from '@/common/fmt.js';
 
 	export default {
 		components: { unidaTabbar },
 		data() {
 			return {
 				statusBar: 0,
+				loading: false,
 				cats: [
 					{ label: '快递代取', icon: '/static/unida/msg/ico-bag.webp', tone: 'purple' },
 					{ label: '外卖代拿', icon: '/static/unida/msg/ico-megaphone.webp', tone: 'orange' },
 					{ label: '物品代送', icon: '/static/unida/msg/ico-calendar.webp', tone: 'pink' },
 					{ label: '其他互助', icon: '/static/unida/msg/ico-bubble.webp', tone: 'green' }
 				],
-				orders: [
-					{ type: '快递代取', tagIcon: '/static/unida/msg/tag-order.webp', reward: '8', title: '帮忙取个快递（中通北区驿站）', from: '北区驿站', to: '东园3栋', time: '今天 18:00 前', user: '阿星', dorm: '东园3栋', tone: 'a' },
-					{ type: '外卖代拿', tagIcon: '/static/unida/msg/tag-order.webp', reward: '5', title: '一楼拿外卖送到宿舍楼下', from: '东门', to: '西园1栋', time: '现在', user: '小林', dorm: '西园1栋', tone: 'b' },
-					{ type: '物品代送', tagIcon: '/static/unida/msg/tag-order.webp', reward: '12', title: '帮忙送一份资料到教学楼', from: '图书馆', to: '3教201', time: '明天 8:00', user: 'Leo', dorm: '南园5栋', tone: 'c' }
-				]
+				activeCat: 0,
+				sort: 'new',
+				orders: []
 			};
 		},
 		onLoad() {
 			const sys = uni.getSystemInfoSync();
 			this.statusBar = sys && sys.statusBarHeight || 0;
 		},
+		onShow() {
+			this.loadHall();
+		},
+		onPullDownRefresh() {
+			this.loadHall();
+		},
 		methods: {
+			goMine() { uni.navigateTo({ url: '/pages/my-errands/my-errands' }); },
+			onSort(s) {
+				if (this.sort === s) return;
+				this.sort = s;
+				this.loadHall();
+			},
+			onCat(i) {
+				this.activeCat = this.activeCat === i ? 0 : i;
+				this.loadHall();
+			},
+			async loadHall() {
+				if (this.loading) return;
+				this.loading = true;
+				try {
+					const r = await callCloud('errand', {
+						action: 'hall',
+						cat: this.activeCat > 0 ? this.cats[this.activeCat - 1].label : '',
+						sort: this.sort
+					});
+					this.orders = (r.list || []).map((x) => ({
+						...x,
+						rewardText: x.reward % 1 === 0 ? String(x.reward) : x.reward.toFixed(2),
+						time: timeAgo(x.createdAt)
+					}));
+				} catch (e) {
+					uni.showToast({ title: (e && e.message) || '加载跑腿大厅失败', icon: 'none' });
+				} finally {
+					this.loading = false;
+					uni.stopPullDownRefresh();
+				}
+			},
 			onSearch() { uni.showToast({ title: '搜索待接入', icon: 'none' }); },
-			onCat(i) { uni.showToast({ title: this.cats[i].label + '分类', icon: 'none' }); },
-			onPublish() { uni.navigateTo({ url: '/pages/publish/publish' }); },
-			onOrder(i) { uni.navigateTo({ url: '/pages/errand-detail/errand-detail' }); }
+			onPublish() { uni.navigateTo({ url: '/pages/errand-publish/errand-publish' }); },
+			onOrder(i) {
+				const o = this.orders[i];
+				uni.navigateTo({ url: '/pages/errand-detail/errand-detail?id=' + (o && o.id) });
+			}
 		}
 	};
 </script>
@@ -118,6 +167,17 @@
 	.eh__sub { margin-top: 10rpx; font-size: 24rpx; color: $t-sub; }
 	.eh__hero-mascot { position: absolute; right: -20rpx; top: 0; width: 220rpx; z-index: 1; }
 	.eh__hero-bubble { position: absolute; right: 200rpx; top: 4rpx; width: 60rpx; opacity: 0.9; z-index: 1; }
+	.eh__mine {
+		align-self: center;
+		margin-top: 40rpx;
+		margin-left: 24rpx;
+		z-index: 2;
+		background: rgba(255, 255, 255, 0.7);
+		border-radius: $r-pill;
+		padding: 10rpx 24rpx;
+		box-shadow: $sh-card;
+	}
+	.eh__mine-t { font-size: 22rpx; color: $c-primary; font-weight: 700; }
 
 	/* ---------- 搜索 ---------- */
 	.eh__search {
@@ -172,7 +232,9 @@
 	/* ---------- 需求列表 ---------- */
 	.eh__sect { display: flex; align-items: baseline; margin-top: 36rpx; }
 	.eh__sect-t { font-size: 32rpx; font-weight: 800; color: $c-ink; }
-	.eh__sect-s { margin-left: auto; font-size: 22rpx; color: $t-tertiary; font-family: $ff-num; }
+	.eh__sect-r { margin-left: auto; display: flex; align-items: center; }
+	.eh__sort { font-size: 22rpx; color: $t-tertiary; margin-left: 20rpx; }
+	.eh__sort--on { color: $c-primary; font-weight: 700; }
 	.eh__item {
 		margin-top: 16rpx;
 		background: $c-white;
@@ -181,7 +243,8 @@
 		padding: 26rpx;
 	}
 	.eh__item-head { display: flex; align-items: center; justify-content: space-between; }
-	.eh__item-tag { height: 40rpx; width: 112rpx; }
+	.eh__cat-chip { background: rgba(128, 92, 250, 0.10); border-radius: $r-pill; padding: 8rpx 20rpx; }
+	.eh__cat-chip-t { font-size: 21rpx; color: $c-primary; font-weight: 600; }
 	.eh__reward { display: flex; align-items: baseline; }
 	.eh__reward-s { font-size: 26rpx; color: $c-peach; font-weight: 700; }
 	.eh__reward-n { font-size: 44rpx; color: $c-peach; font-weight: 800; font-family: $ff-num; }
@@ -196,14 +259,14 @@
 		border-top: 2rpx solid $c-line;
 	}
 	.eh__user { display: flex; align-items: center; }
-	.eh__avatar { width: 56rpx; height: 56rpx; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-	.eh__avatar--a { background: $g-brand; }
-	.eh__avatar--b { background: $g-cta; }
-	.eh__avatar--c { background: linear-gradient(140deg, #69B9F5, #29CA83); }
+	.eh__avatar { width: 56rpx; height: 56rpx; border-radius: 50%; background: $g-brand; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 	.eh__avatar-ch { font-size: 24rpx; color: $c-white; font-weight: 700; }
 	.eh__user-t { margin-left: 12rpx; font-size: 22rpx; color: $t-sub; }
 	.eh__status { background: $g-cta; border-radius: $r-pill; padding: 12rpx 28rpx; box-shadow: 0 8rpx 16rpx rgba(128, 92, 250, 0.24); }
 	.eh__status-t { font-size: 23rpx; color: $c-white; font-weight: 700; }
+
+	.eh__empty { display: flex; justify-content: center; padding: 100rpx 0; }
+	.eh__empty-t { font-size: 26rpx; color: $t-tertiary; }
 
 	.eh__bottom-space { height: 220rpx; }
 </style>

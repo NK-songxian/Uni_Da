@@ -21,7 +21,7 @@
 		</view>
 
 		<!-- 帖子列表 -->
-		<view class="cm__post" v-for="(p, i) in posts" :key="i" @click="openPost(i)">
+		<view class="cm__post" v-for="(p, i) in posts" :key="p.id" @click="openPost(i)">
 			<view class="cm__post-head">
 				<view class="cm__post-avatar" :class="'cm__post-avatar--' + p.tone"><text class="cm__post-avatar-ch">{{ p.user[0] }}</text></view>
 				<view class="cm__post-user">
@@ -31,11 +31,14 @@
 				<view class="cm__post-tag" :class="'cm__post-tag--' + p.tone"><text class="cm__post-tag-t">{{ p.tag }}</text></view>
 			</view>
 			<text class="cm__post-text">{{ p.text }}</text>
-			<view class="cm__post-images" v-if="p.images.length">
-				<view class="cm__post-img" v-for="(g, j) in p.images" :key="j" :style="{ background: g }"></view>
-			</view>
+				<view class="cm__post-images" v-if="p.images.length">
+					<block v-for="(g, j) in p.images" :key="j">
+						<image v-if="isHttpImg(g)" class="cm__post-img cm__post-img--pic" :src="g" mode="aspectFill" @click="previewPostImg(p.images, j)" />
+						<view v-else class="cm__post-img" :style="{ background: g }"></view>
+					</block>
+				</view>
 			<view class="cm__post-actions">
-				<view class="cm__act" @click.stop="onLike(i)">
+				<view class="cm__act" :class="{ 'cm__act--fav': p.liked }" @click.stop="onLike(i)">
 					<image class="cm__act-ico" src="/static/icons-dark/heart.png" mode="aspectFit" />
 					<text class="cm__act-n">{{ p.likes }}</text>
 				</view>
@@ -54,41 +57,196 @@
 			</view>
 		</view>
 
+		<!-- 品牌空态 -->
+		<view class="cm__empty" v-if="!loading && posts.length === 0">
+			<text class="cm__empty-t">还没有帖子，来发第一条吧～</text>
+		</view>
+
 		<view class="cm__bottom-space"></view>
 		<unida-tabbar :current="1" />
+
+		<!-- ══════════ 发帖弹层 ══════════ -->
+		<view class="cm__mask" v-if="showPublish" @click="closePublish"></view>
+		<view class="cm__sheet" v-if="showPublish">
+			<view class="cm__sheet-head">
+				<text class="cm__sheet-title">发布动态</text>
+				<text class="cm__sheet-close" @click="closePublish">×</text>
+			</view>
+			<textarea class="cm__sheet-input" v-model="draft" :maxlength="500" placeholder="分享你的校园生活，搭子们都在看…" />
+			<view class="cm__imgs">
+				<view class="cm__img" v-for="(g, i) in pubImgs" :key="i">
+					<image class="cm__img-pic" :src="g" mode="aspectFill" @click="previewPubImg(i)" />
+					<view class="cm__img-del" @click.stop="removePubImg(i)"><text class="cm__img-del-t">×</text></view>
+				</view>
+				<view class="cm__img cm__img--add" v-if="pubImgs.length < 6" @click="addPubImg">
+					<text class="cm__img-add-ico">＋</text>
+					<text class="cm__img-add-n">{{ pubImgs.length }}/6</text>
+				</view>
+			</view>
+			<view class="cm__sheet-tags">
+				<view
+					class="cm__sheet-tag"
+					v-for="(t, i) in pubTags"
+					:key="i"
+					:class="{ 'cm__sheet-tag--on': pubTag === t }"
+					@click="pubTag = t"
+				>
+					<text class="cm__sheet-tag-t">{{ t }}</text>
+				</view>
+			</view>
+			<view class="cm__sheet-btn" :class="{ 'cm__sheet-btn--off': !draft.trim() || pubBusy }" @click="submitPost">
+				<text class="cm__sheet-btn-t">{{ pubBusy ? '发布中…' : '发布' }}</text>
+			</view>
+		</view>
 	</view>
 </template>
 
 <script>
 	import unidaTabbar from '@/components/unida-tabbar/unida-tabbar.vue';
+	import { callCloud, getToken } from '@/common/cloud.js';
+	import { uploadImages } from '@/common/upload.js';
+	import { timeAgo } from '@/common/fmt.js';
+
 	export default {
 		components: { unidaTabbar },
 		data() {
 			return {
 				statusBar: 0,
+				loading: false,
 				tabs: ['推荐', '关注', '同校'],
 				active: 0,
-				posts: [
-					{ user: '阿星', tone: 'purple', campus: '阳光大学', time: '10分钟前', tag: '校园生活', text: '今天的晚霞也太美了吧！中心湖边随手一拍就是大片，分享给同样热爱生活的小伙伴们～', images: ['linear-gradient(135deg,#FF8A3D,#FFD76A)', 'linear-gradient(135deg,#805CFA,#B59BFF)'], likes: 128, comments: 24, favs: 36, liked: false, faved: false },
-					{ user: '小林同学', tone: 'green', campus: '阳光大学', time: '1小时前', tag: '找搭子', text: '有人一起去图书馆刷题吗？期末了，互相监督！位置已经占好啦，三楼靠窗～', images: [], likes: 45, comments: 18, favs: 12, liked: true, faved: false },
-					{ user: '丸子', tone: 'orange', campus: '阳光大学', time: '2小时前', tag: '社团活动', text: '周六下午街舞社在天台有公开课，零基础也能来玩，带上水就行！', images: ['linear-gradient(135deg,#F472B6,#FF8A3D)'], likes: 89, comments: 31, favs: 27, liked: false, faved: false }
-				]
+				posts: [],
+				// 发帖弹层
+				showPublish: false,
+				draft: '',
+				pubTag: '校园生活',
+				pubTags: ['校园生活', '找搭子', '社团活动', '学习打卡', '运动', '美食'],
+				pubImgs: [],
+				pubBusy: false
 			};
 		},
 		onLoad() {
 			const sys = uni.getSystemInfoSync();
 			this.statusBar = sys && sys.statusBarHeight || 0;
 		},
+		onShow() {
+			this.loadPosts();
+		},
+		onPullDownRefresh() {
+			this.loadPosts();
+		},
 		methods: {
-			onTab(i) { this.active = i; },
-			onPublish() { uni.navigateTo({ url: '/pages/publish/publish' }); },
-			openPost(i) { uni.navigateTo({ url: '/pages/post-detail/post-detail' }); },
-			onLike(i) {
-				this.posts = this.posts.map((x, j) => j === i ? { user: x.user, tone: x.tone, campus: x.campus, time: x.time, tag: x.tag, text: x.text, images: x.images, likes: x.likes + (x.liked ? -1 : 1), comments: x.comments, favs: x.favs, liked: !x.liked, faved: x.faved } : x);
+			async loadPosts() {
+				if (this.loading) return;
+				this.loading = true;
+				try {
+					const r = await callCloud('posts', { action: 'list', token: getToken() });
+					this.posts = (r.list || []).map((x) => ({ ...x, time: x.time || timeAgo(x.ts) }));
+				} catch (e) {
+					uni.showToast({ title: (e && e.message) || '加载帖子失败', icon: 'none' });
+				} finally {
+					this.loading = false;
+					uni.stopPullDownRefresh();
+				}
 			},
-			onComment(i) { uni.navigateTo({ url: '/pages/post-detail/post-detail' }); },
-			onFav(i) {
-				this.posts = this.posts.map((x, j) => j === i ? { user: x.user, tone: x.tone, campus: x.campus, time: x.time, tag: x.tag, text: x.text, images: x.images, likes: x.likes, comments: x.comments, favs: x.favs + (x.faved ? -1 : 1), liked: x.liked, faved: !x.faved } : x);
+			onTab(i) { this.active = i; },
+			onPublish() {
+				this.draft = '';
+				this.pubTag = this.pubTags[0];
+				this.pubImgs = [];
+				this.showPublish = true;
+			},
+			closePublish() { this.showPublish = false; },
+			isHttpImg(g) { return String(g || '').indexOf('http') === 0; },
+			previewPostImg(imgs, i) {
+				const urls = (imgs || []).filter((g) => this.isHttpImg(g));
+				if (!urls.length) return;
+				uni.previewImage({ urls, current: urls.indexOf(imgs[i]) >= 0 ? urls.indexOf(imgs[i]) : 0 });
+			},
+			previewPubImg(i) {
+				uni.previewImage({ urls: this.pubImgs, current: i });
+			},
+			addPubImg() {
+				const left = 6 - this.pubImgs.length;
+				if (left <= 0) return;
+				uni.chooseImage({
+					count: left,
+					sizeType: ['compressed'],
+					success: (res) => {
+						const paths = res.tempFilePaths || [];
+						if (paths.length) this.pubImgs = this.pubImgs.concat(paths).slice(0, 6);
+					}
+				});
+			},
+			removePubImg(i) { this.pubImgs.splice(i, 1); },
+			async submitPost() {
+				const text = this.draft.trim();
+				if (!text || this.pubBusy) return;
+				this.pubBusy = true;
+				try {
+					let images = [];
+					if (this.pubImgs.length) {
+						images = await uploadImages(this.pubImgs, 'posts', (i, n) => {
+							uni.showLoading({ title: '上传图片 ' + (i + 1) + '/' + n, mask: true });
+						});
+						uni.hideLoading();
+					}
+					const r = await callCloud('posts', {
+						action: 'publish',
+						token: getToken(),
+						tag: this.pubTag,
+						text,
+						images
+					});
+					if (r.post) {
+						this.posts = [{ ...r.post, time: '刚刚' }].concat(this.posts);
+					}
+					this.showPublish = false;
+					uni.showToast({ title: '发布成功', icon: 'success' });
+				} catch (e) {
+					uni.hideLoading();
+					uni.showToast({ title: (e && e.message) || '发布失败', icon: 'none' });
+				} finally {
+					this.pubBusy = false;
+				}
+			},
+			openPost(i) {
+				const p = this.posts[i];
+				uni.navigateTo({ url: '/pages/post-detail/post-detail?id=' + (p && p.id) });
+			},
+			async onLike(i) {
+				const p = this.posts[i];
+				if (!p) return;
+				try {
+					const r = await callCloud('like', { action: 'toggle', token: getToken(), postId: p.id });
+					const liked = !!r.liked;
+					const likes = typeof r.likes === 'number' ? r.likes : p.likes + (p.liked ? -1 : 1);
+					this.posts = this.posts.map((x) => x.id === p.id ? { ...x, liked, likes } : x);
+				} catch (e) {
+					uni.showToast({ title: (e && e.message) || '点赞失败', icon: 'none' });
+				}
+			},
+			onComment(i) { this.openPost(i); },
+			async onFav(i) {
+				const p = this.posts[i];
+				if (!p) return;
+				try {
+					const r = await callCloud('favorite', {
+						action: 'toggle',
+						token: getToken(),
+						type: 'post',
+						targetId: p.id,
+						title: p.tag + ' · ' + p.user,
+						cover: '',
+						desc: p.text.slice(0, 80)
+					});
+					const faved = !!r.faved;
+					const favs = p.favs + (faved ? 1 : -1);
+					this.posts = this.posts.map((x) => x.id === p.id ? { ...x, faved, favs: Math.max(0, favs) } : x);
+					uni.showToast({ title: faved ? '已收藏' : '已取消收藏', icon: 'none' });
+				} catch (e) {
+					uni.showToast({ title: (e && e.message) || '收藏失败', icon: 'none' });
+				}
 			},
 			onShare(i) { uni.showToast({ title: '分享卡片待接入', icon: 'none' }); }
 		}
@@ -156,6 +314,29 @@
 		margin-right: 12rpx;
 	}
 	.cm__post-img:last-child { margin-right: 0; }
+	.cm__post-img--pic { width: 100%; }
+
+	/* 发帖配图 */
+	.cm__imgs { display: flex; flex-wrap: wrap; margin-top: 20rpx; }
+	.cm__img {
+		box-sizing: border-box; width: 132rpx; height: 132rpx;
+		margin: 0 14rpx 14rpx 0; position: relative; flex-shrink: 0;
+	}
+	.cm__img-pic { width: 132rpx; height: 132rpx; border-radius: 16rpx; }
+	.cm__img-del {
+		position: absolute; top: -10rpx; right: -10rpx;
+		width: 36rpx; height: 36rpx; border-radius: 50%;
+		background: rgba(41, 36, 61, 0.72);
+		display: flex; align-items: center; justify-content: center;
+	}
+	.cm__img-del-t { color: #fff; font-size: 26rpx; line-height: 1; margin-top: -2rpx; }
+	.cm__img--add {
+		border: 2rpx dashed rgba(123, 97, 255, 0.4); border-radius: 16rpx;
+		background: rgba(123, 97, 255, 0.06);
+		display: flex; flex-direction: column; align-items: center; justify-content: center;
+	}
+	.cm__img-add-ico { font-size: 44rpx; color: #7B61FF; line-height: 1; font-weight: 300; }
+	.cm__img-add-n { margin-top: 8rpx; font-size: 20rpx; color: #AAA2BD; }
 
 	.cm__post-actions {
 		display: flex; align-items: center; justify-content: space-between;
@@ -168,5 +349,55 @@
 	.cm__act--fav .cm__act-ico { opacity: 1; }
 	.cm__act--fav .cm__act-n { color: $c-primary; font-weight: 700; }
 
+	.cm__empty { display: flex; justify-content: center; padding: 100rpx 0; }
+	.cm__empty-t { font-size: 26rpx; color: $t-tertiary; }
+
 	.cm__bottom-space { height: 140rpx; }
+
+	/* ══════════ 发帖弹层 ══════════ */
+	.cm__mask {
+		position: fixed; left: 0; right: 0; top: 0; bottom: 0; z-index: 90;
+		background: rgba(41, 36, 61, 0.45);
+	}
+	.cm__sheet {
+		position: fixed; left: 0; right: 0; bottom: 0; z-index: 91;
+		background: $c-white;
+		border-radius: 36rpx 36rpx 0 0;
+		padding: 32rpx 32rpx calc(32rpx + env(safe-area-inset-bottom));
+	}
+	.cm__sheet-head { display: flex; align-items: center; justify-content: space-between; }
+	.cm__sheet-title { font-size: 32rpx; font-weight: 800; color: $c-ink; }
+	.cm__sheet-close { font-size: 44rpx; color: $t-tertiary; line-height: 1; padding: 0 8rpx; }
+	.cm__sheet-input {
+		display: block;
+		margin-top: 24rpx;
+		width: 100%;
+		box-sizing: border-box;
+		height: 220rpx;
+		background: $c-mist;
+		border-radius: 20rpx;
+		padding: 24rpx;
+		font-size: 27rpx;
+		color: $t-main;
+	}
+	.cm__sheet-tags { display: flex; flex-wrap: wrap; margin-top: 22rpx; }
+	.cm__sheet-tag {
+		padding: 10rpx 24rpx;
+		border-radius: $r-pill;
+		background: $c-mist;
+		margin: 0 14rpx 14rpx 0;
+	}
+	.cm__sheet-tag--on { background: rgba(128, 92, 250, 0.14); }
+	.cm__sheet-tag-t { font-size: 23rpx; color: $t-sub; font-weight: 600; }
+	.cm__sheet-tag--on .cm__sheet-tag-t { color: $c-primary; }
+	.cm__sheet-btn {
+		margin-top: 16rpx;
+		height: 88rpx;
+		border-radius: $r-pill;
+		background: $g-cta;
+		display: flex; align-items: center; justify-content: center;
+		box-shadow: 0 8rpx 16rpx rgba(255, 122, 82, 0.3);
+	}
+	.cm__sheet-btn--off { opacity: 0.5; }
+	.cm__sheet-btn-t { font-size: 28rpx; color: $c-white; font-weight: 700; letter-spacing: 2rpx; }
 </style>

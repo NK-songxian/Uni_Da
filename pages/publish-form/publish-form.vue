@@ -23,9 +23,14 @@
 			<!-- 封面 -->
 			<view class="pf__field">
 				<text class="pf__label">活动封面</text>
-				<view class="pf__upload" @click="onUpload">
+				<view class="pf__upload" v-if="!cover" @click="onPickCover">
 					<image class="pf__upload-img" src="/static/icons-dark/plus.png" mode="aspectFit" />
 					<text class="pf__upload-text">上传图片</text>
+				</view>
+				<view class="pf__cover" v-else>
+					<image class="pf__cover-img" :src="cover" mode="aspectFill" @click="onPickCover" />
+					<view class="pf__cover-del" @click.stop="removeCover"><text class="pf__cover-del-t">×</text></view>
+					<text class="pf__cover-tip">点击图片可更换</text>
 				</view>
 			</view>
 			<!-- 标题 -->
@@ -91,11 +96,15 @@
 </template>
 
 <script>
+	import { callCloud, getToken } from '@/common/cloud.js';
+	import { uploadImage } from '@/common/upload.js';
+
 	export default {
 		data() {
 			return {
 				statusBar: 0,
-				typeList: ['学习', '运动', '娱乐', '教学', '跑腿', '其他'],
+				submitting: false,
+				typeList: ['学习搭子', '运动搭子', '娱乐聚会', '发起活动'],
 				places: ['图书馆', '中心草坪', '北区驿站', '东门', '体育场'],
 				fees: ['免费', 'AA', '自定义'],
 				quicks: [
@@ -105,9 +114,10 @@
 					{ icon: '/static/unida/bubbles/time-1h.webp', text: '1 小时后' }
 				],
 				quickIdx: -1,
+				cover: '',
 				title: '',
 				desc: '',
-				type: '学习',
+				type: '学习搭子',
 				time: '',
 				place: '',
 				total: 10,
@@ -115,13 +125,28 @@
 				feeText: ''
 			};
 		},
-		onLoad() {
+		onLoad(q) {
 			const sys = uni.getSystemInfoSync();
 			this.statusBar = sys && sys.statusBarHeight || 0;
+			// 发布中心带参进入：预选发布类型
+			if (q && q.type) {
+				const label = decodeURIComponent(q.type);
+				if (this.typeList.indexOf(label) >= 0) this.type = label;
+			}
 		},
 		methods: {
 			goBack() { uni.navigateBack(); },
-			onUpload() { uni.showToast({ title: '图片上传待接入', icon: 'none' }); },
+			onPickCover() {
+				uni.chooseImage({
+					count: 1,
+					sizeType: ['compressed'],
+					success: (res) => {
+						const p = res.tempFilePaths && res.tempFilePaths[0];
+						if (p) this.cover = p;
+					}
+				});
+			},
+			removeCover() { this.cover = ''; },
 			onTitle(e) { this.title = e.detail.value; },
 			onDesc(e) { this.desc = e.detail.value; },
 			onType(i) { this.type = this.typeList[i]; },
@@ -135,11 +160,39 @@
 			onPickTime() { uni.showToast({ title: '精确时间选择待接入', icon: 'none' }); },
 			onMinus() { this.total = Math.max(2, this.total - 1); },
 			onPlus() { this.total = Math.min(100, this.total + 1); },
-			onSubmit() {
+			async onSubmit() {
+				if (this.submitting) return;
 				if (!this.title) { uni.showToast({ title: '请填写活动标题', icon: 'none' }); return; }
 				if (!this.time || !this.place) { uni.showToast({ title: '请选择时间和地点', icon: 'none' }); return; }
-				uni.showToast({ title: '活动发布成功（演示）', icon: 'success' });
-				setTimeout(() => uni.reLaunch({ url: '/pages/home/home' }), 1200);
+				this.submitting = true;
+				try {
+					// 先传封面（选了才传）
+					let cover = '';
+					if (this.cover) {
+						uni.showLoading({ title: '上传封面中', mask: true });
+						cover = await uploadImage(this.cover, 'covers');
+					}
+					uni.showLoading({ title: '正在发布到云端' });
+					await callCloud('publishItem', {
+						token: getToken(),
+						title: this.title,
+						type: this.type,
+						desc: this.desc,
+						time: this.time,
+						place: this.place,
+						total: this.total,
+						price: this.fee === '自定义' ? (this.feeText || '面议') : this.fee,
+						cover
+					});
+					uni.hideLoading();
+					uni.showToast({ title: '发布成功，已写入云端', icon: 'success' });
+					setTimeout(() => uni.reLaunch({ url: '/pages/discover/discover' }), 1200);
+				} catch (e) {
+					uni.hideLoading();
+					uni.showToast({ title: (e && e.message) || '发布失败', icon: 'none' });
+				} finally {
+					this.submitting = false;
+				}
 			}
 		}
 	};
@@ -223,6 +276,17 @@
 	}
 	.pf__upload-img { width: 44rpx; height: 44rpx; opacity: 0.75; }
 	.pf__upload-text { margin-top: 12rpx; font-size: 22rpx; color: $c-primary; }
+
+	.pf__cover { margin-top: 16rpx; position: relative; width: 320rpx; }
+	.pf__cover-img { width: 320rpx; height: 220rpx; border-radius: $r-sm; }
+	.pf__cover-del {
+		position: absolute; top: -14rpx; right: -14rpx;
+		width: 40rpx; height: 40rpx; border-radius: 50%;
+		background: rgba(41, 36, 61, 0.72);
+		display: flex; align-items: center; justify-content: center;
+	}
+	.pf__cover-del-t { color: #fff; font-size: 28rpx; line-height: 1; margin-top: -2rpx; }
+	.pf__cover-tip { display: block; margin-top: 10rpx; font-size: 20rpx; color: $t-tertiary; }
 
 	.pf__chips { display: flex; flex-wrap: wrap; margin-top: 16rpx; }
 	.pf__chip {

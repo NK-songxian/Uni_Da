@@ -1,0 +1,17 @@
+{
+  "bsonType": "object",
+  "required": ["openid", "type", "targetId"],
+  "properties": {
+    "openid": { "bsonType": "string" },
+    "type": { "bsonType": "string" },
+    "targetId": { "bsonType": "string" },
+    "title": { "bsonType": "string" },
+    "cover": { "bsonType": "string" },
+    "desc": { "bsonType": "string" },
+    "createdAt": { "bsonType": "int" }
+  },
+  "permission": {
+    "read": false,
+    "write": false
+  }
+}

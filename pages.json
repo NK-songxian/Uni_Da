@@ -138,13 +138,40 @@
 			"path": "pages/errand-hall/errand-hall",
 			"style": {
 				"navigationBarTitleText": "跑腿大厅",
-				"navigationStyle": "custom"
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": true,
+				"backgroundColor": "#F5F0FF",
+				"backgroundTextStyle": "dark"
 			}
 		},
 		{
 			"path": "pages/errand-detail/errand-detail",
 			"style": {
 				"navigationBarTitleText": "订单详情",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/errand-publish/errand-publish",
+			"style": {
+				"navigationBarTitleText": "发布跑腿需求",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/my-errands/my-errands",
+			"style": {
+				"navigationBarTitleText": "我的订单",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": true,
+				"backgroundColor": "#F5F0FF",
+				"backgroundTextStyle": "dark"
+			}
+		},
+		{
+			"path": "pages/notifications/notifications",
+			"style": {
+				"navigationBarTitleText": "消息中心",
 				"navigationStyle": "custom"
 			}
 		},
@@ -194,6 +221,23 @@
 			"path": "pages/community/community",
 			"style": {
 				"navigationBarTitleText": "社区",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": true,
+				"backgroundColor": "#F5F0FF",
+				"backgroundTextStyle": "dark"
+			}
+		},
+		{
+			"path": "pages/favorites/favorites",
+			"style": {
+				"navigationBarTitleText": "我的收藏",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/mypub/mypub",
+			"style": {
+				"navigationBarTitleText": "我的发布",
 				"navigationStyle": "custom"
 			}
 		},

@@ -25,10 +25,10 @@
 					<text class="bs__badge-t">已报名</text>
 				</view>
 			</view>
-			<view class="bs__row"><text class="bs__row-k">活动名称</text><text class="bs__row-v">校园草地音乐会</text></view>
-			<view class="bs__row"><text class="bs__row-k">活动时间</text><text class="bs__row-v">本周六 19:00</text></view>
-			<view class="bs__row"><text class="bs__row-k">活动地点</text><text class="bs__row-v">中心草坪广场</text></view>
-			<view class="bs__row"><text class="bs__row-k">报名编号</text><text class="bs__row-code">UNI 2026 1120 193</text></view>
+			<view class="bs__row"><text class="bs__row-k">活动名称</text><text class="bs__row-v">{{ title }}</text></view>
+			<view class="bs__row"><text class="bs__row-k">活动时间</text><text class="bs__row-v">{{ time }}</text></view>
+			<view class="bs__row"><text class="bs__row-k">活动地点</text><text class="bs__row-v">{{ place }}</text></view>
+			<view class="bs__row"><text class="bs__row-k">报名编号</text><text class="bs__row-code">{{ orderId || 'UNI 2026 1120 193' }}</text></view>
 		</view>
 
 		<!-- ══════════ 签到码（UNIDA 现场签到特色） ══════════ -->
@@ -67,11 +67,21 @@
 <script>
 	export default {
 		data() {
-			return { statusBar: 0 };
+			return {
+				statusBar: 0,
+				orderId: '',
+				title: '校园草地音乐会',
+				time: '本周六 19:00',
+				place: '中心草坪广场'
+			};
 		},
-		onLoad() {
+		onLoad(options) {
 			const sys = uni.getSystemInfoSync();
 			this.statusBar = (sys && sys.statusBarHeight) || 0;
+			this.orderId = (options && options.orderId) || '';
+			this.title = (options && options.title && decodeURIComponent(options.title)) || this.title;
+			this.time = (options && options.time && decodeURIComponent(options.time)) || this.time;
+			this.place = (options && options.place && decodeURIComponent(options.place)) || this.place;
 		},
 		methods: {
 			goMyOrders() { uni.navigateTo({ url: '/pages/my-orders/my-orders' }); },

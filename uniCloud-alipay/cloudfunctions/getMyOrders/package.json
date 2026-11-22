@@ -1,0 +1,7 @@
+{
+  "name": "getMyOrders",
+  "version": "1.0.0",
+  "description": "UNIDA 我的报名列表云函数",
+  "main": "index.js",
+  "dependencies": {}
+}

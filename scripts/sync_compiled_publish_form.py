@@ -10,11 +10,14 @@ ROOT = H.ROOT
 DIST = H.DIST
 VUE = os.path.join(ROOT, "pages", "publish-form", "publish-form.vue")
 OUT_DIR = os.path.join(DIST, "pages", "publish-form")
-DATA_KEYS = ("statusBar", "typeList", "places", "fees", "quicks", "quickIdx",
+DATA_KEYS = ("statusBar", "submitting", "typeList", "places", "fees", "quicks", "quickIdx",
              "title", "desc", "type", "time", "place", "total", "fee", "feeText")
 
 
 def to_native_page(js):
+    # common/cloud.js 源码 import → 原生 Page 可 require
+    js = re.sub(r"import\s+\{([^}]+)\}\s+from\s+'@/common/cloud\.js';",
+                r"const {\1} = require('../../common/cloud.js');", js)
     js = re.sub(r"\bdata\(\)\s*\{\s*return (\{.*?\});\s*\},",
                 lambda m: "data: " + m.group(1) + ",", js, flags=re.S)
     m = re.search(r"\t\tmethods:\s*\{(.*?)\n\t\t\}\n", js, re.S)

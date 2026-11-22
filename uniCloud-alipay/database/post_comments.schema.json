@@ -1,0 +1,16 @@
+{
+  "bsonType": "object",
+  "required": ["postId", "openid", "text"],
+  "properties": {
+    "postId": { "bsonType": "string" },
+    "openid": { "bsonType": "string" },
+    "name": { "bsonType": "string" },
+    "tone": { "bsonType": "string" },
+    "text": { "bsonType": "string" },
+    "createdAt": { "bsonType": "int" }
+  },
+  "permission": {
+    "read": false,
+    "write": false
+  }
+}

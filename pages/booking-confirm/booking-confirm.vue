@@ -86,27 +86,32 @@
 </template>
 
 <script>
+	import { callCloud, getToken } from '@/common/cloud.js';
+
 	export default {
 		data() {
 			return {
 				statusBar: 0,
+				submitting: false,
+				itemId: '',
 				count: 1,
 				remark: '',
 				remarkLen: 0,
 				agreed: true
 			};
 		},
-		onLoad() {
+		onLoad(options) {
 			const sys = uni.getSystemInfoSync();
 			this.statusBar = (sys && sys.statusBarHeight) || 0;
+			this.itemId = (options && options.id) || '';
 		},
 		methods: {
 			goBack() { uni.navigateBack(); },
 			incCount() {
-				if (this.count < 6) this.count += 1;
+				if (this.count < 6) this.count = this.count + 1;
 			},
 			decCount() {
-				if (this.count > 1) this.count -= 1;
+				if (this.count > 1) this.count = this.count - 1;
 			},
 			onRemark(e) {
 				const v = e.detail.value || '';
@@ -114,12 +119,43 @@
 				this.remarkLen = v.length;
 			},
 			toggleAgree() { this.agreed = !this.agreed; },
-			onSubmit() {
+			async onSubmit() {
+				if (this.submitting) return;
 				if (!this.agreed) {
 					uni.showToast({ title: '请先同意活动参与须知', icon: 'none' });
 					return;
 				}
-				uni.navigateTo({ url: '/pages/booking-success/booking-success' });
+				if (!this.itemId) {
+					uni.showToast({ title: '缺少活动 id，请从活动详情进入', icon: 'none' });
+					return;
+				}
+				this.submitting = true;
+				uni.showLoading({ title: '正在提交报名' });
+				try {
+					const r = await callCloud('joinActivity', {
+						token: getToken(),
+						itemId: this.itemId,
+						count: this.count,
+						remark: this.remark,
+						title: '校园草地音乐会 · 一起嗨翻周末',
+						time: '本周六 19:00',
+						place: '中心草坪广场',
+						price: '免费',
+						cover: '/static/art/art-guitar.jpg'
+					});
+					uni.hideLoading();
+					uni.redirectTo({
+						url: '/pages/booking-success/booking-success?orderId=' + (r.orderId || '')
+							+ '&title=' + encodeURIComponent('校园草地音乐会 · 一起嗨翻周末')
+							+ '&time=' + encodeURIComponent('本周六 19:00')
+							+ '&place=' + encodeURIComponent('中心草坪广场')
+					});
+				} catch (e) {
+					uni.hideLoading();
+					uni.showToast({ title: (e && e.message) || '报名失败', icon: 'none' });
+				} finally {
+					this.submitting = false;
+				}
 			}
 		}
 	};
