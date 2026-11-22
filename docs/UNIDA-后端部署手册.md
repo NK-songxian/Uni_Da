@@ -6,6 +6,23 @@
 
 ---
 
+## 第 0 步之前：微信开发者工具要打开哪个目录（最容易踩的坑）
+
+**必须打开编译产物目录，不是源码根目录：**
+
+```
+✅ 正确：H:\UniDA\unida\unpackage\dist\dev\mp-weixin
+❌ 错误：H:\UniDA\unida   ← 这里只有 pages.json，没有 app.json
+```
+
+如果打开错目录，会报：`app.json: 在项目根目录未找到 app.json`。
+
+原因：uni-app 源码用 `pages.json`，编译后才生成微信原生的 `app.json`。源码根目录还有个历史遗留的 `project.config.json`，会让微信开发者工具误以为它是原生小程序项目，实际打开发现没有 app.json 就报错。
+
+> 每次 HBuilderX 重新编译后，产物目录会被刷新，但路径不变，仍是上面那个正确路径。
+
+---
+
 ## 第 0 步：确认工程结构（已完成 ✅）
 
 我已在工程里生成：
